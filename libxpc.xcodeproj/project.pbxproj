@@ -3,70 +3,56 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXFileReference section */
-		391C612A1D0844C0007DE8C3 /* libxpc.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = libxpc.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		391C612D1D0844C0007DE8C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		391C61741D0847CA007DE8C3 /* launchctl */ = {isa = PBXFileReference; lastKnownFileType = folder; path = launchctl; sourceTree = "<group>"; };
+		391C61751D0847CA007DE8C3 /* launchd */ = {isa = PBXFileReference; lastKnownFileType = folder; path = launchd; sourceTree = "<group>"; };
+		391C61761D0847CA007DE8C3 /* launchproxy */ = {isa = PBXFileReference; lastKnownFileType = folder; path = launchproxy; sourceTree = "<group>"; };
+		391C61771D0847CA007DE8C3 /* liblaunch */ = {isa = PBXFileReference; lastKnownFileType = folder; path = liblaunch; sourceTree = "<group>"; };
+		391C61781D0847CA007DE8C3 /* libxpc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = libxpc; sourceTree = "<group>"; };
+		391C61791D0847CA007DE8C3 /* man */ = {isa = PBXFileReference; lastKnownFileType = folder; path = man; sourceTree = "<group>"; };
+		391C617A1D0847CA007DE8C3 /* SystemStarter */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SystemStarter; sourceTree = "<group>"; };
+		391C617B1D0847CA007DE8C3 /* wait4path */ = {isa = PBXFileReference; lastKnownFileType = folder; path = wait4path; sourceTree = "<group>"; };
+		391C617C1D0847CA007DE8C3 /* xcscripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = xcscripts; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		391C61271D0844C0007DE8C3 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		391C61211D0844C0007DE8C3 = {
 			isa = PBXGroup;
 			children = (
+				391C613E1D0845C7007DE8C3 /* Products */,
 				391C612C1D0844C0007DE8C3 /* libxpc */,
-				391C612B1D0844C0007DE8C3 /* Products */,
 			);
-			sourceTree = "<group>";
-		};
-		391C612B1D0844C0007DE8C3 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				391C612A1D0844C0007DE8C3 /* libxpc.bundle */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 		391C612C1D0844C0007DE8C3 /* libxpc */ = {
 			isa = PBXGroup;
 			children = (
+				391C61741D0847CA007DE8C3 /* launchctl */,
+				391C61751D0847CA007DE8C3 /* launchd */,
+				391C61761D0847CA007DE8C3 /* launchproxy */,
+				391C61771D0847CA007DE8C3 /* liblaunch */,
+				391C61781D0847CA007DE8C3 /* libxpc */,
+				391C61791D0847CA007DE8C3 /* man */,
+				391C617A1D0847CA007DE8C3 /* SystemStarter */,
+				391C617B1D0847CA007DE8C3 /* wait4path */,
+				391C617C1D0847CA007DE8C3 /* xcscripts */,
 				391C612D1D0844C0007DE8C3 /* Info.plist */,
 			);
 			path = libxpc;
 			sourceTree = "<group>";
 		};
-/* End PBXGroup section */
-
-/* Begin PBXNativeTarget section */
-		391C61291D0844C0007DE8C3 /* libxpc */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 391C61301D0844C0007DE8C3 /* Build configuration list for PBXNativeTarget "libxpc" */;
-			buildPhases = (
-				391C61261D0844C0007DE8C3 /* Sources */,
-				391C61271D0844C0007DE8C3 /* Frameworks */,
-				391C61281D0844C0007DE8C3 /* Resources */,
+		391C613E1D0845C7007DE8C3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
 			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = libxpc;
-			productName = libxpc;
-			productReference = 391C612A1D0844C0007DE8C3 /* libxpc.bundle */;
-			productType = "com.apple.product-type.bundle";
+			name = Products;
+			sourceTree = "<group>";
 		};
-/* End PBXNativeTarget section */
+/* End PBXGroup section */
 
 /* Begin PBXProject section */
 		391C61221D0844C0007DE8C3 /* Project object */ = {
@@ -74,48 +60,22 @@
 			attributes = {
 				LastUpgradeCheck = 0730;
 				ORGANIZATIONNAME = PureDarwin;
-				TargetAttributes = {
-					391C61291D0844C0007DE8C3 = {
-						CreatedOnToolsVersion = 7.3.1;
-					};
-				};
 			};
 			buildConfigurationList = 391C61251D0844C0007DE8C3 /* Build configuration list for PBXProject "libxpc" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 			);
 			mainGroup = 391C61211D0844C0007DE8C3;
-			productRefGroup = 391C612B1D0844C0007DE8C3 /* Products */;
+			productRefGroup = 391C61211D0844C0007DE8C3;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				391C61291D0844C0007DE8C3 /* libxpc */,
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		391C61281D0844C0007DE8C3 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
-/* Begin PBXSourcesBuildPhase section */
-		391C61261D0844C0007DE8C3 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
 		391C612E1D0844C0007DE8C3 /* Debug */ = {
@@ -199,32 +159,6 @@
 			};
 			name = Release;
 		};
-		391C61311D0844C0007DE8C3 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = libxpc/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				PRODUCT_BUNDLE_IDENTIFIER = PureDarwin.libxpc;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Debug;
-		};
-		391C61321D0844C0007DE8C3 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = libxpc/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
-				PRODUCT_BUNDLE_IDENTIFIER = PureDarwin.libxpc;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -236,14 +170,6 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
-		};
-		391C61301D0844C0007DE8C3 /* Build configuration list for PBXNativeTarget "libxpc" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				391C61311D0844C0007DE8C3 /* Debug */,
-				391C61321D0844C0007DE8C3 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

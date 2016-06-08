@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "391C61291D0844C0007DE8C3"
-               BuildableName = "libxpc.bundle"
-               BlueprintName = "libxpc"
+               BlueprintIdentifier = "391C61361D0845B7007DE8C3"
+               BuildableName = "launchd"
+               BlueprintName = "launchd"
                ReferencedContainer = "container:libxpc.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -29,6 +29,15 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "391C61361D0845B7007DE8C3"
+            BuildableName = "launchd"
+            BlueprintName = "launchd"
+            ReferencedContainer = "container:libxpc.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -42,15 +51,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "391C61291D0844C0007DE8C3"
-            BuildableName = "libxpc.bundle"
-            BlueprintName = "libxpc"
+            BlueprintIdentifier = "391C61361D0845B7007DE8C3"
+            BuildableName = "launchd"
+            BlueprintName = "launchd"
             ReferencedContainer = "container:libxpc.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -60,15 +70,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "391C61291D0844C0007DE8C3"
-            BuildableName = "libxpc.bundle"
-            BlueprintName = "libxpc"
+            BlueprintIdentifier = "391C61361D0845B7007DE8C3"
+            BuildableName = "launchd"
+            BlueprintName = "launchd"
             ReferencedContainer = "container:libxpc.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">
