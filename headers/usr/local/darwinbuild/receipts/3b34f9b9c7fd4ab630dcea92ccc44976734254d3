@@ -1,0 +1,57 @@
+                                         40755 0 20 0 ./System
+                                         40755 0 20 0 ./System/Library
+                                         40755 0 20 0 ./System/Library/Frameworks
+                                         40755 0 20 0 ./System/Library/Frameworks/System.framework
+                                         40755 0 20 0 ./System/Library/Frameworks/System.framework/Versions
+                                         40755 0 20 0 ./System/Library/Frameworks/System.framework/Versions/B
+                                         40755 0 20 0 ./System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders
+                                         120755 0 20 60 ./System/Library/Frameworks/System.framework/Versions/B/PrivateHeaders/pthread_machdep.h -> ../../../../../../../usr/local/include/pthread/tsd_private.h
+                                         40755 0 20 0 ./usr
+                                         40755 0 20 0 ./usr/include
+                                         40755 0 20 0 ./usr/include/pthread
+adafa882a19b2000fe005f92f279ccf30c252440 100644 0 20 3122 ./usr/include/pthread/introspection.h
+c6d70be3c7aa19bd96f21d075f6f8ed611aa36c9 100644 0 20 18376 ./usr/include/pthread/pthread.h
+395af21807061159d35da8ebedbf5796e8816c5b 100644 0 20 1977 ./usr/include/pthread/pthread_impl.h
+2305382dca2ab741fd4ce3999f7c7647efea065b 100644 0 20 3647 ./usr/include/pthread/pthread_spis.h
+6b9bd2cde4eccfbf68f4b7b19167796a3ad3b726 100644 0 20 10256 ./usr/include/pthread/qos.h
+e0ec55701fb8355a31a71e98cd63c22a7238c906 100644 0 20 1376 ./usr/include/pthread/sched.h
+20412cd507d520c4d137d2472f46e2fcf527dd8d 100644 0 20 2761 ./usr/include/pthread/spawn.h
+                                         120755 0 20 17 ./usr/include/pthread.h -> pthread/pthread.h
+                                         120755 0 20 22 ./usr/include/pthread_impl.h -> pthread/pthread_impl.h
+                                         120755 0 20 22 ./usr/include/pthread_spis.h -> pthread/pthread_spis.h
+                                         120755 0 20 15 ./usr/include/sched.h -> pthread/sched.h
+                                         40755 0 20 0 ./usr/include/sys
+                                         40755 0 20 0 ./usr/include/sys/_pthread
+f9add4552ff867143d5fd1ae6e6892a1e106e21a 100644 0 20 1528 ./usr/include/sys/_pthread/_pthread_attr_t.h
+20ea4bbb122db04e0cee751bafc3d43fc5b100e3 100644 0 20 1525 ./usr/include/sys/_pthread/_pthread_cond_t.h
+6fe1897ee8d26dfb334beef495018e0188bcf3dc 100644 0 20 1549 ./usr/include/sys/_pthread/_pthread_condattr_t.h
+89ae190ba486e2f0b7411ce687406211d15c2aee 100644 0 20 1515 ./usr/include/sys/_pthread/_pthread_key_t.h
+b9180955c881cb8ae91469b526cb0a3e060fcbf4 100644 0 20 1526 ./usr/include/sys/_pthread/_pthread_mutex_t.h
+a230f4b55a9fa0523f9e2c400b9fc3c5afad1f16 100644 0 20 1551 ./usr/include/sys/_pthread/_pthread_mutexattr_t.h
+9de47d5908e817b7af8da81ac3509e0059004fd8 100644 0 20 1521 ./usr/include/sys/_pthread/_pthread_once_t.h
+d98dd235f6a7d6a84c4078e0e73a321f4b616adc 100644 0 20 1537 ./usr/include/sys/_pthread/_pthread_rwlock_t.h
+890a6933c5fb39afce9125cb52e11254ae6418cd 100644 0 20 1561 ./usr/include/sys/_pthread/_pthread_rwlockattr_t.h
+639ecd9c1b8c8e50ec6364fa9a4ccf88c03a1990 100644 0 20 1495 ./usr/include/sys/_pthread/_pthread_t.h
+ef0c905d4bcef989379fbb995a062800f329e347 100644 0 20 3859 ./usr/include/sys/_pthread/_pthread_types.h
+f4d5de3d0586111ca2da52dbfa7c377629c59e13 100644 0 20 7819 ./usr/include/sys/qos.h
+                                         40755 0 20 0 ./usr/local
+                                         40755 0 20 0 ./usr/local/include
+                                         120755 0 20 21 ./usr/local/include/posix_sched.h -> pthread/posix_sched.h
+                                         40755 0 20 0 ./usr/local/include/pthread
+bc558a00e2f4bab17bfc82d4ab9de4446d5d518c 100644 0 20 1101 ./usr/local/include/pthread/introspection_private.h
+16dbda3f2ef644986cc78986e0c54df1eda81a8e 100644 0 20 2308 ./usr/local/include/pthread/posix_sched.h
+7cdeda01fb224f0e3bb04a64a2805c8b28d09d0f 100644 0 20 3660 ./usr/local/include/pthread/private.h
+799a63ef8a953943aa015301e021535583a34ebf 100644 0 20 1266 ./usr/local/include/pthread/qos.h
+c422042a3aa3a35c32bb84623c9854216fa43fe0 100644 0 20 9395 ./usr/local/include/pthread/qos_private.h
+24780a5f56a07c4367c254c5cbf9c143d2dfd399 100644 0 20 3204 ./usr/local/include/pthread/spinlock_private.h
+b5f9dc9563e6d4ad796d38d31d32723c4811e2ee 100644 0 20 9669 ./usr/local/include/pthread/tsd_private.h
+24ee55fa70557db23ccb3dc12fb85f3e9183f681 100644 0 20 7268 ./usr/local/include/pthread/workqueue_private.h
+                                         120755 0 20 26 ./usr/local/include/pthread_spinlock.h -> pthread/spinlock_private.h
+                                         120755 0 20 27 ./usr/local/include/pthread_workqueue.h -> pthread/workqueue_private.h
+                                         40755 0 20 0 ./usr/local/include/sys
+92dd346bb6a5a4820f6b1d0413cb36fb004b3e17 100644 0 20 1684 ./usr/local/include/sys/qos_private.h
+                                         40755 0 20 0 ./usr/local/lib
+                                         40755 0 20 0 ./usr/local/lib/loaderd
+                                         40755 0 20 0 ./usr/local/share
+                                         40755 0 20 0 ./usr/local/share/misc
+e157241f07a3c5e45be09922658275bab7923327 100644 0 20 940 ./usr/local/share/misc/pthread.codes

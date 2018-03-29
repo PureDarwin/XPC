@@ -1,0 +1,19 @@
+                                         40755 0 20 0 ./System
+                                         40755 0 20 0 ./System/Library
+                                         40755 0 20 0 ./System/Library/Frameworks
+                                         40755 0 20 0 ./System/Library/Frameworks/Kernel.framework
+                                         40755 0 20 0 ./System/Library/Frameworks/Kernel.framework/Versions
+                                         40755 0 20 0 ./System/Library/Frameworks/Kernel.framework/Versions/A
+                                         40755 0 20 0 ./System/Library/Frameworks/Kernel.framework/Versions/A/Headers
+                                         120755 0 20 47 ./System/Library/Frameworks/Kernel.framework/Versions/A/Headers/AssertMacros.h -> ../../../../../../../usr/include/AssertMacros.h
+                                         120755 0 20 47 ./System/Library/Frameworks/Kernel.framework/Versions/A/Headers/Availability.h -> ../../../../../../../usr/include/Availability.h
+                                         120755 0 20 55 ./System/Library/Frameworks/Kernel.framework/Versions/A/Headers/AvailabilityInternal.h -> ../../../../../../../usr/include/AvailabilityInternal.h
+                                         120755 0 20 53 ./System/Library/Frameworks/Kernel.framework/Versions/A/Headers/AvailabilityMacros.h -> ../../../../../../../usr/include/AvailabilityMacros.h
+                                         120755 0 20 53 ./System/Library/Frameworks/Kernel.framework/Versions/A/Headers/TargetConditionals.h -> ../../../../../../../usr/include/TargetConditionals.h
+                                         40755 0 20 0 ./usr
+                                         40755 0 20 0 ./usr/include
+9bfc80e0ce39f838a11b47a000447ff2b23271ca 100644 0 20 59103 ./usr/include/AssertMacros.h
+866d655c78b1bab030b4271fc68b377c2adf7ac0 100644 0 20 6619 ./usr/include/Availability.h
+b77bdf55f6a2de55c2d2270aa2714ca0e6e6d565 100644 0 20 17772 ./usr/include/AvailabilityInternal.h
+70fb55483dc337ecdc9199dd0f7c4a5f5b5f2d0d 100644 0 20 26404 ./usr/include/AvailabilityMacros.h
+12310f37f6c0d097ab170268e627a0d287c7f7ff 100644 0 20 12777 ./usr/include/TargetConditionals.h
