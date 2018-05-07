@@ -24,12 +24,9 @@
 #include "runtime.h"
 #include "bootstrap.h"
 #include "launch.h"
-#include <xpc/xpc.h>
+#include <xpc/private.h>
 
-#ifndef JOB_T_DEFINED
-#define JOB_T_DEFINED 
 typedef struct job_s *job_t;
-#endif
 typedef struct jobmgr_s *jobmgr_t;
 
 extern jobmgr_t root_jobmgr;
@@ -39,12 +36,10 @@ extern bool launchd_flat_mach_namespace;
 extern bool launchd_embedded_handofgod;
 
 void jobmgr_init(bool);
-mach_port_t jobmgr_port(jobmgr_t);
 jobmgr_t jobmgr_shutdown(jobmgr_t jm);
 void jobmgr_dispatch_all_semaphores(jobmgr_t jm);
 void jobmgr_dispatch_all_interested(jobmgr_t jm, job_t j);
 jobmgr_t jobmgr_delete_anything_with_port(jobmgr_t jm, mach_port_t port);
-void jobmgr_reap_pid(jobmgr_t jm, pid_t pid);
 
 launch_data_t job_export_all(void);
 

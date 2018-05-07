@@ -28,7 +28,7 @@
 #include <vproc_priv.h>
 
 #include <mach/mach.h>
-#include <mach/mach_port.h>
+#include <mach/vm_map.h>
 #include <sys/types.h>
 #include <sys/syslog.h>
 #include <sys/stat.h>
@@ -38,24 +38,13 @@
 
 #include "job.h"
 
-// This is not present in macOS libxpc (or at least is not publically visible)
-//static __attribute__((constructor))
-//void
-//liblaunch_init(void) {
-//    printf("in liblaunch_init()\n");
-//    bootstrap_init();
-//}
-
 void
 bootstrap_init(void)
 {
-    printf("in bootstrap_init()\n");
 	kern_return_t kr = task_get_special_port(task_self_trap(), TASK_BOOTSTRAP_PORT, &bootstrap_port);
-    printf("bootstrap_port == %d\n", bootstrap_port);
 	if (kr != KERN_SUCCESS) {
 		abort();
 	}
-    printf("leaving bootstrap_init(), so must have succeeded\n");
 }
 
 kern_return_t
@@ -114,23 +103,17 @@ bootstrap_register(mach_port_t bp, name_t service_name, mach_port_t sp)
 kern_return_t
 bootstrap_register2(mach_port_t bp, name_t service_name, mach_port_t sp, uint64_t flags)
 {
-    printf("in bootstrap_register2() in liblaunch.dylib\n");
-    
 	kern_return_t kr = vproc_mig_register2(bp, service_name, sp, flags);
 
 	if (kr == VPROC_ERR_TRY_PER_USER) {
 		mach_port_t puc;
 
-        printf("in TRY_PER_USER branch\n");
-        
 		if (vproc_mig_lookup_per_user_context(bp, 0, &puc) == 0) {
 			kr = vproc_mig_register2(puc, service_name, sp, flags);
 			mach_port_deallocate(mach_task_self(), puc);
 		}
 	}
 
-    printf("kr == %d\n", kr);
-    
 	return kr;
 }
 
@@ -153,12 +136,9 @@ bootstrap_create_service(mach_port_t bp, name_t service_name, mach_port_t *sp)
 kern_return_t
 bootstrap_check_in(mach_port_t bp, const name_t service_name, mach_port_t *sp)
 {
-    printf("in bootstrap_check_in()\n");
 	uuid_t junk;
 	(void)bzero(junk, sizeof(junk));
-	kern_return_t kr = vproc_mig_check_in2(bp, (char *)service_name, sp, junk, 0);
-    printf("kr == %d\n", kr);
-    return kr;
+	return vproc_mig_check_in2(bp, (char *)service_name, sp, junk, 0);
 }
 
 kern_return_t

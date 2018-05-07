@@ -18,6 +18,10 @@
  * @APPLE_APACHE_LICENSE_HEADER_END@
  */
 
+// Turn off deprecation warnings so we can see what eles is wrong
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #include "config.h"
 #include "launch.h"
 #include "launch_priv.h"
@@ -25,7 +29,6 @@
 #include "ktrace.h"
 
 #include <mach/mach.h>
-#include <mach/mach_port.h>
 #include <libkern/OSByteOrder.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -43,10 +46,23 @@
 #include <assert.h>
 #include <uuid/uuid.h>
 #include <sys/syscall.h>
-#include <sys/fileport.h>
 #include <dlfcn.h>
 
-#include "job.h"
+#ifdef __LP64__
+/* workaround: 5723161 */
+#ifndef __DARWIN_ALIGN32
+#define	__DARWIN_ALIGN32(x)	(((size_t)(x) + 3) & ~3)
+#endif
+#undef	CMSG_DATA
+#define	CMSG_DATA(cmsg)	\
+	((uint8_t *)(cmsg) + __DARWIN_ALIGN32(sizeof(struct cmsghdr)))
+#undef	CMSG_SPACE
+#define	CMSG_SPACE(l)	\
+	(__DARWIN_ALIGN32(sizeof(struct cmsghdr)) + __DARWIN_ALIGN32(l))
+#undef	CMSG_LEN
+#define	CMSG_LEN(l)	\
+	(__DARWIN_ALIGN32(sizeof(struct cmsghdr)) + (l))
+#endif
 
 struct _launch_data {
 	uint64_t type;
@@ -164,9 +180,9 @@ enum {
 	LAUNCHD_USE_OTHER_FD,
 };
 struct _launch {
-	uint8_t	*sendbuf;
+	void	*sendbuf;
 	int	*sendfds;
-	uint8_t	*recvbuf;
+	void	*recvbuf;
 	int	*recvfds;
 	size_t	sendlen;
 	size_t	sendfdcnt;
@@ -177,14 +193,10 @@ struct _launch {
 	int	fd;
 };
 
-#if 0
 static launch_data_t launch_data_array_pop_first(launch_data_t where);
-#endif
 static int _fd(int fd);
 static void launch_client_init(void);
-#if 0
 static void launch_msg_getmsgs(launch_data_t m, void *context);
-#endif
 static launch_data_t launch_msg_internal(launch_data_t d);
 static void launch_mach_checkin_service(launch_data_t obj, const char *key, void *context);
 
@@ -197,9 +209,9 @@ _launch_init_globals(launch_globals_t globals)
 }
 
 #if !_LIBLAUNCH_HAS_ALLOC_ONCE
-static launch_globals_t __launch_globals;
+launch_globals_t __launch_globals;
 
-static void
+void
 _launch_globals_init(void)
 {
 	__launch_globals = calloc(1, sizeof(struct launch_globals_s));
@@ -222,7 +234,6 @@ launch_client_init(void)
 	char *where = getenv(LAUNCHD_SOCKET_ENV);
 	char *_launchd_fd = getenv(LAUNCHD_TRUSTED_FD_ENV);
 	int dfd, lfd = -1, cifd = -1;
-	kern_return_t kr;
 	name_t spath;
 
 	if (_launchd_fd) {
@@ -248,8 +259,7 @@ launch_client_init(void)
 	if (where && where[0] != '\0') {
 		strncpy(sun.sun_path, where, sizeof(sun.sun_path));
 	} else {
-		kr = _vprocmgr_getsocket(spath);
-		if (kr == 0) {
+		if (_vprocmgr_getsocket(spath) == 0) {
 			if ((getenv("SUDO_COMMAND") || getenv("__USE_SYSTEM_LAUNCHD")) && geteuid() == 0) {
 				/* Talk to the system launchd. */
 				strncpy(sun.sun_path, LAUNCHD_SOCK_PREFIX "/sock", sizeof(sun.sun_path));
@@ -261,8 +271,7 @@ launch_client_init(void)
 
 				strncpy(sun.sun_path, spath, min_len);
 			}
-		} else
-			fprintf(stderr, "_vprocmgr_getsocket(): 0x%x\n", kr);
+		}
 	}
 
 	launch_globals_t globals = _launch_globals();
@@ -466,7 +475,6 @@ launch_data_array_get_index(launch_data_t where, size_t ind)
 	}
 }
 
-#if 0
 launch_data_t
 launch_data_array_pop_first(launch_data_t where)
 {
@@ -479,7 +487,6 @@ launch_data_array_pop_first(launch_data_t where)
 	}
 	return r;
 }
-#endif
 
 size_t
 launch_data_array_get_count(launch_data_t where)
@@ -692,9 +699,9 @@ launchd_close(launch_t lh, typeof(close) closefunc)
 #define ROUND_TO_64BIT_WORD_SIZE(x)	((x + 7) & ~7)
 
 size_t
-launch_data_pack(launch_data_t d, uint8_t *where, size_t len, int *fd_where, size_t *fd_cnt)
+launch_data_pack(launch_data_t d, void *where, size_t len, int *fd_where, size_t *fd_cnt)
 {
-	launch_data_t o_in_w = (void *)where;
+	launch_data_t o_in_w = where;
 	size_t i, rsz, node_data_len = sizeof(struct _launch_data);
 
 	if (node_data_len > len) {
@@ -780,9 +787,9 @@ launch_data_pack(launch_data_t d, uint8_t *where, size_t len, int *fd_where, siz
 }
 
 launch_data_t
-launch_data_unpack(uint8_t *data, size_t data_size, int *fds, size_t fd_cnt, size_t *data_offset, size_t *fdoffset)
+launch_data_unpack(void *data, size_t data_size, int *fds, size_t fd_cnt, size_t *data_offset, size_t *fdoffset)
 {
-	launch_data_t r = (void*)(data + *data_offset);
+	launch_data_t r = data + *data_offset;
 	size_t i, tmpcnt;
 
 	//Check for integer underflow
@@ -808,7 +815,7 @@ launch_data_unpack(uint8_t *data, size_t data_size, int *fds, size_t fd_cnt, siz
 			errno = EAGAIN;
 			return NULL;
 		}
-		r->_array = (void *)(data + *data_offset);
+		r->_array = data + *data_offset;
 		*data_offset += tmpcnt * sizeof(uint64_t);
 		for (i = 0; i < tmpcnt; i++) {
 			r->_array[i] = launch_data_unpack(data, data_size, fds, fd_cnt, data_offset, fdoffset);
@@ -867,127 +874,9 @@ launch_data_unpack(uint8_t *data, size_t data_size, int *fds, size_t fd_cnt, siz
 	return r;
 }
 
-launch_data_t
-launch_msg_internal(launch_data_t d)
-{
-	vm_offset_t request;
-	mach_msg_type_number_t requestCnt;
-	mach_port_array_t request_fds;
-	mach_msg_type_number_t request_fdsCnt;
-	vm_offset_t reply ;
-	mach_msg_type_number_t replyCnt;
-	mach_port_array_t reply_fds;
-	mach_msg_type_number_t reply_fdsCnt;
-	launch_data_t ldreply;
-	size_t i;
-	size_t nfds = 0;
-	kern_return_t kr;
-
-	requestCnt = 1024 * 1024;
-	mig_allocate(&request, requestCnt);
-
-	int out_fds[128];
-	size_t nout_fds = 0;
-	size_t sz = launch_data_pack(d, (void *)request, requestCnt, out_fds, &nout_fds);
-	if (!sz) {
-		goto out_bad;
-	}
-
-	if (nout_fds) {
-		if (nout_fds > 128) {
-			goto out_bad;
-		}
-
-		request_fdsCnt = nout_fds * sizeof(sizeof(out_fds[0]));
-		mig_allocate((vm_address_t *)&request_fds, request_fdsCnt);
-		if (!request_fds) {
-			goto out_bad;
-		}
-
-		for (i = 0; i < nout_fds; i++) {
-			mach_port_t fp = MACH_PORT_NULL;
-			/* Whatever. Worst case is that we insert MACH_PORT_NULL. Not a big
-			 * deal. Note, these get stuffed into an array whose disposition is
-			 * mach_port_move_send_t, so we don't have to worry about them after
-			 * returning.
-			 */
-			if (fileport_makeport(out_fds[i], &fp) != 0) {
-				fprintf(stderr, "Could not pack response descriptor at index: %zu: %d: %s", i, errno, strerror(errno));
-			}
-			request_fds[i] = fp;
-		}
-	} else {
-		request_fds = NULL;
-		request_fdsCnt = 0;
-	}
-
-	kr = vproc_mig_ipc_request(bootstrap_port,
-		request,
-		requestCnt,
-		request_fds,
-		request_fdsCnt,
-		&reply,
-		&replyCnt,
-		&reply_fds,
-		&reply_fdsCnt,
-		0);
-
-	if (kr != KERN_SUCCESS) {
-		fprintf(stderr, "vproc_mig_ipc_request: kr=%x\n", kr);
-		return NULL;
-	}
-
-	nfds = reply_fdsCnt / sizeof((reply_fds)[0]);
-	if (nfds > 128) {
-		fprintf(stderr, "Too many incoming descriptors: %zu", nfds);
-		return NULL;
-	}
-
-	int in_fds[128];
-	for (i = 0; i < nfds; i++) {
-		in_fds[i] = _fd(fileport_makefd(reply_fds[i]));
-		if (in_fds[i] == -1) {
-			fprintf(stderr, "Bad descriptor passed in legacy IPC request at index: %zu", i);
-		}
-	}
-
-
-	size_t dataoff = 0;
-	size_t fdoff = 0;
-	ldreply = launch_data_unpack((void *)reply, replyCnt, in_fds, nfds, &dataoff, &fdoff);
-	if (!ldreply) {
-		fprintf(stderr, "Invalid legacy IPC reply passed.");
-		goto out_bad;
-	}
-
-	mig_deallocate(request, requestCnt);
-
-	return (ldreply);
-
-out_bad:
-	for (i = 0; i < nfds; i++) {
-		(void)close(in_fds[i]);
-	}
-
-//	for (i = 0; i < nout_fds; i++) {
-//		(void)launchd_mport_deallocate((*reply_fds)[i]);
-//	}
-
-	if (request) {
-		mig_deallocate(request, requestCnt);
-	}
-
-	if (ldreply) {
-		launch_data_free(ldreply);
-	}
-
-	return (NULL);
-}
-
 int
 launchd_msg_send(launch_t lh, launch_data_t d)
 {
-
 	struct launch_msg_header lmh;
 	struct cmsghdr *cm = NULL;
 	struct msghdr mh;
@@ -1061,7 +950,6 @@ launchd_msg_send(launch_t lh, launch_data_t d)
 
 		memset(cm, 0, mh.msg_controllen);
 
-
 		cm->cmsg_len = CMSG_LEN(lh->sendfdcnt * sizeof(int));
 		cm->cmsg_level = SOL_SOCKET;
 		cm->cmsg_type = SCM_RIGHTS;
@@ -1117,7 +1005,6 @@ launch_get_fd(void)
 	return globals->l->fd;
 }
 
-#if 0
 void
 launch_msg_getmsgs(launch_data_t m, void *context)
 {
@@ -1131,7 +1018,6 @@ launch_msg_getmsgs(launch_data_t m, void *context)
 		*sync_resp = launch_data_copy(m);
 	}
 }
-#endif
 
 void
 launch_mach_checkin_service(launch_data_t obj, const char *key, void *context __attribute__((unused)))
@@ -1171,7 +1057,6 @@ launch_msg(launch_data_t d)
 
 extern kern_return_t vproc_mig_set_security_session(mach_port_t, uuid_t, mach_port_t);
 
-#if 0
 static inline bool
 uuid_data_is_null(launch_data_t d)
 {
@@ -1186,21 +1071,17 @@ uuid_data_is_null(launch_data_t d)
 
 	return result;
 }
-#endif
 
-#if 0
 launch_data_t
 launch_msg_internal(launch_data_t d)
 {
 	launch_data_t resp = NULL;
 
-#ifdef notyet
 	if (d && (launch_data_get_type(d) == LAUNCH_DATA_STRING)
 			&& (strcmp(launch_data_get_string(d), LAUNCH_KEY_GETJOBS) == 0)
 			&& vproc_swap_complex(NULL, VPROC_GSK_ALLJOBS, NULL, &resp) == NULL) {
 		return resp;
 	}
-#endif
 
 	launch_globals_t globals = _launch_globals();
 	pthread_once(&globals->lc_once, launch_client_init);
@@ -1336,7 +1217,6 @@ out:
 
 	return resp;
 }
-#endif
 
 int
 launchd_msg_recv(launch_t lh, void (*cb)(launch_data_t, void *), void *context)
@@ -1385,7 +1265,7 @@ launchd_msg_recv(launch_t lh, void (*cb)(launch_data_t, void *), void *context)
 	r = 0;
 
 	while (lh->recvlen > 0) {
-		struct launch_msg_header *lmhp = (void *)lh->recvbuf;
+		struct launch_msg_header *lmhp = lh->recvbuf;
 		uint64_t tmplen;
 		data_offset = sizeof(struct launch_msg_header);
 		fd_offset = 0;
@@ -1482,9 +1362,7 @@ int
 _fd(int fd)
 {
 	if (fd >= 0)
-		if (fcntl(fd, F_SETFD, FD_CLOEXEC) == -1) {
-			syslog(LOG_ERR | LOG_CONS, "fcntl failed for fd %d: %m", fd);
-		}
+		fcntl(fd, F_SETFD, 1);
 	return fd;
 }
 
@@ -1602,3 +1480,6 @@ create_and_switch_to_per_session_launchd(const char *login __attribute__((unused
 
 	return 1;
 }
+
+#pragma clang diagnostic pop
+

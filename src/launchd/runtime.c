@@ -37,7 +37,6 @@
 #include <mach/mach_time.h>
 #include <mach/exception.h>
 #include <sys/types.h>
-#include <sys/event.h>
 #include <sys/stat.h>
 #include <sys/sysctl.h>
 #include <sys/time.h>
@@ -51,8 +50,8 @@
 #include <sys/reboot.h>
 #include <sys/fcntl.h>
 #include <sys/kdebug.h>
-#include <sys/wait.h>
 #include <bsm/libbsm.h>
+#include <malloc/malloc.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
@@ -85,8 +84,8 @@
 #include "vproc_internal.h"
 #include "jobServer.h"
 #include "job_reply.h"
+
 #include <xpc/launchd.h>
-#include "shim.h"
 static mach_port_t ipc_port_set;
 static mach_port_t demand_port_set;
 static mach_port_t launchd_internal_port;
@@ -98,12 +97,10 @@ static int bulk_kev_i;
 static int bulk_kev_cnt;
 
 static pthread_t kqueue_demand_thread;
-static pthread_t waitpid_thread;
 
 static void mportset_callback(void);
 static kq_callback kqmportset_callback = (kq_callback)mportset_callback;
 static void *kqueue_demand_loop(void *arg);
-static void *waitpid_loop(void *arg);
 
 boolean_t launchd_internal_demux(mach_msg_header_t *Request, mach_msg_header_t *Reply);
 static void launchd_runtime2(mach_msg_size_t msg_size);
@@ -122,34 +119,18 @@ static uint64_t tbi_safe_math_max;
 static uint64_t time_of_mach_msg_return;
 static double tbi_float_val;
 
-
-#define VERBOSE_DEBUGGING 0
-
-#if VERBOSE_DEBUGGING
-#define _launchd_syslog syslog
-#else
-#define _launchd_syslog launchd_syslog
-#endif
-
-
-static const int init_compat_signals[] = {
-	SIGUSR1,	// halt
-	SIGUSR2,	// halt & power off
-	SIGTERM,	// Go to single user mode
-	SIGINT,	// Reboot
-	SIGTSTP,	// Stop further logins
+static const int sigigns[] = { SIGHUP, SIGINT, SIGPIPE, SIGALRM, SIGTERM,
+	SIGURG, SIGTSTP, SIGTSTP, SIGCONT, SIGTTIN, SIGTTOU, SIGIO, SIGXCPU,
+	SIGXFSZ, SIGVTALRM, SIGPROF, SIGWINCH, SIGINFO, SIGUSR1, SIGUSR2
 };
 
-static const int sigigns[] = { SIGHUP, SIGPIPE, SIGALRM,
-	SIGURG, SIGTSTP, SIGCONT, SIGTTIN, SIGTTOU, SIGIO, SIGXCPU,
-	SIGXFSZ, SIGVTALRM, SIGPROF, SIGWINCH, SIGINFO,
-};
 static sigset_t sigign_set;
 bool pid1_magic;
 bool launchd_apple_internal;
 bool launchd_flat_mach_namespace = true;
 bool launchd_malloc_log_stacks = false;
 bool launchd_use_gmalloc = false;
+bool launchd_log_per_user_shutdown = false;
 #if !TARGET_OS_EMBEDDED
 bool launchd_log_shutdown = true;
 #else
@@ -175,34 +156,6 @@ size_t runtime_busy_cnt;
 
 #define config_check(s, sb) (stat(LAUNCHD_CONFIG_PREFIX s, &sb) == 0)
 
-#ifdef notyet
-/* defined in libbsm */
-int audit_set_terminal_host(uint32_t *m);
-
-int
-audit_set_terminal_host(uint32_t *m)
-{
-
-#ifdef KERN_HOSTID
-        int name[2] = { CTL_KERN, KERN_HOSTID };
-        size_t len;
-
-        if (m == NULL)
-                return (kAUBadParamErr);
-        *m = 0;
-        len = sizeof(*m);
-        if (sysctl(name, 2, m, &len, NULL, 0) != 0) {
-                syslog(LOG_ERR, "sysctl() failed (%s)", strerror(errno));
-                return (kAUSysctlErr);
-        }
-        return (kAUNoErr);
-#else
-        *m = -1;
-        return (kAUNoErr);
-#endif
-}
-#endif
-
 mach_port_t
 runtime_get_kernel_port(void)
 {
@@ -220,7 +173,7 @@ union internal_max_sz {
 };
 
 union xpc_domain_max_sz {
-#ifdef notyet
+#ifdef notyet // _sjc_ cannot find __RequestUnion__xpc_domain_xpc_domain_subsystem
 	union __RequestUnion__xpc_domain_xpc_domain_subsystem req;
 	union __ReplyUnion__xpc_domain_xpc_domain_subsystem rep;
 #endif
@@ -239,9 +192,7 @@ union do_notify_max_sz {
 void
 launchd_runtime_init(void)
 {
-#ifdef notyet
 	pid_t p = getpid();
-#endif
 	(void)posix_assert_zero((mainkq = kqueue()));
 
 	os_assert_zero(mach_port_allocate(mach_task_self(), MACH_PORT_RIGHT_PORT_SET, &demand_port_set));
@@ -252,62 +203,15 @@ launchd_runtime_init(void)
 	os_assert_zero(launchd_mport_make_send(launchd_internal_port));
 
 	max_msg_size = sizeof(union vproc_mig_max_sz);
-#ifdef notyet
 	if (sizeof(union xpc_domain_max_sz) > max_msg_size) {
 		max_msg_size = sizeof(union xpc_domain_max_sz);
 	}
-#endif
 
 	os_assert_zero(runtime_add_mport(launchd_internal_port, launchd_internal_demux));
 	os_assert_zero(pthread_create(&kqueue_demand_thread, NULL, kqueue_demand_loop, NULL));
 	os_assert_zero(pthread_detach(kqueue_demand_thread));
 
-	os_assert_zero(pthread_create(&waitpid_thread, NULL, waitpid_loop, NULL));
-	os_assert_zero(pthread_detach(waitpid_thread));
-
-#ifdef notyet
 	(void)posix_assumes_zero(sysctlbyname("vfs.generic.noremotehang", NULL, NULL, &p, sizeof(p)));
-#endif
-}
-
-static void
-sighandler_init_compat(int signo)
-{
-	int kr;
-	int rflags = 0;
-	_launchd_syslog(LOG_CRIT, "%s(%d)", __FUNCTION__, signo);
-	switch (signo) {
-	case SIGUSR2:
-        rflags = RB_HALT; // _sjc_ because we couldn't find a definition of RB_POWEROFF;
-	case SIGUSR1:
-		rflags |= RB_HALT;
-		// halt and power off
-		kr = job_mig_reboot2(root_jobmgr, rflags);
-		if (kr != KERN_SUCCESS) {
-			_launchd_syslog(LOG_CRIT, "%s(%d):  kr = %d", __FUNCTION__, __LINE__, kr);
-		}
-		break;
-	case SIGTERM:
-		_launchd_syslog(LOG_CRIT, "%s(%d):  Got SIGTERM", __FUNCTION__, __LINE__);
-		// Single user mode
-		break;
-	case SIGINT:
-		// Reboot
-		kr = job_mig_reboot2(root_jobmgr, RB_AUTOBOOT);
-		if (kr != KERN_SUCCESS) {
-			_launchd_syslog(LOG_CRIT, "%s(%d):  kr = %d", __FUNCTION__, __LINE__, kr);
-		}
-		break;
-	case SIGTSTP:
-		// Block further logins
-		break;
-	case SIGHUP:
-		// Rescan the ttys file
-		break;
-	default:
-		_launchd_syslog(LOG_DEBUG, "%s:  unknown signal number %d", __FUNCTION__, signo);
-		break;
-	}
 }
 
 void
@@ -316,9 +220,6 @@ launchd_runtime_init2(void)
 	size_t i;
 
 	__OS_COMPILETIME_ASSERT__(SIG_ERR == (typeof(SIG_ERR))-1);
-	for (i = 0; i < (sizeof(init_compat_signals) / sizeof(int)); i++) {
-		signal(init_compat_signals[i], sighandler_init_compat);
-	}
 	for (i = 0; i < (sizeof(sigigns) / sizeof(int)); i++) {
 		sigaddset(&sigign_set, sigigns[i]);
 		(void)posix_assumes_zero(signal(sigigns[i], SIG_IGN));
@@ -502,6 +403,7 @@ log_kevent_struct(int level, struct kevent *kev_base, int indx)
 			}
 
 			FFLAGIF(NOTE_EXIT)
+			else FFLAGIF(NOTE_REAP)
 			else FFLAGIF(NOTE_FORK)
 			else FFLAGIF(NOTE_EXEC)
 			else FFLAGIF(NOTE_SIGNAL)
@@ -577,7 +479,7 @@ log_kevent_struct(int level, struct kevent *kev_base, int indx)
 		break;
 	}
 
-	_launchd_syslog(level, "KEVENT[%d]: udata = %p data = 0x%lx ident = %s filter = %s flags = %s fflags = %s",
+	launchd_syslog(level, "KEVENT[%d]: udata = %p data = 0x%lx ident = %s filter = %s flags = %s fflags = %s",
 			indx, kev->udata, kev->data, ident_buf, filter_str, flags_buf, fflags_buf);
 }
 
@@ -648,19 +550,6 @@ kqueue_demand_loop(void *arg __attribute__((unused)))
 	return NULL;
 }
 
-void *
-waitpid_loop(void *arg __attribute__((unused)))
-{
-	pid_t pid;
-
-	for (;;) {
-		if ((pid = waitpid(-1, (int *) 0, WNOWAIT)) != -1)
-			jobmgr_reap_pid(root_jobmgr, pid);
-	}
-
-	return (NULL);
-}
-
 kern_return_t
 x_handle_kqueue(mach_port_t junk __attribute__((unused)), integer_t fd)
 {
@@ -681,6 +570,7 @@ x_handle_kqueue(mach_port_t junk __attribute__((unused)), integer_t fd)
 			kevi = &kev[i];
 
 			if (kevi->filter) {
+				launchd_syslog(LOG_DEBUG, "Dispatching kevent (ident/filter): %lu/%hd", kevi->ident, kevi->filter);
 				log_kevent_struct(LOG_DEBUG, kev, i);
 
 				struct job_check_s {
@@ -693,9 +583,10 @@ x_handle_kqueue(mach_port_t junk __attribute__((unused)), integer_t fd)
 					(*((kq_callback *)kevi->udata))(kevi->udata, kevi);
 					runtime_ktrace0(RTKT_LAUNCHD_BSD_KEVENT|DBG_FUNC_END);
 				} else {
-					_launchd_syslog(LOG_ERR, "The following kevent had invalid context data. Please file a bug with the following information:");
+					launchd_syslog(LOG_ERR, "The following kevent had invalid context data. Please file a bug with the following information:");
 					log_kevent_struct(LOG_EMERG, &kev[0], i);
 				}
+				launchd_syslog(LOG_DEBUG, "Handled kevent.");
 			}
 		}
 	} else {
@@ -731,25 +622,24 @@ launchd_mport_notify_req(mach_port_t name, mach_msg_id_t which)
 {
 	mach_port_mscount_t msgc = (which == MACH_NOTIFY_PORT_DESTROYED) ? 0 : 1;
 	mach_port_t previous, where = (which == MACH_NOTIFY_NO_SENDERS) ? name : launchd_internal_port;
-	int err;
 
 	if (which == MACH_NOTIFY_NO_SENDERS) {
 		/* Always make sure the send count is zero, in case a receive right is
 		 * reused
 		 */
-		err = mach_port_set_mscount(mach_task_self(), name, 0);
-		if (unlikely(err != KERN_SUCCESS)) {
-			return err;
+		errno = mach_port_set_mscount(mach_task_self(), name, 0);
+		if (unlikely(errno != KERN_SUCCESS)) {
+			return errno;
 		}
 	}
 
-	err = mach_port_request_notification(mach_task_self(), name, which, msgc, where, MACH_MSG_TYPE_MAKE_SEND_ONCE, &previous);
+	errno = mach_port_request_notification(mach_task_self(), name, which, msgc, where, MACH_MSG_TYPE_MAKE_SEND_ONCE, &previous);
 
-	if (likely(err == 0) && previous != MACH_PORT_NULL) {
+	if (likely(errno == 0) && previous != MACH_PORT_NULL) {
 		(void)os_assumes_zero(launchd_mport_deallocate(previous));
 	}
 
-	return (err);
+	return errno;
 }
 
 pid_t
@@ -767,11 +657,9 @@ runtime_fork(mach_port_t bsport)
 	(void)os_assumes_zero(launchd_mport_deallocate(bsport));
 
 	__OS_COMPILETIME_ASSERT__(SIG_ERR == (typeof(SIG_ERR))-1);
-	if (uflag == false) {
-		(void)posix_assumes_zero(sigprocmask(SIG_BLOCK, &sigign_set, &oset));
-		for (i = 0; i < (sizeof(sigigns) / sizeof(int)); i++) {
-			(void)posix_assumes_zero(signal(sigigns[i], SIG_DFL));
-		}
+	(void)posix_assumes_zero(sigprocmask(SIG_BLOCK, &sigign_set, &oset));
+	for (i = 0; i < (sizeof(sigigns) / sizeof(int)); i++) {
+		(void)posix_assumes_zero(signal(sigigns[i], SIG_DFL));
 	}
 
 	r = fork();
@@ -781,8 +669,7 @@ runtime_fork(mach_port_t bsport)
 		for (i = 0; i < (sizeof(sigigns) / sizeof(int)); i++) {
 			(void)posix_assumes_zero(signal(sigigns[i], SIG_IGN));
 		}
-		if (uflag == false)
-			(void)posix_assumes_zero(sigprocmask(SIG_SETMASK, &oset, NULL));
+		(void)posix_assumes_zero(sigprocmask(SIG_SETMASK, &oset, NULL));
 		(void)os_assumes_zero(launchd_set_bport(MACH_PORT_NULL));
 	} else {
 		pid_t p = -getpid();
@@ -923,7 +810,7 @@ kevent_mod(uintptr_t ident, short filter, u_short flags, u_int fflags, intptr_t 
 		int i = 0;
 		for (i = bulk_kev_i + 1; i < bulk_kev_cnt; i++) {
 			if (bulk_kev[i].filter == filter && bulk_kev[i].ident == ident) {
-				_launchd_syslog(LOG_DEBUG, "Pruning the following kevent:");
+				launchd_syslog(LOG_DEBUG, "Pruning the following kevent:");
 				log_kevent_struct(LOG_DEBUG, &bulk_kev[0], i);
 				bulk_kev[i].filter = (short)0;
 			}
@@ -940,7 +827,7 @@ kevent_mod(uintptr_t ident, short filter, u_short flags, u_int fflags, intptr_t 
 
 	if (kev.flags & EV_ERROR) {
 		if ((flags & EV_ADD) && kev.data) {
-			_launchd_syslog(LOG_DEBUG, "%s(): See the next line...", __func__);
+			launchd_syslog(LOG_DEBUG, "%s(): See the next line...", __func__);
 			log_kevent_struct(LOG_DEBUG, &kev, 0);
 			errno = kev.data;
 			return -1;
@@ -1051,10 +938,10 @@ launchd_exc_runtime_once(mach_port_t port, mach_msg_size_t rcv_msg_size, mach_ms
 		mr = mach_msg(&bufRequest->Head, rcv_options, 0, rcv_msg_size, port, to, MACH_PORT_NULL);
 		switch (mr) {
 		case MACH_RCV_TIMED_OUT:
-			_launchd_syslog(LOG_DEBUG, "Message queue is empty.");
+			launchd_syslog(LOG_DEBUG, "Message queue is empty.");
 			break;
 		case MACH_RCV_TOO_LARGE:
-			_launchd_syslog(LOG_INFO, "Message is larger than %u bytes.", rcv_msg_size);
+			launchd_syslog(LOG_INFO, "Message is larger than %u bytes.", rcv_msg_size);
 			break;
 		default:
 			(void)os_assumes_zero(mr);
@@ -1062,7 +949,7 @@ launchd_exc_runtime_once(mach_port_t port, mach_msg_size_t rcv_msg_size, mach_ms
 
 		if (mr == MACH_MSG_SUCCESS) {
 			if (!mach_exc_server(&bufRequest->Head, &bufReply->Head)) {
-				_launchd_syslog(LOG_WARNING, "Exception server routine failed.");
+				launchd_syslog(LOG_WARNING, "Exception server routine failed.");
 				break;
 			}
 
@@ -1073,14 +960,14 @@ launchd_exc_runtime_once(mach_port_t port, mach_msg_size_t rcv_msg_size, mach_ms
 			smr = mach_msg(&bufReply->Head, send_options, bufReply->Head.msgh_size, 0, MACH_PORT_NULL, to + 100, MACH_PORT_NULL);
 			switch (smr) {
 			case MACH_SEND_TIMED_OUT:
-				_launchd_syslog(LOG_WARNING, "Timed out while trying to send reply to exception message.");
+				launchd_syslog(LOG_WARNING, "Timed out while trying to send reply to exception message.");
 				break;
 			case MACH_SEND_INVALID_DEST:
-				_launchd_syslog(LOG_WARNING, "Tried sending a message to a port that we don't possess a send right to.");
+				launchd_syslog(LOG_WARNING, "Tried sending a message to a port that we don't possess a send right to.");
 				break;
 			default:
 				if (smr) {
-					_launchd_syslog(LOG_WARNING, "Couldn't deliver exception reply: 0x%x", smr);
+					launchd_syslog(LOG_WARNING, "Couldn't deliver exception reply: 0x%x", smr);
 				}
 				break;
 			}
@@ -1095,7 +982,7 @@ runtime_record_caller_creds(audit_token_t *token)
 {
 	(void)memcpy(&ldc_token, token, sizeof(*token));
 	audit_token_to_au32(*token, NULL, &ldc.euid,&ldc.egid, &ldc.uid, &ldc.gid,
-						&ldc.pid, &ldc.asid, NULL);
+		&ldc.pid, &ldc.asid, NULL);
 }
 
 struct ldcred *
@@ -1116,31 +1003,26 @@ launchd_mig_demux(mach_msg_header_t *request, mach_msg_header_t *reply)
 	boolean_t result = false;
 
 	time_of_mach_msg_return = runtime_get_opaque_time();
-#ifdef _EXTRA_LAUNCHD_SPEW
-	_launchd_syslog(LOG_DEBUG, "MIG callout: %u", request->msgh_id);
-#endif
+	launchd_syslog(LOG_DEBUG, "MIG callout: %u", request->msgh_id);
 	mig_callback the_demux = mig_cb_table[MACH_PORT_INDEX(request->msgh_local_port)];
 	mach_msg_audit_trailer_t *tp = (mach_msg_audit_trailer_t *)((vm_offset_t)request + round_msg(request->msgh_size));
 	runtime_record_caller_creds(&tp->msgh_audit);
 
 	result = the_demux(request, reply);
 	if (!result) {
-		_launchd_syslog(LOG_DEBUG, "Demux failed. Trying other subsystems...");
+		launchd_syslog(LOG_DEBUG, "Demux failed. Trying other subsystems...");
 		if (request->msgh_id == MACH_NOTIFY_NO_SENDERS) {
-			_launchd_syslog(LOG_DEBUG, "MACH_NOTIFY_NO_SENDERS");
+			launchd_syslog(LOG_DEBUG, "MACH_NOTIFY_NO_SENDERS");
 			result = notify_server(request, reply);
-#ifdef notyet
 		} else if (the_demux == job_server) {
-			_launchd_syslog(LOG_DEBUG, "Trying domain subsystem...");
-			result = xpc_domain_server(request, reply);
-#endif
+			launchd_syslog(LOG_DEBUG, "Trying domain subsystem...");
+            // _sjc_ because we don't have this: result = xpc_domain_server(request, reply);
+            printf("missing xpc_domain_server()\n");
 		} else {
-			_launchd_syslog(LOG_ERR, "Cannot handle MIG request with ID: 0x%x", request->msgh_id);
+			launchd_syslog(LOG_ERR, "Cannot handle MIG request with ID: 0x%x", request->msgh_id);
 		}
 	} else {
-#ifdef _EXTRA_LAUNCHD_SPEW
-		_launchd_syslog(LOG_DEBUG, "MIG demux succeeded.");
-#endif
+		launchd_syslog(LOG_DEBUG, "MIG demux succeeded.");
 	}
 
 	return result;
@@ -1154,15 +1036,11 @@ launchd_runtime2(mach_msg_size_t msg_size)
 
 		mach_port_t recvp = MACH_PORT_NULL;
 		xpc_object_t request = NULL;
-
-		int result;
-		result = xpc_pipe_try_receive(ipc_port_set, &request, &recvp, launchd_mig_demux, msg_size, 0);
-		if (result != 1)
-			syslog(LOG_ERR, "result=%d", result);
+		int result = xpc_pipe_try_receive(ipc_port_set, &request, &recvp, launchd_mig_demux, msg_size, 0);
 		if (result == 0 && request) {
 			boolean_t handled = false;
 			time_of_mach_msg_return = runtime_get_opaque_time();
-			_launchd_syslog(LOG_DEBUG, "XPC request.");
+			launchd_syslog(LOG_DEBUG, "XPC request.");
 
 			xpc_object_t reply = NULL;
 			if (xpc_event_demux(recvp, request, &reply)) {
@@ -1172,19 +1050,19 @@ launchd_runtime2(mach_msg_size_t msg_size)
 			}
 
 			if (!handled) {
-				_launchd_syslog(LOG_DEBUG, "XPC routine could not be handled.");
+				launchd_syslog(LOG_DEBUG, "XPC routine could not be handled.");
 				xpc_release(request);
 				continue;
 			}
 
-			_launchd_syslog(LOG_DEBUG, "XPC routine was handled.");
+			launchd_syslog(LOG_DEBUG, "XPC routine was handled.");
 			if (reply) {
-				_launchd_syslog(LOG_DEBUG, "Sending reply.");
+				launchd_syslog(LOG_DEBUG, "Sending reply.");
 				result = xpc_pipe_routine_reply(reply);
 				if (result == 0) {
-					_launchd_syslog(LOG_DEBUG, "Reply sent successfully.");
+					launchd_syslog(LOG_DEBUG, "Reply sent successfully.");
 				} else if (result != EPIPE) {
-					_launchd_syslog(LOG_ERR, "Failed to send reply message: 0x%x", result);
+					launchd_syslog(LOG_ERR, "Failed to send reply message: 0x%x", result);
 				}
 
 				xpc_release(reply);
@@ -1192,9 +1070,9 @@ launchd_runtime2(mach_msg_size_t msg_size)
 
 			xpc_release(request);
 		} else if (result == 0) {
-			_launchd_syslog(LOG_DEBUG, "MIG request.");
+			launchd_syslog(LOG_DEBUG, "MIG request.");
 		} else if (result == EINVAL) {
-			_launchd_syslog(LOG_ERR, "Rejected invalid request message.");
+			launchd_syslog(LOG_ERR, "Rejected invalid request message.");
 		}
 	}
 }
@@ -1210,7 +1088,7 @@ runtime_close(int fd)
 		case EVFILT_WRITE:
 		case EVFILT_READ:
 			if (unlikely((int)bulk_kev[i].ident == fd)) {
-				_launchd_syslog(LOG_DEBUG, "Skipping kevent index: %d", i);
+				launchd_syslog(LOG_DEBUG, "Skipping kevent index: %d", i);
 				bulk_kev[i].filter = 0;
 			}
 		default:
@@ -1235,10 +1113,6 @@ runtime_fsync(int fd)
 #endif
 }
 
-#undef TARGET_OS_EMBEDDED
-#define TARGET_OS_EMBEDDED 1
-static int launchd_appletv;
-
 /*
  * We should break this into two reference counts.
  *
@@ -1258,7 +1132,7 @@ runtime_add_ref(void)
 	}
 
 	runtime_busy_cnt++;
-	_launchd_syslog(LOG_PERF, "Incremented busy count. Now: %lu", runtime_busy_cnt);
+	launchd_syslog(LOG_PERF, "Incremented busy count. Now: %lu", runtime_busy_cnt);
 	runtime_remove_timer();
 }
 
@@ -1268,7 +1142,7 @@ runtime_del_ref(void)
 	if (!pid1_magic) {
 #if !TARGET_OS_EMBEDDED
 		if (_vproc_transaction_count() == 0) {
-			_launchd_syslog(LOG_PERF, "Exiting cleanly.");
+			launchd_syslog(LOG_PERF, "Exiting cleanly.");
 		}
 
 		vproc_transaction_end(NULL, NULL);
@@ -1276,7 +1150,7 @@ runtime_del_ref(void)
 	}
 
 	runtime_busy_cnt--;
-	_launchd_syslog(LOG_PERF, "Decremented busy count. Now: %lu", runtime_busy_cnt);
+	launchd_syslog(LOG_PERF, "Decremented busy count. Now: %lu", runtime_busy_cnt);
 	runtime_install_timer();
 }
 
@@ -1306,7 +1180,7 @@ void
 runtime_install_timer(void)
 {
 	if (!pid1_magic && runtime_busy_cnt == 0) {
-		_launchd_syslog(LOG_PERF, "Gone idle. Installing idle-exit timer.");
+		launchd_syslog(LOG_PERF, "Gone idle. Installing idle-exit timer.");
 		(void)posix_assumes_zero(kevent_mod((uintptr_t)&launchd_runtime_busy_time, EVFILT_TIMER, EV_ADD, NOTE_SECONDS, 10, root_jobmgr));
 	}
 }
@@ -1316,7 +1190,7 @@ runtime_remove_timer(void)
 {
 	if (!pid1_magic && runtime_busy_cnt > 0) {
 		if (runtime_busy_cnt == 1) {
-			_launchd_syslog(LOG_PERF, "No longer idle. Removing idle-exit timer.");	
+			launchd_syslog(LOG_PERF, "No longer idle. Removing idle-exit timer.");	
 		}
 		(void)posix_assumes_zero(kevent_mod((uintptr_t)&launchd_runtime_busy_time, EVFILT_TIMER, EV_DELETE, 0, 0, NULL));
 	}
@@ -1330,7 +1204,7 @@ catch_mach_exception_raise(mach_port_t exception_port __attribute__((unused)), m
 
 	(void)os_assumes_zero(pid_for_task(task, &p4t));
 
-	_launchd_syslog(LOG_NOTICE, "%s(): PID: %u thread: 0x%x type: 0x%x code: %p codeCnt: 0x%x",
+	launchd_syslog(LOG_NOTICE, "%s(): PID: %u thread: 0x%x type: 0x%x code: %p codeCnt: 0x%x",
 			__func__, p4t, thread, exception, code, codeCnt);
 
 	(void)os_assumes_zero(launchd_mport_deallocate(thread));
@@ -1345,7 +1219,7 @@ catch_mach_exception_raise_state(mach_port_t exception_port __attribute__((unuse
 		int *flavor, const thread_state_t old_state, mach_msg_type_number_t old_stateCnt,
 		thread_state_t new_state, mach_msg_type_number_t *new_stateCnt)
 {
-	_launchd_syslog(LOG_NOTICE, "%s(): type: 0x%x code: %p codeCnt: 0x%x flavor: %p old_state: %p old_stateCnt: 0x%x new_state: %p new_stateCnt: %p",
+	launchd_syslog(LOG_NOTICE, "%s(): type: 0x%x code: %p codeCnt: 0x%x flavor: %p old_state: %p old_stateCnt: 0x%x new_state: %p new_stateCnt: %p",
 			__func__, exception, code, codeCnt, flavor, old_state, old_stateCnt, new_state, new_stateCnt);
 
 	memcpy(new_state, old_state, old_stateCnt * sizeof(old_state[0]));
@@ -1364,7 +1238,7 @@ catch_mach_exception_raise_state_identity(mach_port_t exception_port __attribute
 
 	(void)os_assumes_zero(pid_for_task(task, &p4t));
 
-	_launchd_syslog(LOG_NOTICE, "%s(): PID: %u thread: 0x%x type: 0x%x code: %p codeCnt: 0x%x flavor: %p old_state: %p old_stateCnt: 0x%x new_state: %p new_stateCnt: %p",
+	launchd_syslog(LOG_NOTICE, "%s(): PID: %u thread: 0x%x type: 0x%x code: %p codeCnt: 0x%x flavor: %p old_state: %p old_stateCnt: 0x%x new_state: %p new_stateCnt: %p",
 			__func__, p4t, thread, exception, code, codeCnt, flavor, old_state, old_stateCnt, new_state, new_stateCnt);
 
 	memcpy(new_state, old_state, old_stateCnt * sizeof(old_state[0]));
@@ -1415,7 +1289,7 @@ launchd_log_vm_stats(void)
 	}
 
 	if (did_first_pass) {
-		_launchd_syslog(LOG_DEBUG, "VM statistics (now - orig): Free: %d Active: %d Inactive: %d Reactivations: %d PageIns: %d PageOuts: %d Faults: %d COW-Faults: %d Purgeable: %d Purges: %d",
+		launchd_syslog(LOG_DEBUG, "VM statistics (now - orig): Free: %d Active: %d Inactive: %d Reactivations: %d PageIns: %d PageOuts: %d Faults: %d COW-Faults: %d Purgeable: %d Purges: %d",
 				stats.free_count - orig_stats.free_count,
 				stats.active_count - orig_stats.active_count,
 				stats.inactive_count - orig_stats.inactive_count,
@@ -1427,7 +1301,7 @@ launchd_log_vm_stats(void)
 				stats.purgeable_count - orig_stats.purgeable_count,
 				stats.purges - orig_stats.purges);
 	} else {
-		_launchd_syslog(LOG_DEBUG, "VM statistics (now): Free: %d Active: %d Inactive: %d Reactivations: %d PageIns: %d PageOuts: %d Faults: %d COW-Faults: %d Purgeable: %d Purges: %d",
+		launchd_syslog(LOG_DEBUG, "VM statistics (now): Free: %d Active: %d Inactive: %d Reactivations: %d PageIns: %d PageOuts: %d Faults: %d COW-Faults: %d Purgeable: %d Purges: %d",
 				orig_stats.free_count,
 				orig_stats.active_count,
 				orig_stats.inactive_count,

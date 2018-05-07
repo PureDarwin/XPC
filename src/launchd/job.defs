@@ -276,12 +276,12 @@ out				rootbs		: mach_port_move_send_t
 );
 
 routine
-ipc_request(
-				j		: job_t;
-				request		: pointer_t, dealloc;
+legacy_ipc_request(
+				j			: job_t;
+				request		: pointer_t;
 				request_fds	: mach_port_move_send_array_t;
 out				reply		: pointer_t, dealloc;
-out				reply_fds	: mach_port_move_send_array_t;
+out				reply_fds	: mach_port_move_send_array_t, dealloc;
 				asport		: mach_port_t
 );
 

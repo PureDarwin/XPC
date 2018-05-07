@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <sys/queue.h>
 #include <sys/fcntl.h>
+#include <malloc/malloc.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
@@ -16,8 +17,8 @@
 #include <stdbool.h>
 #include <syslog.h>
 
-extern const char *launchd_username;
-extern const char *launchd_label;
+extern char *launchd_username;
+extern char *launchd_label;
 extern mach_port_t launchd_drain_reply_port;
 extern bool launchd_var_available;
 extern int64_t launchd_system_start;
@@ -37,9 +38,8 @@ struct launchd_syslog_attr {
  */
 #define LOG_PERF 0x5252615d
 #define LOG_APPLEONLY 0x4141504c
-//#ifdef notyet
 #define LOG_CONSOLE (1 << 31)
-//#endif
+
 __attribute__((visibility("default")))
 __attribute__((used))
 extern bool

@@ -26,7 +26,6 @@
 #include <launch.h>
 #include <bootstrap.h>
 #include "runtime.h"
-#include "log.h"
 
 struct kevent;
 struct conncb;
@@ -49,29 +48,6 @@ char *launchd_copy_persistent_store(int type, const char *file);
 
 int _fd(int fd);
 
-void init_boot(bool sflag);
-void init_pre_kevent(bool sflag);
-void launchd_exit(int code)  __dead2;
-
-#define launchd_assumes(e)      \
-        (__builtin_expect(!(e), 0) ? _log_launchd_bug(0, __FILE__, __LINE__, #e), false : true)
-
-void _log_launchd_bug(const char *rcs_rev, const char *path, unsigned int line, const char *test);
-
-
-void update_ttys(void);
-void catatonia(void);
-bool init_check_pid(pid_t p);
-
-pid_t launchd_fork(void);
-
-extern bool uflag;
-
-#define DEBUG_EXIT(x) \
-	do { \
-		syslog(LOG_EMERG | LOG_CONSOLE, "%s(%d):  about to exit", __FUNCTION__, __LINE__); \
-		sleep(30); \
-		launchd_exit(x); \
-	} while (0)
+pid_t launchd_fork(void); // _sjc_ keep this around while we need it to spawn bash
 
 #endif /* __LAUNCHD_H__ */

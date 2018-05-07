@@ -18,6 +18,10 @@
  * @APPLE_APACHE_LICENSE_HEADER_END@
  */
 
+// Turn off deprecation warnings so we can see what eles is wrong
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #include "config.h"
 #include "vproc.h"
 #include "vproc_priv.h"
@@ -26,8 +30,7 @@
 #include <dispatch/dispatch.h>
 #include <libproc.h>
 #include <mach/mach.h>
-#include <mach/mach_port.h>
-#include <mach/mig.h>
+#include <mach/vm_map.h>
 #include <sys/param.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -100,9 +103,7 @@ vprocmgr_lookup_vproc(const char *label)
 vproc_t
 vproc_retain(vproc_t vp)
 {
-//    int32_t orig = atomic_fetchadd_int(&vp->refcount, 1) - 1; _sjc_ not available
-    // TODO: _sjc_ replace this using eg. stdatomics.h
-    int32_t orig = ++(vp->refcount);
+	int32_t orig = OSAtomicAdd32(1, &vp->refcount) - 1;	
 	if (orig <= 0) {
 		_vproc_set_crash_log_message("Under-retain / over-release of vproc_t.");
 		abort();
@@ -114,9 +115,7 @@ vproc_retain(vproc_t vp)
 void
 vproc_release(vproc_t vp)
 {
-//    int32_t newval = atomic_fetchadd_int(&vp->refcount, -1);
-    // TODO: _sjc_ replace this using eg. stdatomics.h
-    int32_t newval = --(vp->refcount);
+	int32_t newval = OSAtomicAdd32(-1, &vp->refcount);
 	if (newval < 0) {
 		_vproc_set_crash_log_message("Over-release of vproc_t.");
 		abort();
@@ -205,7 +204,7 @@ vproc_transaction_begin(vproc_t vp __unused)
 
 void _vproc_transaction_end_flush(void);
 
-static void
+void
 _vproc_transaction_end_internal2(void *ctx)
 {
 	launch_globals_t globals = _launch_globals();
@@ -237,7 +236,7 @@ _vproc_transaction_end_internal(void *arg)
 	}
 }
 
-static void
+void
 _vproc_transaction_end_flush2(void *ctx __unused)
 {
 	_vproc_transaction_end_internal((void *)1);
@@ -490,7 +489,6 @@ _vproc_post_fork_ping(void)
 	mach_port_t session = MACH_PORT_NULL;
 	kern_return_t kr = vproc_mig_post_fork_ping(bootstrap_port, mach_task_self(), &session);
 	if (kr) {
-		syslog(LOG_DEBUG, "vproc_mig_post_fork_ping kr=%x bootstrap_port=%d\n", kr, bootstrap_port);
 		return _vproc_post_fork_ping;
 	}
 
@@ -777,39 +775,25 @@ _vprocmgr_log_drain(vproc_t vp __attribute__((unused)), pthread_mutex_t *mutex, 
 
 	if (mutex) {
 		pthread_mutex_lock(mutex);
-		for (lm = (struct logmsg_s *)outdata; tmp_cnt > 0; lm = (void *)((uint64_t *)lm + lm->obj_sz/8)) {
-			lm->from_name = (char *)lm + lm->from_name_offset;
-			lm->about_name = (char *)lm + lm->about_name_offset;
-			lm->msg = (char *)lm + lm->msg_offset;
-			lm->session_name = (char *)lm + lm->session_name_offset;
+	}
 
-			tv.tv_sec = lm->when / USEC_PER_SEC;
-			tv.tv_usec = lm->when % USEC_PER_SEC;
+	for (lm = (struct logmsg_s *)outdata; tmp_cnt > 0; lm = ((void *)lm + lm->obj_sz)) {
+		lm->from_name = (char *)lm + lm->from_name_offset;
+		lm->about_name = (char *)lm + lm->about_name_offset;
+		lm->msg = (char *)lm + lm->msg_offset;
+		lm->session_name = (char *)lm + lm->session_name_offset;
 
-			func(&tv, lm->from_pid, lm->about_pid, lm->sender_uid, lm->sender_gid, lm->pri,
-				 lm->from_name, lm->about_name, lm->session_name, lm->msg);
+		tv.tv_sec = lm->when / USEC_PER_SEC;
+		tv.tv_usec = lm->when % USEC_PER_SEC;
 
-			tmp_cnt -= lm->obj_sz;
-		}
+		func(&tv, lm->from_pid, lm->about_pid, lm->sender_uid, lm->sender_gid, lm->pri,
+				lm->from_name, lm->about_name, lm->session_name, lm->msg);
+
+		tmp_cnt -= lm->obj_sz;
+	}
+
+	if (mutex) {
 		pthread_mutex_unlock(mutex);
-	} else {
-		/* the compiler can't tell that mutex isn't modified
-		* in the function so we duplicate :(
-		*/
-		for (lm = (struct logmsg_s *)outdata; tmp_cnt > 0; lm = (void *)((uint64_t *)lm + lm->obj_sz/8)) {
-			lm->from_name = (char *)lm + lm->from_name_offset;
-			lm->about_name = (char *)lm + lm->about_name_offset;
-			lm->msg = (char *)lm + lm->msg_offset;
-			lm->session_name = (char *)lm + lm->session_name_offset;
-
-			tv.tv_sec = lm->when / USEC_PER_SEC;
-			tv.tv_usec = lm->when % USEC_PER_SEC;
-
-			func(&tv, lm->from_pid, lm->about_pid, lm->sender_uid, lm->sender_gid, lm->pri,
-				 lm->from_name, lm->about_name, lm->session_name, lm->msg);
-
-			tmp_cnt -= lm->obj_sz;
-		}
 	}
 
 	if (outdata) {
@@ -900,7 +884,7 @@ out:
 }
 
 vproc_err_t
-vproc_swap_string(vproc_t vp, vproc_gsk_t key, const char *instr, const char **outstr)
+vproc_swap_string(vproc_t vp, vproc_gsk_t key, const char *instr, char **outstr)
 {
 	launch_data_t instr_data = instr ? launch_data_new_string(instr) : NULL;
 	launch_data_t outstr_data = NULL;
@@ -1004,7 +988,7 @@ union maxmsgsz {
 	union __ReplyUnion__helper_downcall_launchd_helper_subsystem rep;
 };
 
-static const size_t vprocmgr_helper_maxmsgsz = sizeof(union maxmsgsz);
+const size_t vprocmgr_helper_maxmsgsz = sizeof(union maxmsgsz);
 
 kern_return_t
 helper_recv_wait(mach_port_t p, int status)
@@ -1037,14 +1021,11 @@ launch_wait(mach_port_t port)
 	return status;
 }
 
-#ifndef __FreeBSD__
 launch_data_t
 launch_socket_service_check_in(void)
 {
 	launch_data_t reply = NULL;
 
-    printf("in lauch_socket_service_check_in() which is missing vproc_mig_legacy_ipc_request()\n");
-    
 	size_t big_enough = 10 * 1024;
 	void *buff = malloc(big_enough);
 	if (buff) {
@@ -1056,7 +1037,6 @@ launch_socket_service_check_in(void)
 				mach_msg_size_t sreplyCnt = 0;
 				mach_port_array_t fdps = NULL;
 				mach_msg_size_t fdpsCnt = 0;
-                /* _sjc_ whole block commented out because we don't have vproc_mig_legacy_ipc_request()
 				kern_return_t kr = vproc_mig_legacy_ipc_request(bootstrap_port, (vm_address_t)buff, sz, NULL, 0, &sreply, &sreplyCnt, &fdps, &fdpsCnt, _audit_session_self());
 				if (kr == BOOTSTRAP_SUCCESS) {
 					int fds[128];
@@ -1076,7 +1056,6 @@ launch_socket_service_check_in(void)
 					mig_deallocate(sreply, sreplyCnt);
 					mig_deallocate((vm_address_t)fdps, fdpsCnt);
 				}
-                 */
 			}
 
 			launch_data_free(req);
@@ -1087,4 +1066,5 @@ launch_socket_service_check_in(void)
 
 	return reply;
 }
-#endif
+
+#pragma clang diagnostic pop

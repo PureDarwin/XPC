@@ -362,7 +362,6 @@ xpc_copy_entitlement_for_token(const char *key __unused, audit_token_t *token __
 	return (_xpc_prim_create(_XPC_TYPE_BOOL, val,0));
 }
 
-
 #define XPC_RPORT "XPC remote port"
 int
 xpc_pipe_routine_reply(xpc_object_t xobj)

@@ -40,7 +40,6 @@
 #include <sys/socket.h>
 #include <sys/syscall.h>
 #include <net/if.h>
-#include <net/if_var.h>
 #include <netinet/in.h>
 #include <netinet/in_var.h>
 #include <netinet6/nd6.h>
@@ -82,9 +81,7 @@
 #include "runtime.h"
 #include "core.h"
 #include "ipc.h"
-#include "shim.h"
 
-#define _LD_LIBRARY_PATH_STDPATH "/lib:/usr/lib:/usr/local/lib"
 #define LAUNCHD_CONF ".launchd.conf"
 
 extern char **environ;
@@ -109,8 +106,8 @@ static void *update_thread(void *nothing);
 static void *crash_addr;
 static pid_t crash_pid;
 
-static const char *_launchd_database_dir;
-static const char *_launchd_log_dir;
+char *_launchd_database_dir;
+char *_launchd_log_dir;
 
 bool launchd_shutting_down;
 bool network_up;
@@ -118,29 +115,6 @@ uid_t launchd_uid;
 FILE *launchd_console = NULL;
 int32_t launchd_sync_frequency = 30;
 
-
-/* gdb can't cope with copy relocations (caused by global variables in shared libraries) */
-#ifdef MACH_DEBUG
-mach_port_t bootstrap_port;
-#endif
-
-void
-launchd_exit(int code)
-{
-	syslog(LOG_ERR, "exiting code %d errno %d", code, errno);
-	sleep(1);
-	_exit(code);
-}
-
-
-__inline int
-posix_spawnattr_setbinpref_np(posix_spawnattr_t * __restrict a __unused,
-							  size_t b __unused, cpu_type_t *__restrict c __unused, size_t *__restrict d __unused)
-{
-	return 0;
-}
-
-bool uflag = false;
 
 int
 main(int argc, char *const *argv)
@@ -155,12 +129,6 @@ main(int argc, char *const *argv)
 	 * stuff in launchd_runtime_init() and the stuff in
 	 * handle_pid1_crashes_separately().
 	 */
-    /*
-	 * Note that this does NOT open a file...
-	 * Does 'init' deserve its own facility number?
-	 */
-	openlog("launchd", LOG_CONS, LOG_AUTH);
-
 	testfd_or_openfd(STDIN_FILENO, _PATH_DEVNULL, O_RDONLY);
 	testfd_or_openfd(STDOUT_FILENO, _PATH_DEVNULL, O_WRONLY);
 	testfd_or_openfd(STDERR_FILENO, _PATH_DEVNULL, O_WRONLY);
@@ -183,10 +151,9 @@ main(int argc, char *const *argv)
 		}
 	}
 
-	while ((ch = getopt(argc, argv, "su")) != -1) {
+	while ((ch = getopt(argc, argv, "s")) != -1) {
 		switch (ch) {
 		case 's': sflag = true; break;	/* single user */
-		case 'u': uflag = true; break; /* run as non-pid1 */
 		case '?': /* we should do something with the global optopt variable here */
 		default:
 			fprintf(stderr, "%s: ignoring unknown arguments\n", getprogname());
@@ -194,9 +161,9 @@ main(int argc, char *const *argv)
 		}
 	}
 
-	if (uflag == false && getpid() != 1 && getppid() != 1) {
+	if (getpid() != 1 && getppid() != 1) {
 		fprintf(stderr, "%s: This program is not meant to be run directly.\n", getprogname());
-		DEBUG_EXIT(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	}
 
 	launchd_runtime_init();
@@ -205,11 +172,9 @@ main(int argc, char *const *argv)
 		setenv("PATH", _PATH_STDPATH, 1);
 	}
 
-	if (NULL == getenv("LD_LIBRARY_PATH")) {
-		setenv("LD_LIBRARY_PATH", _LD_LIBRARY_PATH_STDPATH, 1);
-	}
 	if (pid1_magic) {
 		pid1_magic_init();
+
 		int cfd = -1;
 		if ((cfd = open(_PATH_CONSOLE, O_WRONLY | O_NOCTTY)) != -1) {
 			_fd(cfd);
@@ -218,7 +183,7 @@ main(int argc, char *const *argv)
 			}
 		}
 
-		const char *extra = "";
+		char *extra = "";
 		if (launchd_osinstaller) {
 			extra = " in the OS Installer";
 		} else if (sflag) {
@@ -266,7 +231,7 @@ main(int argc, char *const *argv)
 	} else {
 		launchd_uid = getuid();
 		launchd_var_available = true;
-		if (asprintf((char **)&launchd_label, "com.apple.launchd.peruser.%u", launchd_uid) == 0) {
+		if (asprintf(&launchd_label, "com.apple.launchd.peruser.%u", launchd_uid) == 0) {
 			launchd_label = "com.apple.launchd.peruser.unknown";
 		}
 
@@ -277,11 +242,11 @@ main(int argc, char *const *argv)
 			launchd_username = "(unknown)";
 		}
 
-		if (asprintf((char **)&_launchd_database_dir, LAUNCHD_DB_PREFIX "/com.apple.launchd.peruser.%u", launchd_uid) == 0) {
+		if (asprintf(&_launchd_database_dir, LAUNCHD_DB_PREFIX "/com.apple.launchd.peruser.%u", launchd_uid) == 0) {
 			_launchd_database_dir = "";
 		}
 
-		if (asprintf((char **)&_launchd_log_dir, LAUNCHD_LOG_PREFIX "/com.apple.launchd.peruser.%u", launchd_uid) == 0) {
+		if (asprintf(&_launchd_log_dir, LAUNCHD_LOG_PREFIX "/com.apple.launchd.peruser.%u", launchd_uid) == 0) {
 			_launchd_log_dir = "";
 		}
 
@@ -299,10 +264,8 @@ main(int argc, char *const *argv)
 		}
 
 		launchd_audit_port = _audit_session_self();
-#if 0
 		vproc_transaction_begin(NULL);
 		vproc_transaction_end(NULL, NULL);
-#endif
 		launchd_syslog(LOG_DEBUG, "Per-user launchd started (UID/username): %u/%s.", launchd_uid, launchd_username);
 	}
 
@@ -323,12 +286,6 @@ main(int argc, char *const *argv)
         }
     }
     
-#if 0
-	if (getpid() == 1 /* && !job_active(rlcj) */) {
-			init_pre_kevent(sflag);
-	}
-#endif
-	sleep(1);
 	launchd_runtime();
 }
 
@@ -435,10 +392,10 @@ do_pid1_crash_diagnosis_mode2(const char *msg)
 	int fd;
 	revoke(_PATH_CONSOLE);
 	if ((fd = open(_PATH_CONSOLE, O_RDWR)) == -1) {
-		DEBUG_EXIT(2);
+		_exit(2);
 	}
 	if (login_tty(fd) == -1) {
-		DEBUG_EXIT(3);
+		_exit(3);
 	}
 
 	setenv("TERM", "vt100", 1);
@@ -456,7 +413,7 @@ do_pid1_crash_diagnosis_mode2(const char *msg)
 
 	execl(_PATH_BSHELL, "-sh", NULL);
 	syslog(LOG_ERR, "can't exec %s for PID 1 crash debugging: %m", _PATH_BSHELL);
-	DEBUG_EXIT(EXIT_FAILURE);
+	_exit(EXIT_FAILURE);
 }
 
 void
@@ -479,7 +436,7 @@ fatal_signal_handler(int sig, siginfo_t *si, void *uap __attribute__((unused)))
 	switch ((sample_p = vfork())) {
 	case 0:
 		execve(sample_args[0], sample_args, environ);
-		DEBUG_EXIT(EXIT_FAILURE);
+		_exit(EXIT_FAILURE);
 		break;
 	default:
 		waitpid(sample_p, &wstatus, 0);
@@ -532,7 +489,7 @@ pid1_magic_init(void)
 
 	if (setaudit_addr(&auinfo, sizeof(auinfo)) == -1) {
 		launchd_syslog(LOG_WARNING | LOG_CONSOLE, "Could not set audit session: %d: %s.", errno, strerror(errno));
-		DEBUG_EXIT(EXIT_FAILURE);
+		_exit(EXIT_FAILURE);
 	}
 
 	launchd_audit_session = auinfo.ai_asid;
@@ -568,7 +525,7 @@ int
 _fd(int fd)
 {
 	if (fd >= 0) {
-		(void)posix_assumes_zero(fcntl(fd, F_SETFD, FD_CLOEXEC));
+		(void)posix_assumes_zero(fcntl(fd, F_SETFD, 1));
 	}
 	return fd;
 }
@@ -589,8 +546,8 @@ launchd_shutdown(void)
 
 	now = runtime_get_wall_time();
 
-	const char *term_who = pid1_magic ? "System shutdown" : "Per-user launchd termination for ";
-	launchd_syslog(LOG_CRIT, "%s%s began", term_who, pid1_magic ? "" : launchd_username);
+	char *term_who = pid1_magic ? "System shutdown" : "Per-user launchd termination for ";
+	launchd_syslog(LOG_INFO, "%s%s began", term_who, pid1_magic ? "" : launchd_username);
 
 	os_assert(jobmgr_shutdown(root_jobmgr) != NULL);
 
@@ -714,6 +671,3 @@ pfsystem_callback(void *obj __attribute__((unused)), struct kevent *kev)
 		jobmgr_dispatch_all_semaphores(root_jobmgr);
 	}
 }
-
-
-

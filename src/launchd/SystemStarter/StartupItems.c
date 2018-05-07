@@ -356,9 +356,9 @@ CFMutableArrayRef StartupItemListCreateWithMask(NSSearchPathDomainMask aMask)
 
 								if (aConfigData) {
 									aConfig = (CFMutableDictionaryRef)
-									    CFPropertyListCreateWithData(NULL, aConfigData,
+									    CFPropertyListCreateFromXMLData(NULL, aConfigData,
 													    kCFPropertyListMutableContainers,
-													    NULL, __DARWIN_NULL);
+													    NULL);
 								}
 								if (StartupItemValidate(aConfig)) {
 									CFStringRef aBundlePathString =
