@@ -38,12 +38,13 @@
 
 #include "job.h"
 
-static __attribute__((constructor))
-void
-liblaunch_init(void) {
-    printf("in liblaunch_init()\n");
-    bootstrap_init();
-}
+// This is not present in macOS libxpc (or at least is not publically visible)
+//static __attribute__((constructor))
+//void
+//liblaunch_init(void) {
+//    printf("in liblaunch_init()\n");
+//    bootstrap_init();
+//}
 
 void
 bootstrap_init(void)

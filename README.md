@@ -1,19 +1,34 @@
 # libxpc
-libxpc/launchd for PureDarwin
 
-An open-source reimplementation of Apple's XPC library and launchd for PureDarwin. Based on (launchd 842.1.4)[https://opensource.apple.com/tarballs/launchd/launchd-842.1.4.tar.gz] and iXsystems's implementation of libxpc.
+An open-source reimplementation of Apple's XPC library and launchd for PureDarwin. Based on (launchd 842.1.4)[https://opensource.apple.com/tarballs/launchd/launchd-842.1.4.tar.gz] and iXsystems's skeleton re-implementation of libxpc.
 
-**NOTE:** The code in this repo compiles and runs but is currently untested. In particular, the implementation of xpc is incomplete, with many functions being no-ops.
+**NOTE: The code in this repo compiles and runs but is currently untested. In particular, the implementation of xpc is incomplete, with many functions being no-ops.**
 
 This project differs from a 'pure' launchd built from Apple's source to align better with what can be inferred of the current (macOS 10.13) implementation:
 
-* `liblaunch.dylib` contains no code. Instead it acts as a proxy to `libxpc.dylib` by way of indirect symbols.
+* `liblaunch.dylib` contains no code. Instead it acts as a proxy to `libxpc.dylib` by way of indirect symbols. (But see note below.)
 * `libxpc.dylib` contains the bulk of the logic that was in `liblaunch.dylib`, along with the untested XPC code.
-* `launchd` is mostly unchanged.
+* `launchd` is mostly unchanged, although audit logging is currently disabled.
 * `launchctl` has had a couple of code paths commented-out so that it builds.
 * A launch daemon script is included to launch bash at startup.
 
-## INSTALLATION
+#### Note
+
+The code in this repo is very much a work in progress.
+
+`liblaunch` in it's current for is unusable, so you will need to find a working version (see below).
+
+This version of `launchd` does not correctly bootstrap the system. It has been modified to launch `bash` at startup, so at least you can continue using the system after boot, and maybe investigate why bootstrapping isn't working.
+
+#### Prerequisites
+
+You will need a version of `libSystem` which links to `libxpc`, like [this one](https://github.com/Andromeda-OS/Libsystem).
+
+You will also need a complete version of `liblaunch`, since the empty version not only doesn't work (not that it was expected to) but causes problems. There is a version available in [this](https://github.com/libsystem-ethan/esdarwin) repo. It also contains a version of `libcoreservices`, which is required.
+
+You will also need a version of `libedit`.
+
+#### Instalation
 
 A binary root will be made availble once the code has been shown to work to at least minimum standards.
 
@@ -24,7 +39,10 @@ Install the binaries into a Darwin image in the following locations:
 * `launchctl` into `/bin`.
 * Copy `org.puredarwin.console.plist` into `/System/Library/LaunchDaemons/`.
 * Install a version of `libSystem` which links to `liblaunch` and `libxpc`.
+* Install a version of `libsystem_coreservices` if one isn't already present.
 * Install a version of `libedit` if one isn't already available.
+
+Once you have done this, check the ownership of all directories up to the `LaunchDaemons` directory and all files inside it. They should be `root:wheel` for `launchd` to be happy about launching them.
 
 `launchd` should run as the first user task (`pid` 1) in order to set up certain important services (such as the mach port nameserver) which child tasks inherit. When the kernel finishes booting the system it automatically runs `/sbin/launchd`. In current PureDarwin systems this file is a script which sets up various system parameters and then runs `/bin/bash`. To work with this, you should rename `launchd` to `pdlaunchd` and then replace
 
@@ -38,10 +56,17 @@ in the `launchd` script with
 exec /sbin/pdlaunchd
 ```
 
-This will allow `launchd` to replace the startup script as `pid` 1. `launchd` will then in turn launch a `bash` shell.
+The `exec` part is important. This will allow `launchd` to replace the startup script as `pid` 1. `launchd` will then in turn launch a `bash` shell.
 
-## TODO
+#### Known Issues
 
+* System bootstrapping (launching all the programs from the `/System/Library/LaunchDaemons` directory when first run) is not currently working. However, once at the `bash` prompt you can invoke `/bin/launchctl bootstrap -S System` and they will be run.
+
+#### TODO
+
+* Get system bootstrapping to work
 * Integrate changes from launchd-842.91.1
+* Work out why the proxy liblaunch.dylib is causing problems
 * Complete implementation of xpc functions
-* Remove -lxpc linker flag from launchctl - it should be available through libSystem
+* Get audit logging working using recent OpenBSM
+

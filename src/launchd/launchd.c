@@ -309,6 +309,20 @@ main(int argc, char *const *argv)
 	monitor_networking_state();
 	jobmgr_init(sflag);
 	launchd_runtime_init2();
+    
+    int pid = launchd_fork();
+    if (pid == -1) {
+        printf("error: didn't forking work\n");
+    } else if (pid == 0) {
+        // Spawn bash the old-fashioned way, so at least we can do some interactive work
+        char *argv[] = { "/bin/bash", "-i", 0 };
+        char *envp[] = { "HOME=/", 0 };
+        int rc = execve(argv[0], argv, envp);
+        if (rc == -1) {
+            printf("execve() failed, errno == %d\n", errno);
+        }
+    }
+    
 #if 0
 	if (getpid() == 1 /* && !job_active(rlcj) */) {
 			init_pre_kevent(sflag);

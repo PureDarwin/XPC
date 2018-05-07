@@ -31,6 +31,18 @@ static int _launchd_log_up2 = LOG_UPTO(LOG_NOTICE);
 
 static int64_t _launchd_shutdown_start;
 
+// _sjc_ to try and build a syslog into this binary
+void
+syslog(int pri, const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+//    _vsyslog(pri, fmt, ap, __builtin_return_address(0), false);
+    vsyslog(pri, fmt, ap);
+    va_end(ap);
+}
+// end
+
 struct _launchd_open_log_ctx_s {
 	const char *path;
 	FILE **filep;

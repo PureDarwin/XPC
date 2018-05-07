@@ -524,10 +524,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_USE_STANDARD_INCLUDE_SEARCHING = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				OTHER_LDFLAGS = (
-					"-ledit",
-					"-lxpc",
-				);
+				OTHER_LDFLAGS = "-ledit";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/headers/System/Library/Frameworks/** /System/Library/Frameworks";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
@@ -556,10 +553,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_USE_STANDARD_INCLUDE_SEARCHING = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				OTHER_LDFLAGS = (
-					"-ledit",
-					"-lxpc",
-				);
+				OTHER_LDFLAGS = "-ledit";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/headers/System/Library/Frameworks/**";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";

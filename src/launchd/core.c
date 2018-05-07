@@ -16,6 +16,10 @@
  * @APPLE_APACHE_LICENSE_HEADER_END@
  */
 
+// Turn off deprecation warnings so we can see what eles is wrong
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 #define __APPLE_API_PRIVATE
 #define PRIVATE 1
 
@@ -6989,7 +6993,9 @@ jobmgr_new(jobmgr_t jm, mach_port_t requestorport, mach_port_t transfer_port, bo
 		syslog(LOG_ERR, "launchd_mport_create_recv failed");
 		goto out_bad;
 	}
-		syslog(LOG_ERR, "launchd_mport_create_recv(=%d)\n", jmr->jm_port);
+
+    syslog(LOG_ERR, "launchd_mport_create_recv(=%d)\n", jmr->jm_port);
+    
 	if (!name) {
 		sprintf(jmr->name_init, "%u", MACH_PORT_INDEX(jmr->jm_port));
 	}
@@ -12125,3 +12131,6 @@ launchd_fork(void)
 
 	return (runtime_fork(root_jobmgr->jm_port));
 }
+
+#pragma clang diagnostic pop
+
