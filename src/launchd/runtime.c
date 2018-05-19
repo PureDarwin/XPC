@@ -202,6 +202,7 @@ launchd_runtime_init(void)
 	os_assert_zero(launchd_mport_create_recv(&launchd_internal_port));
 	os_assert_zero(launchd_mport_make_send(launchd_internal_port));
 
+    // _sjc_ investigate this here
 	max_msg_size = sizeof(union vproc_mig_max_sz);
 	if (sizeof(union xpc_domain_max_sz) > max_msg_size) {
 		max_msg_size = sizeof(union xpc_domain_max_sz);

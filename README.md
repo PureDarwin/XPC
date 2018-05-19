@@ -12,15 +12,11 @@ This project differs from a 'pure' launchd built from Apple's source to align be
 * `launchctl` has had a couple of code paths commented-out so that it builds.
 * A launch daemon script is included to launch bash at startup.
 
-#### Note
-
-This version of `launchd` does not correctly bootstrap the system. It has been modified to launch `bash` at startup, so at least you can continue using the system after boot, and maybe investigate why bootstrapping isn't working.
-
 #### Prerequisites
 
 You will need a version of `libSystem` which links to `libxpc`, like [this one](https://github.com/Andromeda-OS/Libsystem). You will also need a version of `libcoreservices`, which it requires. You can find one [here](https://github.com/libsystem-ethan/esdarwin).
 
-You will also need a version of `libedit`.
+You will also need a versions of `libedit` and `libbsm`.
 
 #### Instalation
 
@@ -34,9 +30,9 @@ Install the binaries into a Darwin image in the following locations:
 * Copy `org.puredarwin.console.plist` into `/System/Library/LaunchDaemons/`.
 * Install a version of `libSystem` which links to `liblaunch` and `libxpc`.
 * Install a version of `libsystem_coreservices` if one isn't already present.
-* Install a version of `libedit` if one isn't already available.
+* Install versions of `libedit` and `libbsm` if they aren't already available.
 
-Once you have done this, check the ownership of all directories up to the `LaunchDaemons` directory and all files inside it. They should be `root:wheel` for `launchd` to be happy about launching them.
+Once you have done this, check the ownership of all directories up to the `LaunchDaemons` directory and all files inside it. They need to be `root:wheel` for `launchd` to be happy about launching them.
 
 `launchd` should run as the first user task (`pid` 1) in order to set up certain important services (such as the mach port nameserver) which child tasks inherit. When the kernel finishes booting the system it automatically runs `/sbin/launchd`. In current PureDarwin systems this file is a script which sets up various system parameters and then runs `/bin/bash`. To work with this, you should rename `launchd` to `pdlaunchd` and then replace
 
@@ -50,14 +46,9 @@ in the `launchd` script with
 exec /sbin/pdlaunchd
 ```
 
-The `exec` part is important. This will allow `launchd` to replace the startup script as `pid` 1. `launchd` will then in turn launch a `bash` shell.
-
-#### Known Issues
-
-* System bootstrapping (launching all the programs from the `/System/Library/LaunchDaemons` directory when first run) is not currently working. However, once at the `bash` prompt you can invoke `/bin/launchctl bootstrap -S System` and they will be run.
+The `exec` part is important. This will allow `launchd` to replace the startup script as `pid` 1. `launchd` will then in turn launch `launchctl` to bootstrap the system. If you have installed the `org.puredarwin.console.plist` then a `bash` shell will be started.
 
 #### TODO
 
-* Get system bootstrapping to work
 * Complete implementation of xpc functions
 * Get audit logging working using recent OpenBSM
