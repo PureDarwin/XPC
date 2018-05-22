@@ -1838,8 +1838,9 @@ CreateMyPropertyListFromFile(const char *posixfile)
 	}
 	if (!CFURLCreateDataAndPropertiesFromResource(kCFAllocatorDefault, fileURL, &resourceData, NULL, NULL, &errorCode)) {
 		launchctl_log(LOG_ERR, "%s: CFURLCreateDataAndPropertiesFromResource(%s) failed: %d", getprogname(), posixfile, (int)errorCode);
+        CFRelease(fileURL);
+        return NULL;
 	}
-    //    propertyList = CFPropertyListCreateWriteData(kCFAllocatorDefault, resourceData, kCFPropertyListMutableContainersAndLeaves, &errorString);
     propertyList = CFPropertyListCreateWithData(kCFAllocatorDefault, resourceData, kCFPropertyListMutableContainersAndLeaves, NULL, &error);
     
 	if (fileURL) {
