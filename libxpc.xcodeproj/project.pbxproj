@@ -6,6 +6,23 @@
 	objectVersion = 47;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		1FF7B65D21262C0C00BE3BFB /* world */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 1FF7B65E21262C0C00BE3BFB /* Build configuration list for PBXAggregateTarget "world" */;
+			buildPhases = (
+			);
+			dependencies = (
+				1FF7B66221262C1300BE3BFB /* PBXTargetDependency */,
+				1FF7B66421262C1300BE3BFB /* PBXTargetDependency */,
+				1FF7B66621262C1300BE3BFB /* PBXTargetDependency */,
+				1FF7B66821262C1300BE3BFB /* PBXTargetDependency */,
+			);
+			name = world;
+			productName = world;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		1731C81F206C324B0086D5C0 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1731C81E206C324B0086D5C0 /* CoreFoundation.framework */; };
 		1731C821206C32640086D5C0 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1731C820206C32640086D5C0 /* IOKit.framework */; };
@@ -54,6 +71,34 @@
 			proxyType = 1;
 			remoteGlobalIDString = 1FF7B64421262A8400BE3BFB;
 			remoteInfo = libxpc_nv;
+		};
+		1FF7B66121262C1300BE3BFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 391C61221D0844C0007DE8C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 17C13B18205456CF001CE9DD;
+			remoteInfo = libxpc;
+		};
+		1FF7B66321262C1300BE3BFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 391C61221D0844C0007DE8C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 17C13B2520555B49001CE9DD;
+			remoteInfo = launchd;
+		};
+		1FF7B66521262C1300BE3BFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 391C61221D0844C0007DE8C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1791F1C6205D1D4F00344BA5;
+			remoteInfo = liblaunch;
+		};
+		1FF7B66721262C1300BE3BFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 391C61221D0844C0007DE8C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1791F1E7205D520E00344BA5;
+			remoteInfo = launchctl;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -443,6 +488,11 @@
 						DevelopmentTeam = 3P242C9ES5;
 						ProvisioningStyle = Automatic;
 					};
+					1FF7B65D21262C0C00BE3BFB = {
+						CreatedOnToolsVersion = 9.4.1;
+						DevelopmentTeam = 3P242C9ES5;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 391C61251D0844C0007DE8C3 /* Build configuration list for PBXProject "libxpc" */;
@@ -457,6 +507,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				1FF7B65D21262C0C00BE3BFB /* world */,
 				17C13B18205456CF001CE9DD /* libxpc */,
 				1FF7B64421262A8400BE3BFB /* libxpc_nv */,
 				17C13B2520555B49001CE9DD /* launchd */,
@@ -539,6 +590,26 @@
 			isa = PBXTargetDependency;
 			target = 1FF7B64421262A8400BE3BFB /* libxpc_nv */;
 			targetProxy = 1FF7B65B21262ACD00BE3BFB /* PBXContainerItemProxy */;
+		};
+		1FF7B66221262C1300BE3BFB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 17C13B18205456CF001CE9DD /* libxpc */;
+			targetProxy = 1FF7B66121262C1300BE3BFB /* PBXContainerItemProxy */;
+		};
+		1FF7B66421262C1300BE3BFB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 17C13B2520555B49001CE9DD /* launchd */;
+			targetProxy = 1FF7B66321262C1300BE3BFB /* PBXContainerItemProxy */;
+		};
+		1FF7B66621262C1300BE3BFB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1791F1C6205D1D4F00344BA5 /* liblaunch */;
+			targetProxy = 1FF7B66521262C1300BE3BFB /* PBXContainerItemProxy */;
+		};
+		1FF7B66821262C1300BE3BFB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1791F1E7205D520E00344BA5 /* launchctl */;
+			targetProxy = 1FF7B66721262C1300BE3BFB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -827,6 +898,24 @@
 			};
 			name = Release;
 		};
+		1FF7B65F21262C0C00BE3BFB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3P242C9ES5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1FF7B66021262C0C00BE3BFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3P242C9ES5;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		391C612E1D0844C0007DE8C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -972,6 +1061,15 @@
 			buildConfigurations = (
 				1FF7B64721262A8400BE3BFB /* Debug */,
 				1FF7B64821262A8400BE3BFB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1FF7B65E21262C0C00BE3BFB /* Build configuration list for PBXAggregateTarget "world" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FF7B65F21262C0C00BE3BFB /* Debug */,
+				1FF7B66021262C0C00BE3BFB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
