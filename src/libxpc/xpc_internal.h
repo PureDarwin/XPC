@@ -28,16 +28,7 @@
 #ifndef	_LIBXPC_XPC_INTERNAL_H
 #define	_LIBXPC_XPC_INTERNAL_H
 
-//#include <nv.h>
-// randomly inserted from https://opensource.apple.com/source/zfs/zfs-59/zfs_common/sys/nvpair.h to satisfy below
-/* nvlist header */
-typedef struct nvlist {
-    int32_t        nvl_version;
-    uint32_t    nvl_nvflag;    /* persistent flags */
-    uint64_t    nvl_priv;    /* ptr to private data if not packed */
-    uint32_t    nvl_flag;
-    int32_t        nvl_pad;    /* currently not used, for alignment */
-} nvlist_t;
+#include "nv.h"
 
 
 #include <queue.h> // to get TAILQ_HEAD()
@@ -131,7 +122,7 @@ struct xpc_connection {
 	int			xc_suspend_count;
 	int			xc_transaction_count;
 	int 			xc_flags;
-	volatile uint64_t	xc_last_id;
+	_Atomic(uint64_t)	xc_last_id;
 	void *			xc_context;
 	struct xpc_connection * xc_parent;
 	uid_t			xc_remote_euid;

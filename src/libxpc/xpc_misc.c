@@ -27,14 +27,13 @@
 
 #include <sys/types.h>
 #include <sys/errno.h>
-//#include <sys/sbuf.h> _sjc_ i don't think these are available on osx / in libc
+#include <sys/sbuf.h>
 #include <mach/mach.h>
 #include <xpc/launchd.h>
-#include <machine/atomic.h>
 #include <assert.h>
 #include <syslog.h>
 #include <stdarg.h>
-#include <uuid.h>
+#include <uuid/uuid.h>
 
 #include "xpc_internal.h"
 
@@ -62,8 +61,7 @@ struct xpc_recv_message {
 	mach_msg_trailer_t trailer;
 };
 
-// _sjc_ included sbuf
-//static void xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level);
+static void xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level);
 
 void
 fail_log(const char *exp)
@@ -71,10 +69,8 @@ fail_log(const char *exp)
 	syslog(LOG_ERR, "%s", exp);
 	//sleep(1);
 	printf("%s", exp);
-	//abort();
+	abort();
 }
-
-static void nvlist_add_prim(nvlist_t *nv, const char *key, xpc_object_t xobj);
 
 static void
 xpc_dictionary_destroy(struct xpc_object *dict)
@@ -108,21 +104,19 @@ xpc_array_destroy(struct xpc_object *dict)
 static int
 xpc_pack(struct xpc_object *xo, void *buf, size_t *size)
 {
-    /* _sjc_ no xpc2nv()
 	nvlist_t *nv;
 	void *packed;
 
 	nv = xpc2nv(xo);
 
-    packed = NULL; // _sjc_ linker couldn't find symbol nvlist_pack_buffer(nv, NULL, size);
+	packed = nvlist_pack_buffer(nv, NULL, size);
 	if (packed == NULL) {
 		errno = EINVAL;
 		return (-1);
 	}
 
 	memcpy(buf, packed, *size);
-     */
-	return (0);
+	return 0;
 }
 
 static struct xpc_object *
@@ -131,10 +125,9 @@ xpc_unpack(void *buf, size_t size)
 	struct xpc_object *xo;
 	nvlist_t *nv;
 
-	//nv = nvlist_unpack(buf, size); _sjc_ removed because linker cannot find it
-    //xo = nv2xpc(nv); _sjc_ removed because this is in xpc_array and requires these NV list things
-	//return (xo);
-    return NULL; // _sjc_ added this because it needed to return something
+	nv = nvlist_unpack(buf, size);
+	xo = nv2xpc(nv);
+	return (xo);
 }
 
 void
@@ -191,32 +184,12 @@ xpc_strerror(int error)
 	return (xpc_errors[error]);
 }
 
-char *
-xpc_copy_description(xpc_object_t obj)
-{
-    /* _sjc_ because no sbuf
-	char *result;
-	struct sbuf *sbuf;
-
-	sbuf = sbuf_new_auto();
-	xpc_copy_description_level(obj, sbuf, 0);
-	sbuf_finish(sbuf);
-	result = strdup(sbuf_data(sbuf));
-	sbuf_delete(sbuf);
-
-	return (result);
-     */
-    return strdup("xpc_copy_description() needs to be implemented");
-}
-
-/* _sjc_ because it takes sbuf as a parameter
 static void
 xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level)
 {
 	struct xpc_object *xo = obj;
-	struct uuid *id;
-	char *uuid_str;
-	uint32_t uuid_status;
+	uuid_t id;
+	uuid_string_t uuid_str;
 
 	if (obj == NULL) {
 		sbuf_printf(sbuf, "<null value>\n");
@@ -270,14 +243,14 @@ xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level)
 		break;	
 
 	case _XPC_TYPE_UUID:
-		id = (struct uuid *)xpc_uuid_get_bytes(obj);
-		uuid_to_string(id, &uuid_str, &uuid_status);
+		memcpy(id, xpc_uuid_get_bytes(obj), sizeof(uuid_t));
+		uuid_unparse_upper(id, uuid_str);
 		sbuf_printf(sbuf, "%s\n", uuid_str);
 		free(uuid_str);
 		break;
 
 	case _XPC_TYPE_ENDPOINT:
-		sbuf_printf(sbuf, "<%d>\n", xo->xo_int);
+		sbuf_printf(sbuf, "<%lld>\n", xo->xo_int);
 		break;
 
 	case _XPC_TYPE_NULL:
@@ -285,7 +258,23 @@ xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level)
 		break;
 	}
 }
-*/
+
+extern struct sbuf *sbuf_new_auto(void);
+
+char *
+xpc_copy_description(xpc_object_t obj)
+{
+	char *result;
+	struct sbuf *sbuf;
+
+	sbuf = sbuf_new_auto();
+	xpc_copy_description_level(obj, sbuf, 0);
+	sbuf_finish(sbuf);
+	result = strdup(sbuf_data(sbuf));
+	sbuf_delete(sbuf);
+
+	return (result);
+}
 
 struct _launch_data {
 	uint64_t type;
@@ -362,6 +351,7 @@ xpc_copy_entitlement_for_token(const char *key __unused, audit_token_t *token __
 	return (_xpc_prim_create(_XPC_TYPE_BOOL, val,0));
 }
 
+
 #define XPC_RPORT "XPC remote port"
 int
 xpc_pipe_routine_reply(xpc_object_t xobj)
@@ -381,7 +371,7 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	//if (xpc2nv(xobj, &message->data, &size) == NULL)
 	//	return (EINVAL);
 
-	message->header.msgh_size = msg_size;
+	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_remote_port = xpc_dictionary_copy_mach_send(xobj, XPC_RPORT);
 	message->header.msgh_local_port = MACH_PORT_NULL;
 	message->size = size;
@@ -414,7 +404,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 		return (EINVAL);
 
 	msg_size = /*_sjc_ can't find __ALIGN*/(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
-	message->header.msgh_size = msg_size;
+	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND,
 	    MACH_MSG_TYPE_MAKE_SEND);
 	message->header.msgh_remote_port = dst;
@@ -443,7 +433,6 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	struct xpc_recv_message message;
 	mach_msg_header_t *request;
 	kern_return_t kr;
-	mig_reply_error_t response;
 	mach_msg_trailer_t *tr;
 	int data_size;
 	struct xpc_object *xo;
@@ -464,7 +453,7 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 		LOG("mach_msg_receive returned %d\n", kr);
 	*remote = request->msgh_remote_port;
 	*id = message.id;
-	data_size = message.size;
+	data_size = (int)message.size;
 	LOG("unpacking data_size=%d", data_size);
 	xo = xpc_unpack(&message.data, data_size);
 
@@ -494,7 +483,6 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 	int data_size;
 	struct xpc_object *xo;
 	audit_token_t *auditp;
-	xpc_u val;
 
 	request = &message.header;
 	response = &rsp_message.header;

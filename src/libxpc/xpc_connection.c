@@ -29,13 +29,13 @@
 #include <mach/mach.h>
 #include <servers/bootstrap.h>
 #include <xpc/xpc.h>
-#include <machine/atomic.h>
+#include <stdatomic.h>
+#include <bsm/libbsm.h>
 #include <Block.h>
+#include "vproc.h"
 #include "xpc_internal.h"
 
-// _sjc_ redo these base on eg. stdatomics.h
-#define XPC_CONNECTION_NEXT_ID(conn) (++conn->xc_last_id)
-//#define XPC_CONNECTION_NEXT_ID(conn) (atomic_fetchadd_int(&conn->xc_last_id, 1))
+#define XPC_CONNECTION_NEXT_ID(conn) atomic_fetch_add(&conn->xc_last_id, 1)
 
 static void xpc_connection_recv_message(void *);
 static void xpc_send(xpc_connection_t xconn, xpc_object_t message, uint64_t id);
@@ -133,7 +133,6 @@ xpc_connection_create_mach_service(const char *name, dispatch_queue_t targetq,
 xpc_connection_t
 xpc_connection_create_from_endpoint(xpc_endpoint_t endpoint)
 {
-	kern_return_t kr;
 	struct xpc_connection *conn;
 
 	conn = xpc_connection_create("anonymous", NULL);
@@ -353,13 +352,13 @@ xpc_main(xpc_connection_handler_t handler)
 void
 xpc_transaction_begin(void)
 {
-
+	vproc_transaction_begin(NULL);
 }
 
 void
 xpc_transaction_end(void)
 {
-
+	vproc_transaction_end(NULL, NULL);
 }
 
 static void
@@ -368,7 +367,7 @@ xpc_send(xpc_connection_t xconn, xpc_object_t message, uint64_t id)
 	struct xpc_connection *conn;
 	kern_return_t kr;
 
-	debugf("connection=%p, message=%p, id=%d", xconn, message, id);
+	debugf("connection=%p, message=%p, id=%llu", xconn, message, id);
 
 	conn = xconn;
 	kr = xpc_pipe_send(message, conn->xc_remote_port,
@@ -381,22 +380,13 @@ xpc_send(xpc_connection_t xconn, xpc_object_t message, uint64_t id)
 static void
 xpc_connection_set_credentials(struct xpc_connection *conn, audit_token_t *tok)
 {
-	uid_t uid;
-	gid_t gid;
-	pid_t pid;
-	au_asid_t asid;
-
 	if (tok == NULL)
 		return;
 
-    // _sjc_ linker cannot find audit_token_to_au32()
-    // todo: remove auditing from libxpc? update definitions to match latest version of libbsm?
-//    audit_token_to_au32(*tok, NULL, &uid, &gid, NULL, NULL, &pid, &asid, NULL);
-
-	conn->xc_remote_euid = uid;
-	conn->xc_remote_guid = gid;
-	conn->xc_remote_pid = pid;
-	conn->xc_remote_asid = asid;
+	conn->xc_remote_euid = audit_token_to_euid(*tok);
+	conn->xc_remote_guid = audit_token_to_egid(*tok);
+	conn->xc_remote_pid = audit_token_to_pid(*tok);
+	conn->xc_remote_asid = audit_token_to_asid(*tok);
 }
 
 static void
@@ -416,7 +406,7 @@ xpc_connection_recv_message(void *context)
 	if (kr != KERN_SUCCESS)
 		return;
 
-	debugf("message=%p, id=%d, remote=<%d>", result, id, remote);
+	debugf("message=%p, id=%llu, remote=<%d>", result, id, remote);
 
 	if (conn->xc_flags & XPC_CONNECTION_MACH_SERVICE_LISTENER) {
 		TAILQ_FOREACH(peer, &conn->xc_peers, xc_link) {

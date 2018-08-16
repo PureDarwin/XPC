@@ -38,20 +38,17 @@ static void xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value);
 __private_extern__ void
 nv_release_entry(nvlist_t *nv, const char *key)
 {
-    /* _sjc_ used nvlist stuff
 	xpc_object_t tmp;
 
 	if (nvlist_exists_type(nv, key, NV_TYPE_PTR)) {
 		tmp = (void *)nvlist_take_number(nv, key);
 		xpc_release(tmp);
 	}
-     */
 }
 
 struct xpc_object *
 nv2xpc(const nvlist_t *nv)
 {
-    /* _sjc_ so much nvlist stuff
 	struct xpc_object *xo, *xotmp;
 	void *cookiep;
 	const char *key;
@@ -130,14 +127,11 @@ nv2xpc(const nvlist_t *nv)
 	}
 
 	return (xo);
-     */
-    return NULL;
 }
 
 static void
 xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 {
-    /* _sjc_ nvlist
 	struct xpc_object *xotmp = value;
 
 	switch (xotmp->xo_xpc_type) {
@@ -198,13 +192,11 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 	case _XPC_TYPE_DOUBLE:
 		break;
 	}
-     */
 }
 
 nvlist_t *
 xpc2nv(struct xpc_object *xo)
 {
-    /* _sjc_ nvlist stuff
 	nvlist_t *nv;
 	struct xpc_object *xotmp;
 
@@ -229,8 +221,6 @@ xpc2nv(struct xpc_object *xo)
 	}
 
 	return (nv);
-     */
-    return NULL;
 }
 
 xpc_object_t
