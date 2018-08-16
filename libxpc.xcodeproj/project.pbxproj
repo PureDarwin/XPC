@@ -36,7 +36,26 @@
 		17E13E0F20586373002309E2 /* job_replyUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E0D20586373002309E2 /* job_replyUser.c */; };
 		17E13E1420586546002309E2 /* kill2.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E1320586546002309E2 /* kill2.c */; };
 		17E13E1C2058684B002309E2 /* ktrace.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E1B2058684B002309E2 /* ktrace.c */; };
+		1FF7B65221262AA800BE3BFB /* sys_endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64A21262AA800BE3BFB /* sys_endian.h */; };
+		1FF7B65321262AA800BE3BFB /* libsbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FF7B64B21262AA800BE3BFB /* libsbuf.c */; };
+		1FF7B65421262AA800BE3BFB /* nv.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64C21262AA800BE3BFB /* nv.h */; };
+		1FF7B65521262AA800BE3BFB /* nvlist.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FF7B64D21262AA800BE3BFB /* nvlist.c */; };
+		1FF7B65621262AA800BE3BFB /* nvpair.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FF7B64E21262AA800BE3BFB /* nvpair.c */; };
+		1FF7B65721262AA800BE3BFB /* nv_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64F21262AA800BE3BFB /* nv_impl.h */; };
+		1FF7B65821262AA800BE3BFB /* nvlist_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B65021262AA800BE3BFB /* nvlist_impl.h */; };
+		1FF7B65921262AA800BE3BFB /* nvpair_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B65121262AA800BE3BFB /* nvpair_impl.h */; };
+		1FF7B65A21262ABD00BE3BFB /* libxpc_nv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FF7B64521262A8400BE3BFB /* libxpc_nv.a */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1FF7B65B21262ACD00BE3BFB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 391C61221D0844C0007DE8C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1FF7B64421262A8400BE3BFB;
+			remoteInfo = libxpc_nv;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		1791F1E6205D520E00344BA5 /* CopyFiles */ = {
@@ -108,6 +127,15 @@
 		17E13E0D20586373002309E2 /* job_replyUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = job_replyUser.c; path = src/launchd/job_replyUser.c; sourceTree = SOURCE_ROOT; };
 		17E13E1320586546002309E2 /* kill2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = kill2.c; path = src/launchd/kill2.c; sourceTree = SOURCE_ROOT; };
 		17E13E1B2058684B002309E2 /* ktrace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ktrace.c; path = src/launchd/ktrace.c; sourceTree = SOURCE_ROOT; };
+		1FF7B64521262A8400BE3BFB /* libxpc_nv.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libxpc_nv.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FF7B64A21262AA800BE3BFB /* sys_endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sys_endian.h; path = src/libnv/sys_endian.h; sourceTree = "<group>"; };
+		1FF7B64B21262AA800BE3BFB /* libsbuf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsbuf.c; path = src/libnv/libsbuf.c; sourceTree = "<group>"; };
+		1FF7B64C21262AA800BE3BFB /* nv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nv.h; path = src/libnv/nv.h; sourceTree = "<group>"; };
+		1FF7B64D21262AA800BE3BFB /* nvlist.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nvlist.c; path = src/libnv/nvlist.c; sourceTree = "<group>"; };
+		1FF7B64E21262AA800BE3BFB /* nvpair.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = nvpair.c; path = src/libnv/nvpair.c; sourceTree = "<group>"; };
+		1FF7B64F21262AA800BE3BFB /* nv_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nv_impl.h; path = src/libnv/nv_impl.h; sourceTree = "<group>"; };
+		1FF7B65021262AA800BE3BFB /* nvlist_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nvlist_impl.h; path = src/libnv/nvlist_impl.h; sourceTree = "<group>"; };
+		1FF7B65121262AA800BE3BFB /* nvpair_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = nvpair_impl.h; path = src/libnv/nvpair_impl.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,10 +159,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1FF7B65A21262ABD00BE3BFB /* libxpc_nv.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		17C13B2320555B49001CE9DD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FF7B64221262A8400BE3BFB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -223,10 +259,26 @@
 			name = launchd;
 			sourceTree = "<group>";
 		};
+		1FF7B64921262A9D00BE3BFB /* libnv */ = {
+			isa = PBXGroup;
+			children = (
+				1FF7B64B21262AA800BE3BFB /* libsbuf.c */,
+				1FF7B64F21262AA800BE3BFB /* nv_impl.h */,
+				1FF7B64C21262AA800BE3BFB /* nv.h */,
+				1FF7B65021262AA800BE3BFB /* nvlist_impl.h */,
+				1FF7B64D21262AA800BE3BFB /* nvlist.c */,
+				1FF7B65121262AA800BE3BFB /* nvpair_impl.h */,
+				1FF7B64E21262AA800BE3BFB /* nvpair.c */,
+				1FF7B64A21262AA800BE3BFB /* sys_endian.h */,
+			);
+			name = libnv;
+			sourceTree = "<group>";
+		};
 		391C61211D0844C0007DE8C3 = {
 			isa = PBXGroup;
 			children = (
 				17C13B19205456CF001CE9DD /* libxpc.dylib */,
+				1FF7B64921262A9D00BE3BFB /* libnv */,
 				17C13B2620555B49001CE9DD /* launchd */,
 				1791F1C7205D1D4F00344BA5 /* liblaunch.dylib */,
 				1791F1E8205D520E00344BA5 /* launchctl */,
@@ -235,6 +287,7 @@
 				17C13B2720555B49001CE9DD /* launchd */,
 				1791F1E9205D520E00344BA5 /* launchctl */,
 				1731C81D206C324A0086D5C0 /* Frameworks */,
+				1FF7B64521262A8400BE3BFB /* libxpc_nv.a */,
 			);
 			sourceTree = "<group>";
 		};
@@ -252,6 +305,18 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FF7B64321262A8400BE3BFB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FF7B65921262AA800BE3BFB /* nvpair_impl.h in Headers */,
+				1FF7B65821262AA800BE3BFB /* nvlist_impl.h in Headers */,
+				1FF7B65721262AA800BE3BFB /* nv_impl.h in Headers */,
+				1FF7B65421262AA800BE3BFB /* nv.h in Headers */,
+				1FF7B65221262AA800BE3BFB /* sys_endian.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,6 +368,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1FF7B65C21262ACD00BE3BFB /* PBXTargetDependency */,
 			);
 			name = libxpc;
 			productName = liblaunch;
@@ -325,6 +391,23 @@
 			productName = launchd;
 			productReference = 17C13B2620555B49001CE9DD /* launchd */;
 			productType = "com.apple.product-type.tool";
+		};
+		1FF7B64421262A8400BE3BFB /* libxpc_nv */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1FF7B64621262A8400BE3BFB /* Build configuration list for PBXNativeTarget "libxpc_nv" */;
+			buildPhases = (
+				1FF7B64121262A8400BE3BFB /* Sources */,
+				1FF7B64221262A8400BE3BFB /* Frameworks */,
+				1FF7B64321262A8400BE3BFB /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libxpc_nv;
+			productName = libxpc_nv;
+			productReference = 1FF7B64521262A8400BE3BFB /* libxpc_nv.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
 
@@ -355,6 +438,11 @@
 						DevelopmentTeam = DM8VP44BWF;
 						ProvisioningStyle = Automatic;
 					};
+					1FF7B64421262A8400BE3BFB = {
+						CreatedOnToolsVersion = 9.4.1;
+						DevelopmentTeam = 3P242C9ES5;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 391C61251D0844C0007DE8C3 /* Build configuration list for PBXProject "libxpc" */;
@@ -370,6 +458,7 @@
 			projectRoot = "";
 			targets = (
 				17C13B18205456CF001CE9DD /* libxpc */,
+				1FF7B64421262A8400BE3BFB /* libxpc_nv */,
 				17C13B2520555B49001CE9DD /* launchd */,
 				1791F1C6205D1D4F00344BA5 /* liblaunch */,
 				1791F1E7205D520E00344BA5 /* launchctl */,
@@ -433,7 +522,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1FF7B64121262A8400BE3BFB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FF7B65321262AA800BE3BFB /* libsbuf.c in Sources */,
+				1FF7B65521262AA800BE3BFB /* nvlist.c in Sources */,
+				1FF7B65621262AA800BE3BFB /* nvpair.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1FF7B65C21262ACD00BE3BFB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1FF7B64421262A8400BE3BFB /* libxpc_nv */;
+			targetProxy = 1FF7B65B21262ACD00BE3BFB /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1791F1C9205D1D4F00344BA5 /* Debug */ = {
@@ -678,6 +785,46 @@
 			};
 			name = Release;
 		};
+		1FF7B64721262A8400BE3BFB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3P242C9ES5;
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		1FF7B64821262A8400BE3BFB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3P242C9ES5;
+				EXECUTABLE_PREFIX = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		391C612E1D0844C0007DE8C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -814,6 +961,15 @@
 			buildConfigurations = (
 				17C13B2B20555B49001CE9DD /* Debug */,
 				17C13B2C20555B49001CE9DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1FF7B64621262A8400BE3BFB /* Build configuration list for PBXNativeTarget "libxpc_nv" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FF7B64721262A8400BE3BFB /* Debug */,
+				1FF7B64821262A8400BE3BFB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
