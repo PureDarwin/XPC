@@ -139,7 +139,7 @@ _xpc_prim_create_flags(int type, xpc_u value, size_t size, uint16_t flags)
 xpc_object_t
 xpc_null_create(void)
 {
-	xpc_u val;
+	xpc_u val = {0};
 	return _xpc_prim_create(_XPC_TYPE_NULL, val, 0);
 }
 

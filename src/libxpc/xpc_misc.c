@@ -29,6 +29,7 @@
 #include <sys/errno.h>
 #include <sys/sbuf.h>
 #include <mach/mach.h>
+#include <mach/message.h>
 #include <xpc/launchd.h>
 #include <assert.h>
 #include <syslog.h>
@@ -351,6 +352,8 @@ xpc_copy_entitlement_for_token(const char *key __unused, audit_token_t *token __
 	return (_xpc_prim_create(_XPC_TYPE_BOOL, val,0));
 }
 
+extern kern_return_t
+mach_msg_send(mach_msg_header_t *header);
 
 #define XPC_RPORT "XPC remote port"
 int
