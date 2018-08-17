@@ -24,6 +24,9 @@
 
 #include "kill2.h"
 
+// This function is defined in libsystem_kernel.
+extern int __kill(pid_t pid, int sig, int posix);
+
 int
 kill2(pid_t pid, int sig)
 {
@@ -34,7 +37,7 @@ kill2(pid_t pid, int sig)
 	 * I've filed 5487498 to get a non-portable kill().
 	 * We'll regretfully take advantage of implementation details for now.
 	 */
-	return syscall(SYS_kill, pid, sig, 0);
+	return __kill(pid, sig, 0);
 }
 
 int
