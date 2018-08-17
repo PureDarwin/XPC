@@ -398,13 +398,17 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	xo = xobj;
 	assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY);
 
+	nvlist_t *nvl = xpc2nv(xo);
+	size = nvlist_size(nvl);
+	nvlist_destroy(nvl);
+
+	msg_size = /*_sjc_ can't find __ALIGN*/(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
 	if ((message = malloc(msg_size)) == NULL)
 		return (ENOMEM);
 
 	if (xpc_pack(xo, &message->data, &size) != 0)
 		return (EINVAL);
 
-	msg_size = /*_sjc_ can't find __ALIGN*/(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND,
 	    MACH_MSG_TYPE_MAKE_SEND);

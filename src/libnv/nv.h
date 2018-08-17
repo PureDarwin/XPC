@@ -103,6 +103,7 @@ void nvlist_dump(const nvlist_t *nvl, int fd);
 void nvlist_fdump(const nvlist_t *nvl, FILE *fp);
 #endif
 
+int nvlist_type(const nvlist_t *nvl);
 size_t		 nvlist_size(const nvlist_t *nvl);
 void		*nvlist_pack(const nvlist_t *nvl, size_t *sizep);
 void		*nvlist_pack_buffer(const nvlist_t *nvl, void *buf, size_t *sizep);

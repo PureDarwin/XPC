@@ -49,7 +49,7 @@ nv_release_entry(nvlist_t *nv, const char *key)
 struct xpc_object *
 nv2xpc(const nvlist_t *nv)
 {
-	struct xpc_object *xo, *xotmp;
+	struct xpc_object *xo = NULL, *xotmp = NULL;
 	void *cookiep;
 	const char *key;
 	int type;
