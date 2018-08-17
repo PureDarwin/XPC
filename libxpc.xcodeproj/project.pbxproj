@@ -53,6 +53,7 @@
 		17E13E0F20586373002309E2 /* job_replyUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E0D20586373002309E2 /* job_replyUser.c */; };
 		17E13E1420586546002309E2 /* kill2.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E1320586546002309E2 /* kill2.c */; };
 		17E13E1C2058684B002309E2 /* ktrace.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E1B2058684B002309E2 /* ktrace.c */; };
+		1F1CCB8721273CEA00A89642 /* libxpc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 17C13B19205456CF001CE9DD /* libxpc.dylib */; };
 		1FF7B65221262AA800BE3BFB /* sys_endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64A21262AA800BE3BFB /* sys_endian.h */; };
 		1FF7B65321262AA800BE3BFB /* libsbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FF7B64B21262AA800BE3BFB /* libsbuf.c */; };
 		1FF7B65421262AA800BE3BFB /* nv.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64C21262AA800BE3BFB /* nv.h */; };
@@ -65,6 +66,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		1F1CCB8521273CE600A89642 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 391C61221D0844C0007DE8C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 17C13B18205456CF001CE9DD;
+			remoteInfo = libxpc;
+		};
 		1FF7B65B21262ACD00BE3BFB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 391C61221D0844C0007DE8C3 /* Project object */;
@@ -188,6 +196,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F1CCB8721273CEA00A89642 /* libxpc.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,6 +388,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				1F1CCB8621273CE600A89642 /* PBXTargetDependency */,
 			);
 			name = liblaunch;
 			productName = liblaunch;
@@ -586,6 +596,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		1F1CCB8621273CE600A89642 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 17C13B18205456CF001CE9DD /* libxpc */;
+			targetProxy = 1F1CCB8521273CE600A89642 /* PBXContainerItemProxy */;
+		};
 		1FF7B65C21262ACD00BE3BFB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 1FF7B64421262A8400BE3BFB /* libxpc_nv */;
