@@ -49,8 +49,12 @@ vproc_err_t _vprocmgr_init(const char *session_type);
 vproc_err_t _vproc_post_fork_ping(void);
 
 #if !TARGET_OS_EMBEDDED
-#define _audit_session_self(v) (mach_port_t)syscall(SYS_audit_session_self)
-#define _audit_session_join(s) (au_asid_t)syscall(SYS_audit_session_join, session)
+// These two functions are defined in libsystem_kernel.
+extern mach_port_t audit_session_self(void);
+extern au_asid_t audit_session_join(mach_port_t session);
+
+#define _audit_session_self    audit_session_self
+#define _audit_session_join    audit_session_join
 #else
 #define _audit_session_self(v) MACH_PORT_NULL
 #define _audit_session_join(s) 0
