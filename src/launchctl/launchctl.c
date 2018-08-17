@@ -328,7 +328,7 @@ main(int argc, char *const argv[])
 	_launchctl_is_managed = is_managed;
 
 	_launchctl_istty = isatty(STDIN_FILENO);
-	argc--, argv++;
+	argc--; argv++;
 
 	if (argc > 0 && argv[0][0] == '-') {
 		char *flago;
@@ -346,7 +346,7 @@ main(int argc, char *const argv[])
 						launchctl_log(LOG_ERR, "Unknown user: %s", argv[1]);
 						exit(EXIT_FAILURE);
 					}
-					argc--, argv++;
+					argc--; argv++;
 				} else {
 					launchctl_log(LOG_ERR, "-u option requires an argument.");
 				}
@@ -359,7 +359,7 @@ main(int argc, char *const argv[])
 				break;
 			}
 		}
-		argc--, argv++;
+		argc--; argv++;
 	}
 
 	/* Running in the context of the root user's per-user launchd is only from
@@ -392,11 +392,6 @@ main(int argc, char *const argv[])
 			launchctl_log(LOG_ERR, "You must be root to run in the root user context.");
 			exit(EXIT_FAILURE);
 		}
-	}
-
-	if (!readline) {
-		launchctl_log(LOG_ERR, "missing library: readline");
-		exit(EXIT_FAILURE);
 	}
 
 	if (argc == 0) {
@@ -3596,6 +3591,9 @@ launch_data_array_append(launch_data_t a, launch_data_t o)
 
 	return launch_data_array_set_index(a, o, offt);
 }
+
+extern const char *
+mach_error_string(kern_return_t kr);
 
 mach_port_t
 str2bsport(const char *s)
