@@ -602,7 +602,7 @@ const unsigned char *
 nvpair_unpack_nvlist(bool isbe __unused, nvpair_t *nvp,
     const unsigned char *ptr, size_t *leftp, size_t nfds, nvlist_t **child)
 {
-	nvlist_t *value;
+	nvlist_t *value = NULL;
 
 	PJDLOG_ASSERT(nvp->nvp_type == NV_TYPE_NVLIST ||
 	    nvp->nvp_type == NV_TYPE_NVLIST_ARRAY ||
