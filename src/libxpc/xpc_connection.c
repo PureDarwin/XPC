@@ -383,10 +383,20 @@ xpc_connection_set_credentials(struct xpc_connection *conn, audit_token_t *tok)
 	if (tok == NULL)
 		return;
 
-	conn->xc_remote_euid = audit_token_to_euid(*tok);
-	conn->xc_remote_guid = audit_token_to_egid(*tok);
-	conn->xc_remote_pid = audit_token_to_pid(*tok);
-	conn->xc_remote_asid = audit_token_to_asid(*tok);
+	// Yuck. We really shouldn't be taking this kind of dependency
+	// on the internal guts of the audit_token_t. However, that being
+	// said, there is no other way to extract the salient data from the
+	// token. I cannot link to libbsm and use the official APIs, because
+	// libbsm is a higher-level API than libxpc. This is a layering violation.
+	// Nor do I consider it acceptable to dlopen() libbsm at runtime, as that
+	// would be practically the same thing (xpc_connection_set_credentials()
+	// is frequently called AFAICT).
+
+	// This code came from openbsm/libbsm/bsm_wrappers.c in OpenBSM-21.
+	conn->xc_remote_euid = tok->val[1];
+	conn->xc_remote_guid = tok->val[2];
+	conn->xc_remote_pid = tok->val[5];
+	conn->xc_remote_asid = tok->val[6];
 }
 
 static void

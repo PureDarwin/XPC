@@ -763,7 +763,6 @@
 				GCC_USE_STANDARD_INCLUDE_SEARCHING = NO;
 				INSTALL_PATH = /usr/lib/system;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				OTHER_LDFLAGS = "-Wl,-upward-lbsm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
 			};
@@ -794,7 +793,6 @@
 				GCC_USE_STANDARD_INCLUDE_SEARCHING = NO;
 				INSTALL_PATH = /usr/lib/system;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				OTHER_LDFLAGS = "-Wl,-upward-lbsm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
 			};
