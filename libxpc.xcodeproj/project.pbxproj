@@ -344,6 +344,8 @@
 				1FF7B64521262A8400BE3BFB /* libxpc_nv.a */,
 			);
 			sourceTree = "<group>";
+			tabWidth = 4;
+			usesTabs = 1;
 		};
 /* End PBXGroup section */
 
