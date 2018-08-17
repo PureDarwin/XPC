@@ -783,6 +783,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
+				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
 			};
 			name = Debug;
 		};
@@ -814,6 +815,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
+				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
 			};
 			name = Release;
 		};
