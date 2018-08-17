@@ -404,6 +404,7 @@
 				1791F1E4205D520E00344BA5 /* Sources */,
 				1791F1E5205D520E00344BA5 /* Frameworks */,
 				1791F1E6205D520E00344BA5 /* CopyFiles */,
+				1F1CCB882127433C00A89642 /* Postflight */,
 			);
 			buildRules = (
 			);
@@ -439,6 +440,7 @@
 				17C13B2220555B49001CE9DD /* Sources */,
 				17C13B2320555B49001CE9DD /* Frameworks */,
 				17C13B2420555B49001CE9DD /* CopyFiles */,
+				1F1CCB892127435200A89642 /* Postflight */,
 			);
 			buildRules = (
 			);
@@ -528,6 +530,39 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1F1CCB882127433C00A89642 /* Postflight */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Postflight;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = ". \"${SRCROOT}/src/xcscripts/launchctl-postflight.sh\"";
+			showEnvVarsInLog = 0;
+		};
+		1F1CCB892127435200A89642 /* Postflight */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = Postflight;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = ". \"${SRCROOT}/src/xcscripts/launchd-postflight.sh\"";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1791F1C3205D1D4F00344BA5 /* Sources */ = {
