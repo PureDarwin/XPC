@@ -11661,6 +11661,8 @@ job_mig_legacy_ipc_request(job_t j, vm_offset_t request,
 	mach_msg_type_number_t *replyCnt, mach_port_array_t *reply_fdps,
 	mach_msg_type_number_t *reply_fdsCnt, mach_port_t asport)
 {
+	size_t nout_fds = 0;
+
 	if (!j) {
 		return BOOTSTRAP_NO_MEMORY;
 	}
@@ -11712,7 +11714,6 @@ job_mig_legacy_ipc_request(job_t j, vm_offset_t request,
 	}
 
 	int out_fds[LAUNCHD_MAX_LEGACY_FDS];
-	size_t nout_fds = 0;
 	size_t sz = launch_data_pack(ldreply, (void *)*reply, *replyCnt, out_fds, &nout_fds);
 	if (!sz) {
 		job_log(j, LOG_ERR, "Could not pack legacy IPC reply.");

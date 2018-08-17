@@ -52,6 +52,7 @@ vproc_err_t _vproc_post_fork_ping(void);
 // These two functions are defined in libsystem_kernel.
 extern mach_port_t audit_session_self(void);
 extern au_asid_t audit_session_join(mach_port_t session);
+extern int audit_session_port(au_asid_t asid, mach_port_t *port);
 
 #define _audit_session_self    audit_session_self
 #define _audit_session_join    audit_session_join
