@@ -364,12 +364,13 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 
 	xo = xobj;
 	assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY);
-//	size = nvlist_size(xo->xo_nv);
+	nvlist_t *nvlist = xpc2nv(xobj);
+	if (nvlist == NULL)
+		return (EINVAL);
+	size = nvlist_size(nvlist);
 	msg_size = size + sizeof(mach_msg_header_t) + sizeof(size_t);
 	if ((message = malloc(msg_size)) == NULL)
 		return (ENOMEM);
-	//if (xpc2nv(xobj, &message->data, &size) == NULL)
-	//	return (EINVAL);
 
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_remote_port = xpc_dictionary_copy_mach_send(xobj, XPC_RPORT);
