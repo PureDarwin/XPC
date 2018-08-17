@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <mach/mach.h>
 #include <xpc/launchd.h>
+#include <sys/fileport.h>
 #include "xpc_internal.h"
 
 struct _xpc_type_s {
@@ -301,7 +302,7 @@ xpc_data_get_bytes_ptr(xpc_object_t xdata)
 		return (NULL);
 
 	if (xo->xo_xpc_type == _XPC_TYPE_DATA)
-		return (xo->xo_ptr);
+		return (void *)(xo->xo_ptr);
 
 	return (0);	
 }
@@ -312,6 +313,22 @@ xpc_data_get_bytes(xpc_object_t xdata, void *buffer, size_t off, size_t length)
 
 	/* XXX */
 	return (0);
+}
+
+xpc_object_t
+xpc_fd_create(int fd)
+{
+	xpc_u val;
+	fileport_makeport(fd, &val.port);
+	return _xpc_prim_create(_XPC_TYPE_FD, val, sizeof(val.port));
+}
+
+int
+xpc_fd_dup(xpc_object_t xfd)
+{
+	struct xpc_object *xo = xfd;
+	if (xo->xo_xpc_type != _XPC_TYPE_FD) return -1;
+	return fileport_makefd(xo->xo_u.port);
 }
 
 xpc_object_t
@@ -330,7 +347,7 @@ xpc_string_create_with_format(const char *fmt, ...)
 	xpc_u val;
 
 	va_start(ap, fmt);
-	vasprintf(&val.str, fmt, ap);
+	vasprintf((char **)&val.str, fmt, ap);
 	va_end(ap);
 	return _xpc_prim_create(_XPC_TYPE_STRING, val, strlen(val.str));
 }
@@ -340,7 +357,7 @@ xpc_string_create_with_format_and_arguments(const char *fmt, va_list ap)
 {
 	xpc_u val;
 
-	vasprintf(&val.str, fmt, ap);
+	vasprintf((char **)&val.str, fmt, ap);
 	return _xpc_prim_create(_XPC_TYPE_STRING, val, strlen(val.str));
 }
 
@@ -445,7 +462,7 @@ xpc_hash(xpc_object_t obj)
 
 	case _XPC_TYPE_STRING:
 		return (xpc_data_hash(
-		    xpc_string_get_string_ptr(obj),
+		    (const uint8_t *)xpc_string_get_string_ptr(obj),
 		    xpc_string_get_length(obj)));
 
 	case _XPC_TYPE_DATA:
@@ -455,7 +472,7 @@ xpc_hash(xpc_object_t obj)
 
 	case _XPC_TYPE_DICTIONARY:
 		xpc_dictionary_apply(obj, ^(const char *k, xpc_object_t v) {
-			hash ^= xpc_data_hash(k, strlen(k));
+			hash ^= xpc_data_hash((const uint8_t *)k, strlen(k));
 			hash ^= xpc_hash(v);
 			return ((bool)true);
 		});
