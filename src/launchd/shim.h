@@ -69,7 +69,9 @@ typedef char event_name_t[64];
 #define XPC_PROCESS_ROUTINE_KEY_NEW_INSTANCE_PORT "XPC process key new instance port"
 #define XPC_SERVICE_ENV_ATTACHED "XPC service env attached"
 
+#ifndef _POSIX_SPAWN_DISABLE_ASLR
 #define _POSIX_SPAWN_DISABLE_ASLR 0x8000
+#endif
 
 #define XPC_EVENT_FLAG_ENTITLEMENTS 0x000000000000
 
