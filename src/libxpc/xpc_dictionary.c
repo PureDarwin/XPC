@@ -49,7 +49,7 @@ nv_release_entry(nvlist_t *nv, const char *key)
 struct xpc_object *
 nv2xpc(const nvlist_t *nv)
 {
-	struct xpc_object *xo, *xotmp;
+	struct xpc_object *xo = NULL, *xotmp = NULL;
 	void *cookiep;
 	const char *key;
 	int type;
@@ -207,10 +207,12 @@ xpc2nv(struct xpc_object *xo)
 			xpc2nv_primitive(nv, k, v);
 			return ((bool)true);
 		});
+
+		return nv;
 	}
 
 	if (xo->xo_xpc_type == _XPC_TYPE_ARRAY) {
-		char *key;
+		char *key = NULL;
 		nv = nvlist_create_array(0);
 		xpc_array_apply(xo, ^(size_t index, xpc_object_t v) {
 			asprintf(&key, "%ld", index);
@@ -218,9 +220,12 @@ xpc2nv(struct xpc_object *xo)
 			free(key);
 			return ((bool)true);
 		});
+
+		return nv;
 	}
 
-	return (nv);
+	assert(0 && "xpc_object not array or dictionary");
+	return NULL;
 }
 
 xpc_object_t
@@ -229,7 +234,7 @@ xpc_dictionary_create(const char * const *keys, const xpc_object_t *values,
 {
 	struct xpc_object *xo;
 	size_t i;
-	xpc_u val;
+	xpc_u val = {0};
 
 	xo = _xpc_prim_create(_XPC_TYPE_DICTIONARY, val, count);
 	

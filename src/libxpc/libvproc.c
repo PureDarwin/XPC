@@ -837,7 +837,7 @@ vproc_err_t
 vproc_swap_complex(vproc_t vp, vproc_gsk_t key, launch_data_t inval, launch_data_t *outval)
 {
 	size_t data_offset = 0, good_enough_size = 10*1024*1024;
-	mach_msg_type_number_t indata_cnt = 0, outdata_cnt;
+	mach_msg_type_number_t indata_cnt = 0, outdata_cnt = 0;
 	vm_offset_t indata = 0, outdata = 0;
 	launch_data_t out_obj;
 	void *rval = vproc_swap_complex;

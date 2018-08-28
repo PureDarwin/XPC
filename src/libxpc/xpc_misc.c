@@ -29,6 +29,7 @@
 #include <sys/errno.h>
 #include <sys/sbuf.h>
 #include <mach/mach.h>
+#include <mach/message.h>
 #include <xpc/launchd.h>
 #include <assert.h>
 #include <syslog.h>
@@ -351,6 +352,8 @@ xpc_copy_entitlement_for_token(const char *key __unused, audit_token_t *token __
 	return (_xpc_prim_create(_XPC_TYPE_BOOL, val,0));
 }
 
+extern kern_return_t
+mach_msg_send(mach_msg_header_t *header);
 
 #define XPC_RPORT "XPC remote port"
 int
@@ -364,17 +367,19 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 
 	xo = xobj;
 	assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY);
-//	size = nvlist_size(xo->xo_nv);
+	nvlist_t *nvlist = xpc2nv(xobj);
+	if (nvlist == NULL)
+		return (EINVAL);
+	size = nvlist_size(nvlist);
 	msg_size = size + sizeof(mach_msg_header_t) + sizeof(size_t);
 	if ((message = malloc(msg_size)) == NULL)
 		return (ENOMEM);
-	//if (xpc2nv(xobj, &message->data, &size) == NULL)
-	//	return (EINVAL);
 
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_remote_port = xpc_dictionary_copy_mach_send(xobj, XPC_RPORT);
 	message->header.msgh_local_port = MACH_PORT_NULL;
 	message->size = size;
+	memcpy(message->data, nvlist, size);
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS)
 		err = (kr == KERN_INVALID_TASK) ? EPIPE : EINVAL;
@@ -397,13 +402,17 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	xo = xobj;
 	assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY);
 
+	nvlist_t *nvl = xpc2nv(xo);
+	size = nvlist_size(nvl);
+	nvlist_destroy(nvl);
+
+	msg_size = /*_sjc_ can't find __ALIGN*/(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
 	if ((message = malloc(msg_size)) == NULL)
 		return (ENOMEM);
 
 	if (xpc_pack(xo, &message->data, &size) != 0)
 		return (EINVAL);
 
-	msg_size = /*_sjc_ can't find __ALIGN*/(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND,
 	    MACH_MSG_TYPE_MAKE_SEND);
