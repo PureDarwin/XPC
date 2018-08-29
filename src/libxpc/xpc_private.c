@@ -1,7 +1,6 @@
 #include <xpc/xpc.h>
 #include <xpc/private.h>
 #include <sys/codesign.h>
-#include <ctype.h>
 #include <errno.h>
 
 int _xpc_runtime_is_app_sandboxed(void)
