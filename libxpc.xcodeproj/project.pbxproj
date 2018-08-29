@@ -55,6 +55,7 @@
 		17E13E1C2058684B002309E2 /* ktrace.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E1B2058684B002309E2 /* ktrace.c */; };
 		1F0F396721364BB5003E244C /* csops_entitlements_blob_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */; };
 		1F1CCB8721273CEA00A89642 /* libxpc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 17C13B19205456CF001CE9DD /* libxpc.dylib */; };
+		1FD61C05213711D900A5A7BA /* xpc_entitlements_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */; };
 		1FF7B65221262AA800BE3BFB /* sys_endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64A21262AA800BE3BFB /* sys_endian.h */; };
 		1FF7B65321262AA800BE3BFB /* libsbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FF7B64B21262AA800BE3BFB /* libsbuf.c */; };
 		1FF7B65421262AA800BE3BFB /* nv.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64C21262AA800BE3BFB /* nv.h */; };
@@ -183,6 +184,8 @@
 		17E13E1B2058684B002309E2 /* ktrace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ktrace.c; path = src/launchd/ktrace.c; sourceTree = SOURCE_ROOT; };
 		1F0F395E21364785003E244C /* csops_entitlement_blob_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = csops_entitlement_blob_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csops_entitlements_blob_test.c; path = tests/csops_entitlements_blob_test.c; sourceTree = "<group>"; };
+		1FD61BFC213711BC00A5A7BA /* xpc_entitlements_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xpc_entitlements_test; sourceTree = BUILT_PRODUCTS_DIR; };
+		1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xpc_entitlements_test.c; path = tests/xpc_entitlements_test.c; sourceTree = "<group>"; };
 		1FF7B64521262A8400BE3BFB /* libxpc_nv.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libxpc_nv.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF7B64A21262AA800BE3BFB /* sys_endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sys_endian.h; path = src/libnv/sys_endian.h; sourceTree = "<group>"; };
 		1FF7B64B21262AA800BE3BFB /* libsbuf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsbuf.c; path = src/libnv/libsbuf.c; sourceTree = "<group>"; };
@@ -228,6 +231,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		1F0F395B21364785003E244C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FD61BF9213711BC00A5A7BA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -327,6 +337,7 @@
 			isa = PBXGroup;
 			children = (
 				1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */,
+				1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */,
 			);
 			name = tests;
 			sourceTree = "<group>";
@@ -353,15 +364,16 @@
 				1FF7B64921262A9D00BE3BFB /* libnv */,
 				17C13B2620555B49001CE9DD /* launchd */,
 				1791F1C7205D1D4F00344BA5 /* liblaunch.dylib */,
+				17C13B2720555B49001CE9DD /* launchd */,
 				1791F1E8205D520E00344BA5 /* launchctl */,
 				1791F1CB205D1D9400344BA5 /* liblaunch */,
 				17C13B1D205456D6001CE9DD /* libxpc */,
-				17C13B2720555B49001CE9DD /* launchd */,
 				1791F1E9205D520E00344BA5 /* launchctl */,
 				1F0F396521364BAB003E244C /* tests */,
 				1731C81D206C324A0086D5C0 /* Frameworks */,
 				1FF7B64521262A8400BE3BFB /* libxpc_nv.a */,
 				1F0F395E21364785003E244C /* csops_entitlement_blob_test */,
+				1FD61BFC213711BC00A5A7BA /* xpc_entitlements_test */,
 			);
 			sourceTree = "<group>";
 			tabWidth = 4;
@@ -487,6 +499,22 @@
 			productReference = 1F0F395E21364785003E244C /* csops_entitlement_blob_test */;
 			productType = "com.apple.product-type.tool";
 		};
+		1FD61BFB213711BC00A5A7BA /* xpc_entitlements_test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1FD61C02213711BD00A5A7BA /* Build configuration list for PBXNativeTarget "xpc_entitlements_test" */;
+			buildPhases = (
+				1FD61BF8213711BC00A5A7BA /* Sources */,
+				1FD61BF9213711BC00A5A7BA /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = xpc_entitlements_test;
+			productName = xpc_entitlements_test;
+			productReference = 1FD61BFC213711BC00A5A7BA /* xpc_entitlements_test */;
+			productType = "com.apple.product-type.tool";
+		};
 		1FF7B64421262A8400BE3BFB /* libxpc_nv */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1FF7B64621262A8400BE3BFB /* Build configuration list for PBXNativeTarget "libxpc_nv" */;
@@ -538,6 +566,11 @@
 						DevelopmentTeam = 3P242C9ES5;
 						ProvisioningStyle = Automatic;
 					};
+					1FD61BFB213711BC00A5A7BA = {
+						CreatedOnToolsVersion = 9.4.1;
+						DevelopmentTeam = 3P242C9ES5;
+						ProvisioningStyle = Automatic;
+					};
 					1FF7B64421262A8400BE3BFB = {
 						CreatedOnToolsVersion = 9.4.1;
 						DevelopmentTeam = 3P242C9ES5;
@@ -569,6 +602,7 @@
 				1791F1C6205D1D4F00344BA5 /* liblaunch */,
 				1791F1E7205D520E00344BA5 /* launchctl */,
 				1F0F395D21364785003E244C /* csops_entitlement_blob_test */,
+				1FD61BFB213711BC00A5A7BA /* xpc_entitlements_test */,
 			);
 		};
 /* End PBXProject section */
@@ -667,6 +701,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				1F0F396721364BB5003E244C /* csops_entitlements_blob_test.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1FD61BF8213711BC00A5A7BA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FD61C05213711D900A5A7BA /* xpc_entitlements_test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1004,6 +1046,42 @@
 			};
 			name = Release;
 		};
+		1FD61C00213711BD00A5A7BA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3P242C9ES5;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		1FD61C01213711BD00A5A7BA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3P242C9ES5;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		1FF7B64721262A8400BE3BFB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1205,6 +1283,15 @@
 			buildConfigurations = (
 				1F0F396221364785003E244C /* Debug */,
 				1F0F396321364785003E244C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1FD61C02213711BD00A5A7BA /* Build configuration list for PBXNativeTarget "xpc_entitlements_test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1FD61C00213711BD00A5A7BA /* Debug */,
+				1FD61C01213711BD00A5A7BA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
