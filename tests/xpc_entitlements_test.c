@@ -76,12 +76,11 @@ void print_dict(xpc_object_t object, int indent) {
 }
 
 int main(int argc, const char * argv[]) {
-	if (argc < 2) {
-		fprintf(stderr, "usage: %s pid\n", argv[0]);
-		return 1;
+	pid_t pid = getpid();
+	if (argc > 1) {
+		pid = atoi(argv[1]);
 	}
 
-	pid_t pid = atoi(argv[1]);
 	xpc_object_t entitlements = xpc_copy_entitlements_for_pid(pid);
 	if (entitlements == NULL) {
 		if (errno == 0) {
