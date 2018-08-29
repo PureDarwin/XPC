@@ -210,7 +210,8 @@ failure:
 }
 
 xpc_object_t xpc_copy_entitlements_for_pid(pid_t pid) {
-	char *plist = entitlements_plist_for_pid(pid);
+	char *plist_buffer = entitlements_plist_for_pid(pid);
+	char *plist = plist_buffer;
 	if (plist == NULL) {
 		// Error!
 		return NULL;
@@ -233,9 +234,10 @@ xpc_object_t xpc_copy_entitlements_for_pid(pid_t pid) {
 	if (!scan_string(plist, "</plist>")) goto failure;
 
 	// Any data past the </plist> is ignored.
+	free(plist_buffer);
 	return entitlements;
 
 failure:
-	free(plist);
+	free(plist_buffer);
 	return NULL;
 }
