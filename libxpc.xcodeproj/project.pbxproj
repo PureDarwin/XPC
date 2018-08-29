@@ -53,6 +53,7 @@
 		17E13E0F20586373002309E2 /* job_replyUser.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E0D20586373002309E2 /* job_replyUser.c */; };
 		17E13E1420586546002309E2 /* kill2.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E1320586546002309E2 /* kill2.c */; };
 		17E13E1C2058684B002309E2 /* ktrace.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E1B2058684B002309E2 /* ktrace.c */; };
+		1F0F396721364BB5003E244C /* csops_entitlements_blob_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */; };
 		1F1CCB8721273CEA00A89642 /* libxpc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 17C13B19205456CF001CE9DD /* libxpc.dylib */; };
 		1FF7B65221262AA800BE3BFB /* sys_endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64A21262AA800BE3BFB /* sys_endian.h */; };
 		1FF7B65321262AA800BE3BFB /* libsbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FF7B64B21262AA800BE3BFB /* libsbuf.c */; };
@@ -180,6 +181,8 @@
 		17E13E0D20586373002309E2 /* job_replyUser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = job_replyUser.c; path = src/launchd/job_replyUser.c; sourceTree = SOURCE_ROOT; };
 		17E13E1320586546002309E2 /* kill2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = kill2.c; path = src/launchd/kill2.c; sourceTree = SOURCE_ROOT; };
 		17E13E1B2058684B002309E2 /* ktrace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ktrace.c; path = src/launchd/ktrace.c; sourceTree = SOURCE_ROOT; };
+		1F0F395E21364785003E244C /* csops_entitlement_blob_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = csops_entitlement_blob_test; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csops_entitlements_blob_test.c; path = tests/csops_entitlements_blob_test.c; sourceTree = "<group>"; };
 		1FF7B64521262A8400BE3BFB /* libxpc_nv.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libxpc_nv.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF7B64A21262AA800BE3BFB /* sys_endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sys_endian.h; path = src/libnv/sys_endian.h; sourceTree = "<group>"; };
 		1FF7B64B21262AA800BE3BFB /* libsbuf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsbuf.c; path = src/libnv/libsbuf.c; sourceTree = "<group>"; };
@@ -218,6 +221,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		17C13B2320555B49001CE9DD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F0F395B21364785003E244C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -313,6 +323,14 @@
 			name = launchd;
 			sourceTree = "<group>";
 		};
+		1F0F396521364BAB003E244C /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */,
+			);
+			name = tests;
+			sourceTree = "<group>";
+		};
 		1FF7B64921262A9D00BE3BFB /* libnv */ = {
 			isa = PBXGroup;
 			children = (
@@ -340,8 +358,10 @@
 				17C13B1D205456D6001CE9DD /* libxpc */,
 				17C13B2720555B49001CE9DD /* launchd */,
 				1791F1E9205D520E00344BA5 /* launchctl */,
+				1F0F396521364BAB003E244C /* tests */,
 				1731C81D206C324A0086D5C0 /* Frameworks */,
 				1FF7B64521262A8400BE3BFB /* libxpc_nv.a */,
+				1F0F395E21364785003E244C /* csops_entitlement_blob_test */,
 			);
 			sourceTree = "<group>";
 			tabWidth = 4;
@@ -451,6 +471,22 @@
 			productReference = 17C13B2620555B49001CE9DD /* launchd */;
 			productType = "com.apple.product-type.tool";
 		};
+		1F0F395D21364785003E244C /* csops_entitlement_blob_test */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1F0F396421364785003E244C /* Build configuration list for PBXNativeTarget "csops_entitlement_blob_test" */;
+			buildPhases = (
+				1F0F395A21364785003E244C /* Sources */,
+				1F0F395B21364785003E244C /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = csops_entitlement_blob_test;
+			productName = codesign_test;
+			productReference = 1F0F395E21364785003E244C /* csops_entitlement_blob_test */;
+			productType = "com.apple.product-type.tool";
+		};
 		1FF7B64421262A8400BE3BFB /* libxpc_nv */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1FF7B64621262A8400BE3BFB /* Build configuration list for PBXNativeTarget "libxpc_nv" */;
@@ -497,6 +533,11 @@
 						DevelopmentTeam = DM8VP44BWF;
 						ProvisioningStyle = Automatic;
 					};
+					1F0F395D21364785003E244C = {
+						CreatedOnToolsVersion = 9.4.1;
+						DevelopmentTeam = 3P242C9ES5;
+						ProvisioningStyle = Automatic;
+					};
 					1FF7B64421262A8400BE3BFB = {
 						CreatedOnToolsVersion = 9.4.1;
 						DevelopmentTeam = 3P242C9ES5;
@@ -527,6 +568,7 @@
 				17C13B2520555B49001CE9DD /* launchd */,
 				1791F1C6205D1D4F00344BA5 /* liblaunch */,
 				1791F1E7205D520E00344BA5 /* launchctl */,
+				1F0F395D21364785003E244C /* csops_entitlement_blob_test */,
 			);
 		};
 /* End PBXProject section */
@@ -617,6 +659,14 @@
 				17E13E0F20586373002309E2 /* job_replyUser.c in Sources */,
 				1791F1FE205D5CC000344BA5 /* job_replyServer.c in Sources */,
 				17E13E02205725AB002309E2 /* runtime.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		1F0F395A21364785003E244C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1F0F396721364BB5003E244C /* csops_entitlements_blob_test.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -912,6 +962,48 @@
 			};
 			name = Release;
 		};
+		1F0F396221364785003E244C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3P242C9ES5;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				OTHER_CFLAGS = "-nostdinc";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/headers/System/Library/Frameworks/** /System/Library/Frameworks";
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
+				USE_HEADERMAP = NO;
+			};
+			name = Debug;
+		};
+		1F0F396321364785003E244C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3P242C9ES5;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				OTHER_CFLAGS = "-nostdinc";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/headers/System/Library/Frameworks/** /System/Library/Frameworks";
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
+				USE_HEADERMAP = NO;
+			};
+			name = Release;
+		};
 		1FF7B64721262A8400BE3BFB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1104,6 +1196,15 @@
 			buildConfigurations = (
 				17C13B2B20555B49001CE9DD /* Debug */,
 				17C13B2C20555B49001CE9DD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1F0F396421364785003E244C /* Build configuration list for PBXNativeTarget "csops_entitlement_blob_test" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1F0F396221364785003E244C /* Debug */,
+				1F0F396321364785003E244C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
