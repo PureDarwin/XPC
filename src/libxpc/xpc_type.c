@@ -336,7 +336,7 @@ xpc_string_create(const char *string)
 {
 	xpc_u val;
 
-	val.str = string;
+	val.str = strdup(string);
 	return _xpc_prim_create(_XPC_TYPE_STRING, val, strlen(string));
 }
 

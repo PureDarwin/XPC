@@ -140,6 +140,9 @@ xpc_object_destroy(struct xpc_object *xo)
 	if (xo->xo_xpc_type == _XPC_TYPE_ARRAY)
 		xpc_array_destroy(xo);
 
+	if (xo->xo_xpc_type == _XPC_TYPE_STRING)
+		free(xo->xo_u.str);
+
 	free(xo);
 }
 
