@@ -229,6 +229,7 @@ xpc_object_t xpc_copy_entitlements_for_pid(pid_t pid) {
 	skip_whitespace(plist);
 
 	if (!scan_string(plist, "<plist version=\"1.0\">")) goto failure;
+	skip_whitespace(plist);
 	xpc_object_t entitlements = plist_to_dict(plist);
 	skip_whitespace(plist);
 	if (!scan_string(plist, "</plist>")) goto failure;
