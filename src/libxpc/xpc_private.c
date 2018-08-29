@@ -33,11 +33,11 @@ static char *entitlements_plist_for_pid(pid_t pid) {
 			return NULL;
 		}
 
-		// The first 8 bytes of the blob are the header; skip those.
-		blob += 8;
-
+		// The first 8 bytes of the blob are a binary header; skip it.
 		// The rest of the blob is an XML-format plist.
-		return blob;
+		char *plist = strdup(blob + 8);
+		free(blob);
+		return plist;
 	} else {
 		// The process has no entitlements.
 		return strdup("");
