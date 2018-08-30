@@ -13,7 +13,7 @@ void xpc_api_misuse(const char *info, ...) {
 	va_end(ap);
 
 	__crashreporter_info__ = xpc_api_misuse_reason;
-	abort();
+	__builtin_trap();
 }
 
 const char *xpc_debugger_api_misuse_info(void) {
