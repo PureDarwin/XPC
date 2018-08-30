@@ -64,15 +64,6 @@ struct xpc_recv_message {
 
 static void xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level);
 
-void
-fail_log(const char *exp)
-{
-	syslog(LOG_ERR, "%s", exp);
-	//sleep(1);
-	printf("%s", exp);
-	abort();
-}
-
 static void
 xpc_dictionary_destroy(struct xpc_object *dict)
 {
