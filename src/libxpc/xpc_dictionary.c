@@ -323,9 +323,8 @@ xpc_dictionary_copy_mach_send(xpc_object_t xdict, const char *key)
 	}
 	return (0);
 #endif
-    
-    // TODO: _sjc_ find why the above was defined-out and this returned nothing
-    return 0;
+
+	xpc_api_misuse("%s: function unimplemented", __PRETTY_FUNCTION__);
 }
 
 void
