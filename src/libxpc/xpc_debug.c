@@ -5,7 +5,7 @@ asm(".desc __crashreporter_info__, 0x10");
 
 static char *xpc_api_misuse_reason = NULL;
 
-__attribute__((visibility("hidden")))
+__attribute__((visibility("hidden"), noreturn))
 void xpc_api_misuse(const char *info) {
 	xpc_api_misuse_reason = __crashreporter_info__ = info;
 	abort();

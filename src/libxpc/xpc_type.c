@@ -137,6 +137,11 @@ _xpc_prim_create_flags(int type, xpc_u value, size_t size, uint16_t flags)
 	return (xo);
 }
 
+#define xpc_assert_type(xo, type) \
+	do { if (xo->xo_xpc_type != type) xpc_api_misuse("XPC object type mismatch: Expected " #type); } while (0)
+#define xpc_assert_nonnull(xo) \
+	do { if (xo == NULL) xpc_api_misuse("Parameter cannot be NULL"); } while (0)
+
 xpc_object_t
 xpc_null_create(void)
 {
@@ -156,16 +161,12 @@ xpc_bool_create(bool value)
 bool
 xpc_bool_get_value(xpc_object_t xbool)
 {
-	struct xpc_object *xo;
+	struct xpc_object *xo = xbool;
 
-	xo = xbool;
-	if (xo == NULL)
-		return (0);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_BOOL);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_BOOL)
-		return (xo->xo_bool);
-
-	return (false);
+	return (xo->xo_bool);
 }
 
 xpc_object_t
@@ -180,16 +181,12 @@ xpc_int64_create(int64_t value)
 int64_t
 xpc_int64_get_value(xpc_object_t xint)
 {
-	struct xpc_object *xo;
+	struct xpc_object *xo = xint;
 
-	xo = xint;
-	if (xo == NULL)
-		return (0);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_INT64);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_INT64)
-		return (xo->xo_int);
-
-	return (0);	
+	return (xo->xo_int);
 }
 
 xpc_object_t
@@ -204,16 +201,12 @@ xpc_uint64_create(uint64_t value)
 uint64_t
 xpc_uint64_get_value(xpc_object_t xuint)
 {
-	struct xpc_object *xo;
+	struct xpc_object *xo = xuint;
 
-	xo = xuint;
-	if (xo == NULL)
-		return (0);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_UINT64);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_UINT64)
-		return (xo->xo_uint);
-
-	return (0);
+	return (xo->xo_uint);
 }
 
 xpc_object_t
@@ -230,10 +223,10 @@ xpc_double_get_value(xpc_object_t xdouble)
 {
 	struct xpc_object *xo = xdouble;
 
-	if (xo->xo_xpc_type == _XPC_TYPE_DOUBLE)
-		return (xo->xo_d);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_DOUBLE);
 
-	return (0);	
+	return (xo->xo_d);
 }
 
 xpc_object_t
@@ -256,13 +249,10 @@ xpc_date_get_value(xpc_object_t xdate)
 {
 	struct xpc_object *xo = xdate;
 
-	if (xo == NULL)
-		return (0);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_DATE);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_DATE)
-		return (xo->xo_int);
-
-	return (0);	
+	return (xo->xo_int);
 }
 
 xpc_object_t
@@ -278,6 +268,7 @@ xpc_data_create(const void *bytes, size_t length)
 xpc_object_t
 xpc_data_create_with_dispatch_data(dispatch_data_t ddata)
 {
+	xpc_api_misuse("xpc_data_create_with_dispatch_data() is not implemented");
     return NULL; // _sjc_ added because there was nothing else here
 }
 
@@ -286,13 +277,10 @@ xpc_data_get_length(xpc_object_t xdata)
 {
 	struct xpc_object *xo = xdata;
 
-	if (xo == NULL)
-		return (0);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_DATA);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_DATA)
-		return (xo->xo_size);
-
-	return (0);	
+	return (xo->xo_size);
 }
 
 const void *
@@ -300,19 +288,20 @@ xpc_data_get_bytes_ptr(xpc_object_t xdata)
 {
 	struct xpc_object *xo = xdata;
 
-	if (xo == NULL)
-		return (NULL);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_DATA);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_DATA)
-		return (void *)(xo->xo_ptr);
-
-	return (0);	
+	return (void *)(xo->xo_ptr);
 }
 
 size_t
 xpc_data_get_bytes(xpc_object_t xdata, void *buffer, size_t off, size_t length)
 {
 	struct xpc_object *xo = xdata;
+
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_DATA);
+
 	size_t length_to_copy = length;
 	if (length_to_copy > xo->xo_size) length_to_copy = xo->xo_size;
 
@@ -335,7 +324,10 @@ int
 xpc_fd_dup(xpc_object_t xfd)
 {
 	struct xpc_object *xo = xfd;
-	if (xo->xo_xpc_type != _XPC_TYPE_FD) return -1;
+
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_FD);
+
 	return fileport_makefd(xo->xo_u.port);
 }
 
@@ -374,13 +366,10 @@ xpc_string_get_length(xpc_object_t xstring)
 {
 	struct xpc_object *xo = xstring;
 
-	if (xo == NULL)
-		return (0);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_STRING);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_STRING)
-		return (xo->xo_size);
-
-	return (0);
+	return (xo->xo_size);
 }
 
 const char *
@@ -388,13 +377,10 @@ xpc_string_get_string_ptr(xpc_object_t xstring)
 {
 	struct xpc_object *xo = xstring;
 
-	if (xo == NULL)
-		return (NULL);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_STRING);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_STRING)
-		return (xo->xo_str);
-
-	return (NULL);
+	return (xo->xo_str);
 }
 
 xpc_object_t
@@ -409,16 +395,12 @@ xpc_uuid_create(const uuid_t uuid)
 const uint8_t *
 xpc_uuid_get_bytes(xpc_object_t xuuid)
 {
-	struct xpc_object *xo;
+	struct xpc_object *xo = xuuid;
 
-	xo = xuuid;
-	if (xo == NULL)
-		return (NULL);
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_UUID);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_UUID)
-		return ((uint8_t*)&xo->xo_uuid);
-
-	return (NULL);
+	return ((uint8_t*)&xo->xo_uuid);
 }
 
 xpc_type_t
@@ -438,7 +420,7 @@ xpc_equal(xpc_object_t x1, xpc_object_t x2)
 	xo1 = x1;
 	xo2 = x2;
     
-    printf("called unimplemented xpc_equal()\n");
+    xpc_api_misuse("xpc_equal() is not implemented");
     return true; // _sjc_ this didn't return anything
 }
 
