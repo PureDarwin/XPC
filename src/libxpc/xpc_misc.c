@@ -143,6 +143,9 @@ xpc_object_destroy(struct xpc_object *xo)
 	if (xo->xo_xpc_type == _XPC_TYPE_STRING)
 		free(xo->xo_u.str);
 
+	if (xo->xo_xpc_type == _XPC_TYPE_DATA)
+		free((void *)xo->xo_u.ptr);
+
 	free(xo);
 }
 

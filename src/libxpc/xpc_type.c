@@ -270,7 +270,8 @@ xpc_data_create(const void *bytes, size_t length)
 {
 	xpc_u val;
 
-	val.ptr = (uintptr_t)bytes;
+	val.ptr = (uintptr_t)malloc(length);
+	memcpy((void *)val.ptr, bytes, length);
 	return _xpc_prim_create(_XPC_TYPE_DATA, val, length);
 }
 
@@ -311,9 +312,15 @@ xpc_data_get_bytes_ptr(xpc_object_t xdata)
 size_t
 xpc_data_get_bytes(xpc_object_t xdata, void *buffer, size_t off, size_t length)
 {
+	struct xpc_object *xo = xdata;
+	size_t length_to_copy = length;
+	if (length_to_copy > xo->xo_size) length_to_copy = xo->xo_size;
 
-	/* XXX */
-	return (0);
+	uint8_t *byte_buffer = (uint8_t *)buffer;
+	byte_buffer += off;
+	memcpy(byte_buffer, (void *)xo->xo_u.ptr, length_to_copy);
+
+	return length_to_copy;
 }
 
 xpc_object_t
