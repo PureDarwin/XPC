@@ -156,6 +156,7 @@ xpc_retain(xpc_object_t obj)
 
 	xo = obj;
 	//atomic_add_int(&xo->xo_refcnt, 1); _sjc_ removed because linker couldn't find atomic_add_int()
+	xo->xo_refcnt++;
 	return (obj);
 }
 
