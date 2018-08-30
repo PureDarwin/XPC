@@ -419,9 +419,63 @@ xpc_equal(xpc_object_t x1, xpc_object_t x2)
 
 	xo1 = x1;
 	xo2 = x2;
-    
-    xpc_api_misuse("xpc_equal() is not implemented");
-    return true; // _sjc_ this didn't return anything
+
+	xpc_assert_nonnull(xo1);
+	xpc_assert_nonnull(xo2);
+
+	if (xo1->xo_xpc_type != xo2->xo_xpc_type) return false;
+
+	switch (xo1->xo_xpc_type) {
+		case _XPC_TYPE_BOOL:
+			return xo1->xo_u.b == xo2->xo_u.b;
+		case _XPC_TYPE_INT64:
+		case _XPC_TYPE_DATE:
+			return xo1->xo_u.i == xo2->xo_u.i;
+		case _XPC_TYPE_UINT64:
+			return xo1->xo_u.ui == xo2->xo_u.ui;
+		case _XPC_TYPE_ENDPOINT:
+			xpc_api_misuse("Cannot compare two endpoints: Not implemented");
+		case _XPC_TYPE_STRING:
+			return strcmp(xo1->xo_u.str, xo1->xo_u.str) == 0;
+		case _XPC_TYPE_DATA:
+			return memcmp((void *)xo1->xo_u.ptr, (void *)xo2->xo_u.ptr, xo1->xo_size) == 0;
+		case _XPC_TYPE_DICTIONARY:
+		{
+			struct xpc_dict_pair *pair;
+			size_t count1 = 0, count2 = 0;
+			TAILQ_FOREACH(pair, &xo1->xo_u.dict, xo_link) {
+				count1++;
+			}
+			TAILQ_FOREACH(pair, &xo2->xo_u.dict, xo_link) {
+				count2++;
+			}
+
+			if (count1 != count2) return false;
+
+			TAILQ_FOREACH(pair, &xo1->xo_u.dict, xo_link) {
+				struct xpc_object *value1 = pair->value;
+				struct xpc_object *value2 = xpc_dictionary_get_value(xo2, pair->key);
+				if (value2 == NULL) return false;
+				if (!xpc_equal(value1, value2)) return false;
+			}
+
+			TAILQ_FOREACH(pair, &xo2->xo_u.dict, xo_link) {
+				if (xpc_dictionary_get_value(xo1, pair->key) == NULL) return false;
+			}
+
+			return true;
+		}
+		case _XPC_TYPE_ARRAY:
+		{
+			if (xpc_array_get_count(xo1) != xpc_array_get_count(xo2)) return false;
+
+			return xpc_array_apply(xo1, ^bool(size_t index, xpc_object_t value) {
+				return xpc_equal(value, xpc_array_get_value(xo2, index));
+			});
+		}
+	}
+
+    xpc_api_misuse("xpc_equal() is not implemented for this object type");
 }
 
 static size_t
