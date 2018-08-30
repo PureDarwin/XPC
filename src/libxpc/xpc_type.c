@@ -29,6 +29,7 @@
 #include <mach/mach.h>
 #include <xpc/launchd.h>
 #include <sys/fileport.h>
+#include <time.h>
 #include "xpc_internal.h"
 
 struct _xpc_type_s {
@@ -247,7 +248,7 @@ xpc_date_create(int64_t interval)
 xpc_object_t
 xpc_date_create_from_current(void)
 {
-    return NULL; // _sjc_ added because there was nothing else here
+    return xpc_date_create(time(NULL) * NSEC_PER_SEC);
 }
 
 int64_t
