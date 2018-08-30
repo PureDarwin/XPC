@@ -31,6 +31,11 @@
 #include "xpc_internal.h"
 #include <assert.h>
 
+#define xpc_assert_type(xo, type) \
+	do { if (((struct xpc_object *)xo)->xo_xpc_type != type) xpc_api_misuse("XPC object type mismatch: Expected " #type); } while (0)
+#define xpc_assert_nonnull(xo) \
+	do { if (xo == NULL) xpc_api_misuse("Parameter cannot be NULL"); } while (0)
+
 #define NVLIST_XPC_TYPE		"__XPC_TYPE"
 
 static void xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value);
@@ -262,6 +267,7 @@ void
 xpc_dictionary_get_audit_token(xpc_object_t xdict, audit_token_t *token)
 {
 	struct xpc_object *xo;
+	xpc_assert_nonnull(xdict);
 
 	xo = xdict;
 	if (xo->xo_audit_token != NULL)
@@ -271,6 +277,9 @@ void
 xpc_dictionary_set_mach_recv(xpc_object_t xdict, const char *key, mach_port_t port)
 {
 	struct xpc_object *xo = xdict;
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xotmp;
 	xpc_u val;
 
@@ -283,6 +292,9 @@ xpc_dictionary_set_mach_recv(xpc_object_t xdict, const char *key, mach_port_t po
 void
 xpc_dictionary_set_mach_send(xpc_object_t xdict, const char *key, mach_port_t port)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xotmp;
 	xpc_u val;
 
@@ -295,6 +307,9 @@ xpc_dictionary_set_mach_send(xpc_object_t xdict, const char *key, mach_port_t po
 mach_port_t
 xpc_dictionary_copy_mach_send(xpc_object_t xdict, const char *key)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xo;
 	const struct xpc_object *xotmp;
 
@@ -316,6 +331,9 @@ xpc_dictionary_copy_mach_send(xpc_object_t xdict, const char *key)
 void
 xpc_dictionary_set_value(xpc_object_t xdict, const char *key, xpc_object_t value)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xo, *xotmp;
 	struct xpc_dict_head *head;
 	struct xpc_dict_pair *pair;
@@ -341,6 +359,9 @@ xpc_dictionary_set_value(xpc_object_t xdict, const char *key, xpc_object_t value
 xpc_object_t
 xpc_dictionary_get_value(xpc_object_t xdict, const char *key)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xo;
 	struct xpc_dict_head *head;
 	struct xpc_dict_pair *pair;
@@ -359,6 +380,9 @@ xpc_dictionary_get_value(xpc_object_t xdict, const char *key)
 size_t
 xpc_dictionary_get_count(xpc_object_t xdict)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xo;
 
 	xo = xdict;
@@ -368,6 +392,9 @@ xpc_dictionary_get_count(xpc_object_t xdict)
 void
 xpc_dictionary_set_bool(xpc_object_t xdict, const char *key, bool value)
 {;
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xo, *xotmp;
 
 	xo = xdict;
@@ -378,6 +405,9 @@ xpc_dictionary_set_bool(xpc_object_t xdict, const char *key, bool value)
 void
 xpc_dictionary_set_int64(xpc_object_t xdict, const char *key, int64_t value)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xo, *xotmp;
 
 	xo = xdict;
@@ -388,6 +418,9 @@ xpc_dictionary_set_int64(xpc_object_t xdict, const char *key, int64_t value)
 void
 xpc_dictionary_set_uint64(xpc_object_t xdict, const char *key, uint64_t value)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xo, *xotmp;
 
 	xo = xdict;
@@ -398,6 +431,9 @@ xpc_dictionary_set_uint64(xpc_object_t xdict, const char *key, uint64_t value)
 void
 xpc_dictionary_set_string(xpc_object_t xdict, const char *key, const char *value)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xo, *xotmp;
 
 	xo = xdict;
@@ -408,6 +444,9 @@ xpc_dictionary_set_string(xpc_object_t xdict, const char *key, const char *value
 bool
 xpc_dictionary_get_bool(xpc_object_t xdict, const char *key)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	xpc_object_t xo;
 
 	xo = xpc_dictionary_get_value(xdict, key);
@@ -417,6 +456,9 @@ xpc_dictionary_get_bool(xpc_object_t xdict, const char *key)
 int64_t
 xpc_dictionary_get_int64(xpc_object_t xdict, const char *key)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	xpc_object_t xo;
 
 	xo = xpc_dictionary_get_value(xdict, key);
@@ -426,6 +468,9 @@ xpc_dictionary_get_int64(xpc_object_t xdict, const char *key)
 uint64_t
 xpc_dictionary_get_uint64(xpc_object_t xdict, const char *key)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	xpc_object_t xo;
 
 	xo = xpc_dictionary_get_value(xdict, key);
@@ -435,6 +480,9 @@ xpc_dictionary_get_uint64(xpc_object_t xdict, const char *key)
 const char *
 xpc_dictionary_get_string(xpc_object_t xdict, const char *key)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	xpc_object_t xo;
 
 	xo = xpc_dictionary_get_value(xdict, key);
@@ -444,6 +492,9 @@ xpc_dictionary_get_string(xpc_object_t xdict, const char *key)
 bool
 xpc_dictionary_apply(xpc_object_t xdict, xpc_dictionary_applier_t applier)
 {
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
 	struct xpc_object *xo, *xotmp;
 	struct xpc_dict_head *head;
 	struct xpc_dict_pair *pair;
