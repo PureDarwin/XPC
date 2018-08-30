@@ -268,8 +268,7 @@ xpc_data_create(const void *bytes, size_t length)
 xpc_object_t
 xpc_data_create_with_dispatch_data(dispatch_data_t ddata)
 {
-	xpc_api_misuse("xpc_data_create_with_dispatch_data() is not implemented");
-    return NULL; // _sjc_ added because there was nothing else here
+	xpc_api_misuse("%s: function unimplemented", __PRETTY_FUNCTION__);
 }
 
 size_t

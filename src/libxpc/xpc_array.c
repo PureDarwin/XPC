@@ -246,7 +246,7 @@ void
 xpc_array_set_connection(xpc_object_t xarray, size_t index,
     xpc_connection_t value)
 {
-	xpc_api_misuse("xpc_array_set_connection(): Not implemented");
+	xpc_api_misuse("%s: function unimplemented", __PRETTY_FUNCTION__);
 }
 
 bool
@@ -352,7 +352,7 @@ xpc_array_dup_fd(xpc_object_t array, size_t index)
 xpc_connection_t
 xpc_array_get_connection(xpc_object_t array, size_t index)
 {
-	xpc_api_misuse("xpc_array_get_connection(): Not implemented");
+	xpc_api_misuse("%s: function unimplemented", __PRETTY_FUNCTION__);
 }
 
 bool
