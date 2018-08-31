@@ -31,7 +31,7 @@
 #include "xpc_internal.h"
 
 #define xpc_assert_type(xo, type) \
-	do { if (((struct xpc_object *)xo)->xo_xpc_type != type) xpc_api_misuse("XPC object type mismatch: Expected " #type); } while (0)
+	do { if (((struct xpc_object *)xo)->xo_xpc_type != type) xpc_api_misuse("XPC object type mismatch: Expected %s", #type); } while (0)
 #define xpc_assert_nonnull(xo) \
 	do { if (xo == NULL) xpc_api_misuse("Parameter cannot be NULL"); } while (0)
 
