@@ -35,7 +35,6 @@ xpc_object_t xpc_copy_entitlements_for_pid(pid_t pid) {
 		return xpc_data_create(blob + 8, required_length - 8);
 	} else {
 		// The process has no entitlements.
-		errno = 0;
 		return NULL;
 	}
 }
