@@ -437,6 +437,7 @@ xpc_equal(xpc_object_t x1, xpc_object_t x2)
 		case _XPC_TYPE_STRING:
 			return strcmp(xo1->xo_u.str, xo1->xo_u.str) == 0;
 		case _XPC_TYPE_DATA:
+			if (xo1->xo_size != xo2->xo_size) return false;
 			return memcmp((void *)xo1->xo_u.ptr, (void *)xo2->xo_u.ptr, xo1->xo_size) == 0;
 		case _XPC_TYPE_DICTIONARY:
 		{
