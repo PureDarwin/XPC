@@ -164,7 +164,6 @@ __private_extern__ int xpc_pipe_send(xpc_object_t obj, mach_port_t dst,
     mach_port_t local, uint64_t id);
 __private_extern__ int xpc_pipe_receive(mach_port_t local, mach_port_t *remote,
     xpc_object_t *result, uint64_t *id);
-
-void fail_log(const char *) __dead2;
+__private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((noreturn, format(printf, 1, 2)));
 
 #endif	/* _LIBXPC_XPC_INTERNAL_H */

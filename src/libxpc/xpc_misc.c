@@ -64,15 +64,6 @@ struct xpc_recv_message {
 
 static void xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level);
 
-void
-fail_log(const char *exp)
-{
-	syslog(LOG_ERR, "%s", exp);
-	//sleep(1);
-	printf("%s", exp);
-	abort();
-}
-
 static void
 xpc_dictionary_destroy(struct xpc_object *dict)
 {
@@ -83,7 +74,7 @@ xpc_dictionary_destroy(struct xpc_object *dict)
 
 	TAILQ_FOREACH_SAFE(p, head, xo_link, ptmp) {
 		TAILQ_REMOVE(head, p, xo_link);
-		xpc_object_destroy(p->value);
+		xpc_release(p->value);
 		free(p);
 	}
 }
@@ -98,7 +89,7 @@ xpc_array_destroy(struct xpc_object *dict)
 
 	TAILQ_FOREACH_SAFE(p, head, xo_link, ptmp) {
 		TAILQ_REMOVE(head, p, xo_link);
-		xpc_object_destroy(p);
+		xpc_release(p);
 	}
 }
 
@@ -140,6 +131,12 @@ xpc_object_destroy(struct xpc_object *xo)
 	if (xo->xo_xpc_type == _XPC_TYPE_ARRAY)
 		xpc_array_destroy(xo);
 
+	if (xo->xo_xpc_type == _XPC_TYPE_STRING)
+		free(xo->xo_u.str);
+
+	if (xo->xo_xpc_type == _XPC_TYPE_DATA)
+		free((void *)xo->xo_u.ptr);
+
 	free(xo);
 }
 
@@ -150,6 +147,7 @@ xpc_retain(xpc_object_t obj)
 
 	xo = obj;
 	//atomic_add_int(&xo->xo_refcnt, 1); _sjc_ removed because linker couldn't find atomic_add_int()
+	xo->xo_refcnt++;
 	return (obj);
 }
 

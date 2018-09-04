@@ -32,7 +32,7 @@
 #if KERNEL
 #include <kern/cs_blobs.h>
 #else
-#include <System/kern/cs_blobs.h>
+// #include <System/kern/cs_blobs.h>
 #endif
 
 /* MAC flags used by F_ADDFILESIGS_* */
