@@ -1,0 +1,6 @@
+language: c
+os: osx
+xcode: xcode9.4
+
+script:
+  - xcodebuild -project libxpc.xcodeproj CODE_SIGN_IDENTITY=""
