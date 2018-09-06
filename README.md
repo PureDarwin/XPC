@@ -1,4 +1,4 @@
-# XPC and Friends!
+# XPC and Friends! [![Build Status](https://travis-ci.org/PureDarwin2/launchd-and-libxpc.svg?branch=master)](https://travis-ci.org/PureDarwin2/launchd-and-libxpc)
 
 An open-source reimplementation of Apple's XPC library and launchd for PureDarwin. Based on [launchd 842.91.1](https://opensource.apple.com/tarballs/launchd/launchd-842.91.1.tar.gz) and iXsystems's skeleton re-implementation of libxpc.
 
