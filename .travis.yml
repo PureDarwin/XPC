@@ -3,4 +3,4 @@ os: osx
 xcode: xcode9.4
 
 script:
-  - xcodebuild libxpc.xcodeproj CODE_SIGN_IDENTITY=""
+  - xcodebuild -project libxpc.xcodeproj CODE_SIGN_IDENTITY=""
