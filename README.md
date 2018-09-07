@@ -18,7 +18,7 @@ You will need a version of `libSystem` which links to `libxpc`, like [this one](
 
 You will also need a versions of `libedit` and `libbsm`.
 
-#### Instalation
+#### Installation
 
 A binary root will be made availble once the code has been shown to work to at least minimum standards.
 
