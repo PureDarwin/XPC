@@ -50,5 +50,10 @@ The `exec` part is important. This will allow `launchd` to replace the startup s
 
 #### TODO
 
-* Complete implementation of xpc functions
+* Complete implementation of these xpc functions
+ XPC_ERROR_CONNECTION_INTERRUPTED
+ XPC_CONNECTION_MACH_SERVICE_LISTENER
+ XPC_CONNECTION_MACH_SERVICE_PRIVILEGED
+ XPC_ERROR_CONNECTION_INVALID
+
 * Get audit logging working using recent OpenBSM
