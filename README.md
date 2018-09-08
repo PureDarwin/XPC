@@ -2,7 +2,7 @@
 
 An open-source reimplementation of Apple's XPC library and launchd for PureDarwin. Based on [launchd 842.91.1](https://opensource.apple.com/tarballs/launchd/launchd-842.91.1.tar.gz) and iXsystems's skeleton re-implementation of libxpc.
 
-**NOTE: The code in this repo compiles and runs but is currently untested. In particular, the implementation of xpc is incomplete, with many functions being no-ops.**
+**NOTE: The code in this repo compiles and runs but is currently untested. In particular, the implementation of xpc is incomplete, with several functions being no-ops.**
 
 This project differs from a 'pure' launchd built from Apple's source to align better with what can be inferred of the current (macOS 10.13) implementation:
 
@@ -14,7 +14,7 @@ This project differs from a 'pure' launchd built from Apple's source to align be
 
 #### Prerequisites
 
-You will need a version of `libSystem` which links to `libxpc`, like [this one](https://github.com/Andromeda-OS/Libsystem). You will also need a version of `libcoreservices`, which it requires. You can find one [here](https://github.com/libsystem-ethan/esdarwin).
+You will need a version of `libSystem` which links to `libxpc`, like [this one](https://github.com/PureDarwin/Libsystem). You will also need a version of `libcoreservices`, which it requires. You can find one [here](https://github.com/PureDarwin/libcoreservices).
 
 You will also need a versions of `libedit` and `libbsm`.
 
@@ -32,7 +32,7 @@ Install the binaries into a Darwin image in the following locations:
 * Install a version of `libsystem_coreservices` if one isn't already present.
 * Install versions of `libedit` and `libbsm` if they aren't already available.
 
-Once you have done this, check the ownership of all directories up to the `LaunchDaemons` directory and all files inside it. They need to be `root:wheel` for `launchd` to be happy about launching them.
+Once you have done this, check the ownership of all directories up to the `LaunchDaemons` directory and all files inside it. They need to be `root:wheel` for `launchd` to be happy about launching them. Please note that if `chown`/`chmod` has no effect, you may need to run `diskutil enableOwnership` on the mounted volume first.
 
 `launchd` should run as the first user task (`pid` 1) in order to set up certain important services (such as the mach port nameserver) which child tasks inherit. When the kernel finishes booting the system it automatically runs `/sbin/launchd`. In current PureDarwin systems this file is a script which sets up various system parameters and then runs `/bin/bash`. To work with this, you should rename `launchd` to `pdlaunchd` and then replace
 
@@ -50,10 +50,5 @@ The `exec` part is important. This will allow `launchd` to replace the startup s
 
 #### TODO
 
-* Complete implementation of these xpc functions
- XPC_ERROR_CONNECTION_INTERRUPTED
- XPC_CONNECTION_MACH_SERVICE_LISTENER
- XPC_CONNECTION_MACH_SERVICE_PRIVILEGED
- XPC_ERROR_CONNECTION_INVALID
-
+* Complete implementation of these xpc functions: `XPC_ERROR_CONNECTION_INTERRUPTED`; `XPC_CONNECTION_MACH_SERVICE_LISTENER`; `XPC_CONNECTION_MACH_SERVICE_PRIVILEGED`; `XPC_ERROR_CONNECTION_INVALID`
 * Get audit logging working using recent OpenBSM
