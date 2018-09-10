@@ -498,6 +498,20 @@ xpc_dictionary_get_string(xpc_object_t xdict, const char *key)
 	return (xpc_string_get_string_ptr(xo));
 }
 
+const void *
+xpc_dictionary_get_data(xpc_object_t xdict, const char *key, size_t *length)
+{
+	xpc_assert_nonnull(xdict);
+	xpc_assert_nonnull(key);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
+	xpc_object_t xdata = xpc_dictionary_get_value(xdict, key);
+	xpc_assert_type(xdata, _XPC_TYPE_DATA);
+
+	if (length != NULL) *length = xpc_data_get_length(xdata);
+	return xpc_data_get_bytes_ptr(xdata);
+}
+
 bool
 xpc_dictionary_apply(xpc_object_t xdict, xpc_dictionary_applier_t applier)
 {
