@@ -39,7 +39,7 @@
 
 #define XPC_ERROR_CONNECTION_INTERRUPTED
 
-var XPC_ERROR_CONNECTION_INTERRUPTED: xpc_object_t { get }
+var XPC_ERROR_CONNECTION_INTERRUPTED: xpc_object_t { get };
 
 
 static void xpc_connection_recv_message(void *);
