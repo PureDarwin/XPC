@@ -55,6 +55,7 @@
 		17E13E1C2058684B002309E2 /* ktrace.c in Sources */ = {isa = PBXBuildFile; fileRef = 17E13E1B2058684B002309E2 /* ktrace.c */; };
 		1F0F396721364BB5003E244C /* csops_entitlements_blob_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */; };
 		1F1CCB8721273CEA00A89642 /* libxpc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 17C13B19205456CF001CE9DD /* libxpc.dylib */; };
+		1F48936D2145F89B0060BEBE /* xpc_error.c in Sources */ = {isa = PBXBuildFile; fileRef = 1F48936C2145F89B0060BEBE /* xpc_error.c */; };
 		1FD343DD213880EE003FE9D1 /* xpc_debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FD343DC213880EE003FE9D1 /* xpc_debug.c */; };
 		1FD61C05213711D900A5A7BA /* xpc_entitlements_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */; };
 		1FF7B65221262AA800BE3BFB /* sys_endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64A21262AA800BE3BFB /* sys_endian.h */; };
@@ -185,6 +186,7 @@
 		17E13E1B2058684B002309E2 /* ktrace.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = ktrace.c; path = src/launchd/ktrace.c; sourceTree = SOURCE_ROOT; };
 		1F0F395E21364785003E244C /* csops_entitlement_blob_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = csops_entitlement_blob_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csops_entitlements_blob_test.c; path = tests/csops_entitlements_blob_test.c; sourceTree = "<group>"; };
+		1F48936C2145F89B0060BEBE /* xpc_error.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = xpc_error.c; path = src/libxpc/xpc_error.c; sourceTree = "<group>"; };
 		1FD343DC213880EE003FE9D1 /* xpc_debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = xpc_debug.c; path = src/libxpc/xpc_debug.c; sourceTree = "<group>"; };
 		1FD61BFC213711BC00A5A7BA /* xpc_entitlements_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xpc_entitlements_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xpc_entitlements_test.c; path = tests/xpc_entitlements_test.c; sourceTree = "<group>"; };
@@ -302,6 +304,7 @@
 				1791F1DF205D45FD00344BA5 /* xpc_dictionary.c */,
 				1791F1DE205D45FD00344BA5 /* xpc_private.c */,
 				1FD343DC213880EE003FE9D1 /* xpc_debug.c */,
+				1F48936C2145F89B0060BEBE /* xpc_error.c */,
 			);
 			name = libxpc;
 			sourceTree = "<group>";
@@ -667,6 +670,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1791F1D4205D319600344BA5 /* helper.defs in Sources */,
+				1F48936D2145F89B0060BEBE /* xpc_error.c in Sources */,
 				1791F1E2205D45FD00344BA5 /* xpc_private.c in Sources */,
 				1791F1D2205D30F100344BA5 /* libvproc.c in Sources */,
 				1791F1D8205D409400344BA5 /* xpc_misc.c in Sources */,

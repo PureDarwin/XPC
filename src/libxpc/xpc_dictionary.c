@@ -359,13 +359,20 @@ xpc_object_t
 xpc_dictionary_get_value(xpc_object_t xdict, const char *key)
 {
 	xpc_assert_nonnull(xdict);
-	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
 
 	struct xpc_object *xo;
 	struct xpc_dict_head *head;
 	struct xpc_dict_pair *pair;
 
 	xo = xdict;
+	if (xo->xo_xpc_type == _XPC_TYPE_STATIC_ERROR) {
+		xpc_object_t error = xpc_hydrate_static_error(xdict);
+		xpc_object_t value = xpc_dictionary_get_value(error, key);
+		xpc_release(error);
+		return value;
+	}
+
+	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
 	head = &xo->xo_dict;
 
 	TAILQ_FOREACH(pair, head, xo_link) {
@@ -380,11 +387,18 @@ size_t
 xpc_dictionary_get_count(xpc_object_t xdict)
 {
 	xpc_assert_nonnull(xdict);
-	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
 
 	struct xpc_object *xo;
 
 	xo = xdict;
+	if (xo->xo_xpc_type == _XPC_TYPE_STATIC_ERROR) {
+		xpc_object_t error = xpc_hydrate_static_error(xdict);
+		size_t count = xpc_dictionary_get_count(error);
+		xpc_release(error);
+		return count;
+	}
+
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
 	return (xo->xo_size);
 }
 
