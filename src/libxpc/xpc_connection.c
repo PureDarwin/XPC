@@ -470,3 +470,9 @@ xpc_connection_recv_message(void *context)
 		}
 	}
 }
+
+void
+xpc_create_from_plist(void)
+{
+	xpc_api_misuse("%s: Function unimplemented", __FUNCTION__);
+}
