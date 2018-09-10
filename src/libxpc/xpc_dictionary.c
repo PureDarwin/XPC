@@ -440,6 +440,16 @@ xpc_dictionary_set_string(xpc_object_t xdict, const char *key, const char *value
 	xpc_dictionary_set_value(xdict, key, xotmp);
 }
 
+void
+xpc_dictionary_set_uuid(xpc_object_t xdict, const char *key, const uuid_t uuid)
+{
+	xpc_assert_nonnull(xdict);
+	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
+
+	struct xpc_object *xotmp = xpc_uuid_create(uuid);
+	xpc_dictionary_set_value(xdict, key, xotmp);
+}
+
 bool
 xpc_dictionary_get_bool(xpc_object_t xdict, const char *key)
 {
