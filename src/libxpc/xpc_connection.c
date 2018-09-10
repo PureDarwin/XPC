@@ -37,11 +37,6 @@
 
 #define XPC_CONNECTION_NEXT_ID(conn) atomic_fetch_add(&conn->xc_last_id, 1)
 
-#define XPC_ERROR_CONNECTION_INTERRUPTED
-
-var XPC_ERROR_CONNECTION_INTERRUPTED: xpc_object_t { get };
-
-
 static void xpc_connection_recv_message(void *);
 static void xpc_send(xpc_connection_t xconn, xpc_object_t message, uint64_t id);
 
