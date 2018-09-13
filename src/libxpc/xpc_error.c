@@ -24,7 +24,7 @@ struct _xpc_dictionary_s {
 #define XPC_MAGIC_DICT_INVALID_ERROR			(uint16_t)0x10002
 #define XPC_MAGIC_DICT_TERMINATION_IMMINENT		(uint16_t)0x10003
 
-const struct _xpc_dictionary_s _xpc_error_dictionary_interrupted = {
+const struct _xpc_dictionary_s _xpc_error_connection_interrupted = {
 	_XPC_TYPE_STATIC_ERROR,
 	XPC_MAGIC_DICT_INTERRUPTED_ERROR
 };
