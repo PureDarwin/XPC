@@ -791,10 +791,11 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INSTALL_PATH = /usr/lib/system;
-				LINK_WITH_STANDARD_LIBRARIES = YES;
+				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_LDFLAGS = (
-					"-lxpc",
+					"-umbrella",
+					System,
 					"-Wl,-reexported_symbols_list,$(SRCROOT)/src/liblaunch/IndirectSymbols",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -824,10 +825,11 @@
 				EXECUTABLE_PREFIX = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INSTALL_PATH = /usr/lib/system;
-				LINK_WITH_STANDARD_LIBRARIES = YES;
+				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_LDFLAGS = (
-					"-lxpc",
+					"-umbrella",
+					System,
 					"-Wl,-reexported_symbols_list,$(SRCROOT)/src/liblaunch/IndirectSymbols",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -919,7 +921,21 @@
 				GCC_USE_STANDARD_INCLUDE_SEARCHING = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				INSTALL_PATH = /usr/lib/system;
+				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				OTHER_LDFLAGS = (
+					"-umbrella",
+					System,
+					"-L/usr/lib/system",
+					"-ldyld",
+					"-lcompiler_rt",
+					"-lsystem_kernel",
+					"-lsystem_c",
+					"-ldispatch",
+					"-lsystem_malloc",
+					"-lpthread",
+					"-lsystem_blocks",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
 				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
@@ -951,7 +967,21 @@
 				GCC_USE_STANDARD_INCLUDE_SEARCHING = NO;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				INSTALL_PATH = /usr/lib/system;
+				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				OTHER_LDFLAGS = (
+					"-umbrella",
+					System,
+					"-L/usr/lib/system",
+					"-ldyld",
+					"-lcompiler_rt",
+					"-lsystem_kernel",
+					"-lsystem_c",
+					"-ldispatch",
+					"-lsystem_malloc",
+					"-lpthread",
+					"-lsystem_blocks",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
 				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
