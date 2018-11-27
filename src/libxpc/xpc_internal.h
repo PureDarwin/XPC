@@ -87,6 +87,8 @@ typedef union {
 
 
 #define _XPC_FROM_WIRE 0x1
+#define _XPC_STATIC_OBJECT_FLAG 0x2
+
 struct xpc_object {
 	uint8_t			xo_xpc_type;
 	uint16_t		xo_flags;

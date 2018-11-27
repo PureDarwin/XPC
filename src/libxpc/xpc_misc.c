@@ -155,13 +155,14 @@ void
 xpc_release(xpc_object_t obj)
 {
 	struct xpc_object *xo;
-
 	xo = obj;
-//    if (atomic_fetchadd_int(&xo->xo_refcnt, -1) > 1)
-    // TODO: _sjc_ replace this with eg. stdatomic.s
-    if ( --(xo->xo_refcnt) > 1 ) {
-        return;
-    }
+
+	// Don't destroy statically allocated objects. (These are compiled
+	// into a binary, and as such we can't call free() on them.)
+	if ((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) != 0 && xo->xo_refcnt == 1)
+		return;
+	if ( --(xo->xo_refcnt) > 1 )
+		return;
 
 	xpc_object_destroy(xo);
 }
@@ -545,4 +546,9 @@ xpc_call_wakeup(mach_port_t rport, int retcode)
 		err = 0;
 
 	return (err);
+}
+
+extern void _xpc_initialize_errors(void);
+void _libxpc_initializer(void) {
+	_xpc_initialize_errors();
 }

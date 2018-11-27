@@ -365,13 +365,6 @@ xpc_dictionary_get_value(xpc_object_t xdict, const char *key)
 	struct xpc_dict_pair *pair;
 
 	xo = xdict;
-	if (xo->xo_xpc_type == _XPC_TYPE_STATIC_ERROR) {
-		xpc_object_t error = xpc_hydrate_static_error(xdict);
-		xpc_object_t value = xpc_dictionary_get_value(error, key);
-		xpc_release(error);
-		return value;
-	}
-
 	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
 	head = &xo->xo_dict;
 
@@ -391,13 +384,6 @@ xpc_dictionary_get_count(xpc_object_t xdict)
 	struct xpc_object *xo;
 
 	xo = xdict;
-	if (xo->xo_xpc_type == _XPC_TYPE_STATIC_ERROR) {
-		xpc_object_t error = xpc_hydrate_static_error(xdict);
-		size_t count = xpc_dictionary_get_count(error);
-		xpc_release(error);
-		return count;
-	}
-
 	xpc_assert_type(xdict, _XPC_TYPE_DICTIONARY);
 	return (xo->xo_size);
 }
