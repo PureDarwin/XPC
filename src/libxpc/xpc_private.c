@@ -24,7 +24,7 @@ xpc_object_t xpc_copy_entitlements_for_pid(pid_t pid) {
 	required_length = ntohl(required_length);
 
 	if (required_length != 0) {
-		char *blob = calloc(1, required_length);
+		char *blob = alloca(required_length);
 		ret = csops(pid, CS_OPS_ENTITLEMENTS_BLOB, blob, required_length);
 		if (ret == -1) {
 			return NULL;
