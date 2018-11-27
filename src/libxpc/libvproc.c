@@ -106,7 +106,7 @@ vproc_retain(vproc_t vp)
 	int32_t orig = OSAtomicAdd32(1, &vp->refcount) - 1;	
 	if (orig <= 0) {
 		_vproc_set_crash_log_message("Under-retain / over-release of vproc_t.");
-		abort();
+		__builtin_trap();
 	}
 
 	return vp;
@@ -118,7 +118,7 @@ vproc_release(vproc_t vp)
 	int32_t newval = OSAtomicAdd32(-1, &vp->refcount);
 	if (newval < 0) {
 		_vproc_set_crash_log_message("Over-release of vproc_t.");
-		abort();
+		__builtin_trap();
 	} else if (newval == 0) {
 		mach_port_deallocate(mach_task_self(), vp->j_port);
 		free(vp);
@@ -176,7 +176,7 @@ _vproc_transaction_begin_internal(void *ctx __unused)
 
 	if (new < 1) {
 		_vproc_set_crash_log_message("Underflow of transaction count.");
-		abort();
+		__builtin_trap();
 	}
 
 	(void)os_assumes_zero(proc_set_dirty(getpid(), true));
@@ -225,7 +225,7 @@ _vproc_transaction_end_internal(void *arg)
 
 	if (new < 0) {
 		_vproc_set_crash_log_message("Underflow of transaction count.");
-		abort();
+		__builtin_trap();
 	}
 
 	if (globals->_vproc_gone2zero_callout && !arg) {
