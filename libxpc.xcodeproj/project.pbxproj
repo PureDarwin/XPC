@@ -368,18 +368,18 @@
 		391C61211D0844C0007DE8C3 = {
 			isa = PBXGroup;
 			children = (
-				17C13B19205456CF001CE9DD /* libxpc.dylib */,
 				1FF7B64921262A9D00BE3BFB /* libnv */,
-				17C13B2620555B49001CE9DD /* launchd */,
-				1791F1C7205D1D4F00344BA5 /* liblaunch.dylib */,
 				17C13B2720555B49001CE9DD /* launchd */,
-				1791F1E8205D520E00344BA5 /* launchctl */,
 				1791F1CB205D1D9400344BA5 /* liblaunch */,
 				17C13B1D205456D6001CE9DD /* libxpc */,
 				1791F1E9205D520E00344BA5 /* launchctl */,
 				1F0F396521364BAB003E244C /* tests */,
 				1731C81D206C324A0086D5C0 /* Frameworks */,
+				17C13B2620555B49001CE9DD /* launchd */,
+				1791F1E8205D520E00344BA5 /* launchctl */,
 				1FF7B64521262A8400BE3BFB /* libxpc_nv.a */,
+				17C13B19205456CF001CE9DD /* libxpc.dylib */,
+				1791F1C7205D1D4F00344BA5 /* liblaunch.dylib */,
 				1F0F395E21364785003E244C /* csops_entitlement_blob_test */,
 				1FD61BFC213711BC00A5A7BA /* xpc_entitlements_test */,
 			);
