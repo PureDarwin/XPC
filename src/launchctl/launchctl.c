@@ -195,7 +195,6 @@ static void empty_dir(const char *thedir, struct stat *psb);
 static int touch_file(const char *path, mode_t m);
 static void do_sysversion_sysctl(void);
 static void do_application_firewall_magic(int sfd, launch_data_t thejob);
-static void preheat_page_cache_hack(void);
 static void do_bootroot_magic(void);
 static void do_single_user_mode(bool);
 static bool do_single_user_mode2(void);
@@ -2491,8 +2490,6 @@ system_specific_bootstrap(bool sflag)
 
 	do_BootCache_magic(BOOTCACHE_START);
 
-	preheat_page_cache_hack();
-
 	_vproc_set_global_on_demand(true);
 
 	char *load_launchd_items[] = { "load", "-D", "all", NULL };
@@ -4481,49 +4478,6 @@ do_application_firewall_magic(int sfd, launch_data_t thejob)
 			(void)os_assumes_zero(errno);
 		}
 	}
-}
-
-
-void
-preheat_page_cache_hack(void)
-{
-	struct dirent *de;
-	DIR *thedir;
-
-	/* Disable this hack for now */
-	return;
-
-	if ((thedir = opendir("/etc/preheat_at_boot")) == NULL) {
-		return;
-	}
-
-	while ((de = readdir(thedir))) {
-		struct stat sb;
-		void *junkbuf;
-		int fd;
-
-		if (de->d_name[0] == '.') {
-			continue;
-		}
-
-		if ((fd = open(de->d_name, O_RDONLY)) == -1) {
-			continue;
-		}
-
-		if (fstat(fd, &sb) != -1) { 
-			if ((sb.st_size < 10*1024*1024) && (junkbuf = malloc((size_t)sb.st_size)) != NULL) {
-				ssize_t n = read(fd, junkbuf, (size_t)sb.st_size);
-				if (posix_assumes_zero(n) != -1 && n != (ssize_t)sb.st_size) {
-					(void)os_assumes_zero(n);
-				}
-				free(junkbuf);
-			}
-		}
-
-		close(fd);
-	}
-
-	closedir(thedir);
 }
 
 void
