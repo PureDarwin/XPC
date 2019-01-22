@@ -1,62 +1,151 @@
-// We cannot include xpc/xpc.h in this file, as otherwise the definitions
-// of the _xpc_error_* symbols would not compile correctly. Therefore, I
-// must redefine all applicable symbols here. How annoying.
+/*
+This file is part of Darling.
 
-#include <os/object.h>
-#include <dispatch/dispatch.h>
+Copyright (C) 2017 Darling developers
 
-#include <sys/mman.h>
-#include <uuid/uuid.h>
-#include <bsm/audit.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
+Darling is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-typedef struct xpc_object * xpc_object_t;
-typedef void (^xpc_handler_t)(xpc_object_t object);
+Darling is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-extern xpc_object_t xpc_string_create(const char *);
-extern void xpc_dictionary_set_value(xpc_object_t, const char *, xpc_object_t);
-extern void xpc_release(xpc_object_t);
+You should have received a copy of the GNU General Public License
+along with Darling.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
+#include "xpc/xpc.h"
 #include "xpc_internal.h"
 
-#define xpc_assert_type(xo, type) \
-	do { if (((struct xpc_object *)xo)->xo_xpc_type != type) xpc_api_misuse("XPC object type mismatch: Expected %s", #type); } while (0)
-#define xpc_assert_nonnull(xo) \
-	do { if (xo == NULL) xpc_api_misuse("Parameter cannot be NULL"); } while (0)
+/* The only key for XPC_ERROR_* dictionaries */
+#define _XPC_ERROR_KEY_DESCRIPTION_STR "XPCErrorDescription"
+const char *const _xpc_error_key_description = _XPC_ERROR_KEY_DESCRIPTION_STR;
 
-const char * const _xpc_error_key_description = "XPC_ERROR_DESCRIPTION";
-
+/*
+* XPC_ERROR_* constants are declared to be of type `struct _xpc_dictionary_s`
+* in Apple's <xpc/connection.h>, yet we want `struct _xpc_dictionary_s *` to
+* be interchangable with `struct xpc_object *`, because both types get passed
+* as opaque pointers of type `xpc_object_t` to various XPC functions.
+* Thankfully, `struct _xpc_dictionary_s` isn't used anywhere else, so we can
+* make it a simple wrapper.
+*/
 struct _xpc_dictionary_s {
-	struct xpc_object object;
+	struct xpc_object inner;
 };
 
-struct _xpc_dictionary_s _xpc_error_connection_interrupted = {0};
-struct _xpc_dictionary_s _xpc_error_connection_invalid = {0};
-struct _xpc_dictionary_s _xpc_error_termination_imminent = {0};
+/*
+* We cannot initialize these structures using any function because they are
+* declared as `const` in Apple's <xpc/connection.h>
+* See <sys/queue.h> for TAILQ_ENTRY & TAILQ_HEAD structure details.
+*/
 
-static void _xpc_initialize_error_object(struct xpc_object *object, const char *description) {
-	object->xo_xpc_type = _XPC_TYPE_DICTIONARY;
-	object->xo_flags = _XPC_STATIC_OBJECT_FLAG;
-	object->xo_refcnt = 1;
-	object->xo_audit_token = NULL;
-	object->xo_size = 1;
-	TAILQ_INIT(&object->xo_dict);
+/* XPC_ERROR_CONNECTION_INTERRUPTED */
 
-	xpc_object_t descriptionObject = xpc_string_create(description);
-	xpc_dictionary_set_value(object, _xpc_error_key_description, descriptionObject);
-	xpc_release(descriptionObject);
-}
+const struct _xpc_dictionary_s _xpc_error_connection_interrupted;
 
-__attribute__((visibility("hidden")))
-void _xpc_initialize_errors(void) {
-	_xpc_initialize_error_object(&_xpc_error_connection_invalid.object, "Connection invalid");
-	_xpc_initialize_error_object(&_xpc_error_connection_interrupted.object, "Connection interrupted");
-	_xpc_initialize_error_object(&_xpc_error_termination_imminent.object, "Process termination imminent");
-}
+static const struct xpc_object _xpc_error_connection_interrupted_val = {
+	.xo_xpc_type = _XPC_TYPE_STRING,
+	.xo_size = 22,		/* strlen("Connection interrupted") */
+	.xo_refcnt = 1,
+	.xo_u = {
+		.str = "Connection interrupted"
+	}
+};
+
+static const struct xpc_dict_pair _xpc_error_connection_interrupted_pair = {
+	.key = _XPC_ERROR_KEY_DESCRIPTION_STR,
+	.value = &_xpc_error_connection_interrupted_val,
+	.xo_link = {
+		.tqe_next = NULL,
+		.tqe_prev = &_xpc_error_connection_interrupted.inner.xo_u.dict.tqh_first
+	}
+};
+
+const struct _xpc_dictionary_s _xpc_error_connection_interrupted = {
+	.inner = {
+		.xo_xpc_type = _XPC_TYPE_DICTIONARY,
+		.xo_size = 1,
+		.xo_refcnt = 1,
+		.xo_u = {
+			.dict = {
+				.tqh_first = &_xpc_error_connection_interrupted_pair,
+				.tqh_last = &_xpc_error_connection_interrupted_pair.xo_link.tqe_next
+			}
+		}
+	}
+};
+
+/* XPC_ERROR_CONNECTION_INVALID */
+
+const struct _xpc_dictionary_s _xpc_error_connection_invalid;
+
+static const struct xpc_object _xpc_error_connection_invalid_val = {
+	.xo_xpc_type = _XPC_TYPE_STRING,
+	.xo_size = 18,		/* strlen("Connection invalid") */
+	.xo_refcnt = 1,
+	.xo_u = {
+		.str = "Connection invalid"
+	}
+};
+
+static const struct xpc_dict_pair _xpc_error_connection_invalid_pair = {
+	.key = _XPC_ERROR_KEY_DESCRIPTION_STR,
+	.value = &_xpc_error_connection_invalid_val,
+	.xo_link = {
+		.tqe_next = NULL,
+		.tqe_prev = &_xpc_error_connection_invalid.inner.xo_u.dict.tqh_first
+	}
+};
+
+const struct _xpc_dictionary_s _xpc_error_connection_invalid = {
+	.inner = {
+		.xo_xpc_type = _XPC_TYPE_DICTIONARY,
+		.xo_size = 1,
+		.xo_refcnt = 1,
+		.xo_u = {
+			.dict = {
+				.tqh_first = &_xpc_error_connection_invalid_pair,
+				.tqh_last = &_xpc_error_connection_invalid_pair.xo_link.tqe_next
+			}
+		}
+	}
+};
+
+/* XPC_ERROR_TERMINATION_IMMINENT */
+
+const struct _xpc_dictionary_s _xpc_error_termination_imminent;
+
+static const struct xpc_object _xpc_error_termination_imminent_val = {
+	.xo_xpc_type = _XPC_TYPE_STRING,
+	.xo_size = 20,		/* strlen("Termination imminent") */
+	.xo_refcnt = 1,
+	.xo_u = {
+		.str = "Termination imminent"
+	}
+};
+
+static const struct xpc_dict_pair _xpc_error_termination_imminent_pair = {
+	.key = _XPC_ERROR_KEY_DESCRIPTION_STR,
+	.value = &_xpc_error_termination_imminent_val,
+	.xo_link = {
+		.tqe_next = NULL,
+		.tqe_prev = &_xpc_error_termination_imminent.inner.xo_u.dict.tqh_first
+	}
+};
+
+const struct _xpc_dictionary_s _xpc_error_termination_imminent = {
+	.inner = {
+		.xo_xpc_type = _XPC_TYPE_DICTIONARY,
+		.xo_size = 1,
+		.xo_refcnt = 1,
+		.xo_u = {
+			.dict = {
+				.tqh_first = &_xpc_error_termination_imminent_pair,
+				.tqh_last = &_xpc_error_termination_imminent_pair.xo_link.tqe_next
+			}
+		}
+	}
+};
