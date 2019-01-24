@@ -14,6 +14,10 @@ kern_return_t xpc_domain_server(mach_msg_header_t *request, mach_msg_header_t *r
 }
 
 xpc_object_t xpc_copy_entitlements_for_pid(pid_t pid) {
+	// Tests on macOS indicate that passing a zero pid_t is treated as the calling process's pid.
+	if (pid == 0) pid = getpid();
+
+	int old_error = errno;
 	char fakeheader[8];
 	int ret = csops(pid, CS_OPS_ENTITLEMENTS_BLOB, fakeheader, sizeof(fakeheader));
 	if (ret == -1 && errno != ERANGE) {
@@ -32,6 +36,7 @@ xpc_object_t xpc_copy_entitlements_for_pid(pid_t pid) {
 
 		// The first 8 bytes of the blob are a binary header; skip it.
 		// The rest of the blob is an XML-format plist.
+		errno = old_error;
 		return xpc_data_create(blob + 8, required_length - 8);
 	} else {
 		// The process has no entitlements.
