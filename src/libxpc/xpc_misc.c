@@ -547,8 +547,3 @@ xpc_call_wakeup(mach_port_t rport, int retcode)
 
 	return (err);
 }
-
-extern void _xpc_initialize_errors(void);
-void _libxpc_initializer(void) {
-	_xpc_initialize_errors();
-}
