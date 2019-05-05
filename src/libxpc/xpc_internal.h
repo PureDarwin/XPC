@@ -60,8 +60,7 @@
 #define _XPC_TYPE_SHMEM			15
 #define _XPC_TYPE_ERROR			16
 #define _XPC_TYPE_DOUBLE		17
-#define _XPC_TYPE_STATIC_ERROR	18
-#define _XPC_TYPE_MAX			_XPC_TYPE_MAGIC_DICT
+#define _XPC_TYPE_MAX			_XPC_TYPE_DOUBLE
 
 #define	XPC_SEQID	"XPC sequence number"
 
@@ -168,6 +167,5 @@ __private_extern__ int xpc_pipe_send(xpc_object_t obj, mach_port_t dst,
 __private_extern__ int xpc_pipe_receive(mach_port_t local, mach_port_t *remote,
     xpc_object_t *result, uint64_t *id);
 __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((noreturn, format(printf, 1, 2)));
-__XNU_PRIVATE_EXTERN extern xpc_object_t xpc_hydrate_static_error(xpc_object_t input);
 
 #endif	/* _LIBXPC_XPC_INTERNAL_H */
