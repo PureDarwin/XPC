@@ -1,6 +1,13 @@
 language: c
 os: osx
-xcode: xcode9.4
+xcode: xcode10.2
+sudo: true
 
 script:
-  - xcodebuild -project libxpc.xcodeproj CODE_SIGN_IDENTITY=""
+    - curl --fail -L -o ~/darwinbuild.pkg 'https://github.com/PureDarwin/darwinbuild/releases/download/1535/darwinbuild-installer.pkg'
+    - sudo installer -pkg ~/darwinbuild.pkg -target /
+    - curl --fail -L -o ~/make_tarball 'https://github.com/PureDarwin/darwinbuild/raw/master/darwinbuild/darwinbuild-create-tarball'
+    - curl --fail -L -o ~/PD18_2.plist 'https://github.com/PureDarwin/PureDarwin/raw/master/plists/PD18_2.plist' && plutil -replace projects.libxpc.version -string 10000 ~/PD18_2.plist
+    - mkdir -p ~/darwinbuild && cd ~/darwinbuild  sudo darwinbuild -init ~/PD18_2.plist
+    - sudo ~/make_tarball ~/darwinbuild/Sources libxpc-10000
+    - cd ~/darwinbuild && sudo darwinbuild -recursive libxpc
