@@ -1,7 +1,5 @@
 #include <xpc/xpc.h>
-
-char *__crashreporter_info__;
-asm(".desc __crashreporter_info__, 0x10");
+#include <CrashReporterClient.h>
 
 static char *xpc_api_misuse_reason = NULL;
 
@@ -12,7 +10,7 @@ void xpc_api_misuse(const char *info, ...) {
 	vasprintf(&xpc_api_misuse_reason, info, ap);
 	va_end(ap);
 
-	__crashreporter_info__ = xpc_api_misuse_reason;
+	CRSetCrashLogMessage(xpc_api_misuse_reason);
 	__builtin_trap();
 }
 

@@ -942,10 +942,11 @@
 					"-lsystem_malloc",
 					"-lpthread",
 					"-lsystem_blocks",
+					"-lCrashReporterClient",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
 				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
 			};
 			name = Debug;
@@ -989,10 +990,11 @@
 					"-lsystem_malloc",
 					"-lpthread",
 					"-lsystem_blocks",
+					"-lCrashReporterClient",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
 				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
 			};
 			name = Release;
