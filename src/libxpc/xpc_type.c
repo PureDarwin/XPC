@@ -137,11 +137,6 @@ _xpc_prim_create_flags(int type, xpc_u value, size_t size, uint16_t flags)
 	return (xo);
 }
 
-#define xpc_assert_type(xo, type) \
-	do { if (xo->xo_xpc_type != type) xpc_api_misuse("XPC object type mismatch: Expected %s", #type); } while (0)
-#define xpc_assert_nonnull(xo) \
-	do { if (xo == NULL) xpc_api_misuse("Parameter cannot be NULL"); } while (0)
-
 xpc_object_t
 xpc_null_create(void)
 {

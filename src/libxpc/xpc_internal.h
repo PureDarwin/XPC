@@ -168,4 +168,16 @@ __private_extern__ int xpc_pipe_receive(mach_port_t local, mach_port_t *remote,
     xpc_object_t *result, uint64_t *id);
 __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((noreturn, format(printf, 1, 2)));
 
+#define xpc_precondition(cond, message, ...) \
+	do { if (!(cond)) xpc_api_misuse("Bug in client of libxpc: " message, __VA_ARGS__); } while (0)
+#define xpc_assert(cond, message, ...) \
+	do { if (!(cond)) xpc_api_misuse("Bug in libxpc: " message, __VA_ARGS__); } while (0)
+
+// FIXME: Get rid of pointless %s interpolation here; due to C preprocessor quirks, xpc_precondition()
+// will not compile as currently defined if no parameters are passed.
+#define xpc_assert_nonnull(xo) \
+	xpc_precondition(xo != NULL, "Parameter cannot be %s", "NULL")
+#define xpc_assert_type(xo, type) \
+	xpc_precondition(xo->xo_xpc_type == type, "object type mismatch: Expected %s", #type);
+
 #endif	/* _LIBXPC_XPC_INTERNAL_H */
