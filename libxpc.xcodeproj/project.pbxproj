@@ -187,6 +187,7 @@
 		1F0F395E21364785003E244C /* csops_entitlement_blob_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = csops_entitlement_blob_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csops_entitlements_blob_test.c; path = tests/csops_entitlements_blob_test.c; sourceTree = "<group>"; };
 		1F48936C2145F89B0060BEBE /* xpc_error.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = xpc_error.c; path = src/libxpc/xpc_error.c; sourceTree = "<group>"; };
+		1F950471227F9BF900424594 /* darwinbuild.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = darwinbuild.xcconfig; sourceTree = "<group>"; };
 		1FD343DC213880EE003FE9D1 /* xpc_debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = xpc_debug.c; path = src/libxpc/xpc_debug.c; sourceTree = "<group>"; };
 		1FD61BFC213711BC00A5A7BA /* xpc_entitlements_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xpc_entitlements_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xpc_entitlements_test.c; path = tests/xpc_entitlements_test.c; sourceTree = "<group>"; };
@@ -375,6 +376,7 @@
 				1791F1E9205D520E00344BA5 /* launchctl */,
 				1F0F396521364BAB003E244C /* tests */,
 				1731C81D206C324A0086D5C0 /* Frameworks */,
+				1F950471227F9BF900424594 /* darwinbuild.xcconfig */,
 				17C13B2620555B49001CE9DD /* launchd */,
 				1791F1E8205D520E00344BA5 /* launchctl */,
 				1FF7B64521262A8400BE3BFB /* libxpc_nv.a */,
@@ -1197,6 +1199,7 @@
 		};
 		391C612E1D0844C0007DE8C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1F950471227F9BF900424594 /* darwinbuild.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -1250,6 +1253,7 @@
 		};
 		391C612F1D0844C0007DE8C3 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1F950471227F9BF900424594 /* darwinbuild.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
