@@ -114,27 +114,6 @@
 		};
 /* End PBXContainerItemProxy section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		1791F1E6205D520E00344BA5 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-		17C13B2420555B49001CE9DD /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		1731C81E206C324B0086D5C0 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		1731C820206C32640086D5C0 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
@@ -445,7 +424,6 @@
 			buildPhases = (
 				1791F1E4205D520E00344BA5 /* Sources */,
 				1791F1E5205D520E00344BA5 /* Frameworks */,
-				1791F1E6205D520E00344BA5 /* CopyFiles */,
 				1F1CCB882127433C00A89642 /* Postflight */,
 			);
 			buildRules = (
@@ -481,7 +459,6 @@
 			buildPhases = (
 				17C13B2220555B49001CE9DD /* Sources */,
 				17C13B2320555B49001CE9DD /* Frameworks */,
-				17C13B2420555B49001CE9DD /* CopyFiles */,
 				1F1CCB892127435200A89642 /* Postflight */,
 			);
 			buildRules = (
