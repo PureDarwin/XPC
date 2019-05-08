@@ -242,7 +242,6 @@ static int managerpid_cmd(int argc __attribute__((unused)), char * const argv[] 
 static int manageruid_cmd(int argc __attribute__((unused)), char * const argv[] __attribute__((unused)));
 static int managername_cmd(int argc __attribute__((unused)), char * const argv[] __attribute__((unused)));
 static int asuser_cmd(int argc, char * const argv[]);
-static int exit_cmd(int argc, char *const argv[]) __attribute__((noreturn));
 static int help_cmd(int argc, char *const argv[]);
 
 static const struct {
@@ -279,8 +278,6 @@ static const struct {
 	{ "manageruid",		manageruid_cmd,			"Print the UID of the launchd managing this Mach bootstrap." },
 	{ "managername",	managername_cmd,		"Print the name of this Mach bootstrap." },
 	{ "asuser",			asuser_cmd,				"Execute a subcommand in the given user's context." },
-	{ "exit",			exit_cmd,				"Exit the interactive invocation of launchctl" },
-	{ "quit",			exit_cmd,				"Quit the interactive invocation of launchctl" },
 	{ "help",			help_cmd,				"This help output" },
 };
 
@@ -309,8 +306,6 @@ static CFDictionaryRef _launchctl_jetsam_defaults_cached = NULL;
 int
 main(int argc, char *const argv[])
 {
-	char *l;
-
 	if (getenv(LAUNCH_ENV_BOOTSTRAPPINGSYSTEM)) {
 		/* We're bootstrapping the install environment, so we can't talk to
 		 * mDNSResponder or opendirectoryd.
@@ -392,32 +387,10 @@ main(int argc, char *const argv[])
 		}
 	}
 
-	if (argc == 0) {
-		while ((l = readline(_launchctl_istty ? "launchd% " : NULL))) {
-			char *inputstring = l, *argv2[100], **ap = argv2;
-			int i = 0;
-
-			while ((*ap = strsep(&inputstring, " \t"))) {
-				if (**ap != '\0') {
-					ap++;
-					i++;
-				}
-			}
-
-			if (i > 0) {
-				demux_cmd(i, argv2);
-			}
-
-			free(l);
-		}
-
-		if (_launchctl_istty) {
-			fputc('\n', stdout);
-		}
-	}
-
 	if (argc > 0) {
 		exit(demux_cmd(argc, argv));
+	} else {
+		help_cmd(argc, argv);
 	}
 
 	exit(EXIT_SUCCESS);
@@ -2070,12 +2043,6 @@ help_cmd(int argc, char *const argv[])
 	}
 
 	return 0;
-}
-
-int
-exit_cmd(int argc __attribute__((unused)), char *const argv[] __attribute__((unused)))
-{
-	exit(0);
 }
 
 int
