@@ -18,7 +18,7 @@
  * @APPLE_APACHE_LICENSE_HEADER_END@
  */
 
-// Turn off deprecation warnings so we can see what eles is wrong
+// Turn off deprecation warnings so we can see what else is wrong
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
