@@ -1138,6 +1138,7 @@
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
 			};
 			name = Debug;
 		};
@@ -1159,6 +1160,7 @@
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
 			};
 			name = Release;
 		};
