@@ -93,17 +93,6 @@ xpc_array_destroy(struct xpc_object *dict)
 	}
 }
 
-static struct xpc_object *
-xpc_unpack(void *buf, size_t size)
-{
-	struct xpc_object *xo;
-	nvlist_t *nv;
-
-	nv = nvlist_unpack(buf, size);
-	xo = nv2xpc(nv);
-	return (xo);
-}
-
 void
 xpc_object_destroy(struct xpc_object *xo)
 {
@@ -447,7 +436,10 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	*id = message.id;
 	data_size = (int)message.size;
 	debugf("unpacking data_size=%d", data_size);
-	xo = xpc_unpack(&message.data, data_size);
+
+	nvlist_t *nv = nvlist_unpack(&message.data, data_size);
+	xo = nv2xpc(nv);
+	nvlist_destroy(nv);
 
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
 	auditp = &((mach_msg_audit_trailer_t *)tr)->msgh_audit;
@@ -500,7 +492,11 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 	debugf("demux returned false\n");
 	data_size = request->msgh_size;
 	debugf("unpacking data_size=%d", data_size);
-	xo = xpc_unpack(&message.data, data_size);
+
+	nvlist_t *nvlist = nvlist_unpack(&message.data, data_size);
+	xo = nv2xpc(nvlist);
+	nvlist_destroy(nvlist);
+
 	/* is padding for alignment enforced in the kernel?*/
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
 	auditp = &((mach_msg_audit_trailer_t *)tr)->msgh_audit;
