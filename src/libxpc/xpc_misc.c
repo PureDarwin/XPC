@@ -93,24 +93,6 @@ xpc_array_destroy(struct xpc_object *dict)
 	}
 }
 
-static int
-xpc_pack(struct xpc_object *xo, void *buf, size_t *size)
-{
-	nvlist_t *nv;
-	void *packed;
-
-	nv = xpc2nv(xo);
-
-	packed = nvlist_pack_buffer(nv, NULL, size);
-	if (packed == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
-
-	memcpy(buf, packed, *size);
-	return 0;
-}
-
 static struct xpc_object *
 xpc_unpack(void *buf, size_t size)
 {
@@ -403,14 +385,16 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 
 	nvlist_t *nvl = xpc2nv(xo);
 	size = nvlist_size(nvl);
-	nvlist_destroy(nvl);
 
 	msg_size = __DARWIN_ALIGN(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
 	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
-	if (xpc_pack(xo, &message->data, &size) != 0) {
+	void *packed = nvlist_pack_buffer(nvl, NULL, &size);
+	if (packed == NULL) {
 		debugf("Could not pack XPC message for transport");
+		free(message);
+		nvlist_destroy(nvl);
 		return (EINVAL);
 	}
 
@@ -421,6 +405,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	message->header.msgh_local_port = local;
 	message->id = id;
 	message->size = size;
+	memcpy(&message->data, packed, size);
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS) {
 		debugf("mach_msg_send() failed, kr=0x%X", kr);
@@ -428,7 +413,8 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	} else
 		err = 0;
 	free(message);
-	return (err);	
+	nvlist_destroy(nvl);
+	return (err);
 }
 
 int
