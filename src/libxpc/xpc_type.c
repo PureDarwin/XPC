@@ -497,7 +497,7 @@ xpc_hash(xpc_object_t obj)
 	case _XPC_TYPE_UINT64:
 	case _XPC_TYPE_DATE:
 	case _XPC_TYPE_ENDPOINT:
-		return ((size_t)xo->xo_u.ui);
+		return ((size_t)xo->xo_u.port);
 
 	case _XPC_TYPE_STRING:
 		return (xpc_data_hash(
