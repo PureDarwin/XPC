@@ -423,7 +423,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	message->size = size;
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS) {
-		debugf("mach_msg_send() failed, kr=%d", kr);
+		debugf("mach_msg_send() failed, kr=0x%X", kr);
 		err = (kr == KERN_INVALID_TASK) ? EPIPE : EINVAL;
 	} else
 		err = 0;
