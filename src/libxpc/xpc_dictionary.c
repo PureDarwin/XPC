@@ -303,20 +303,8 @@ xpc_dictionary_copy_mach_send(xpc_object_t xdict, const char *key)
 	const struct xpc_object *xotmp;
 
 	xpc_assert_nonnull(xdict);
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
-
-#if 0
-	xo = xdict;
-	if (nvlist_exists_type(xo->xo_nv, key, NV_TYPE_ENDPOINT))
-		return (nvlist_get_number(xo->xo_nv, key));
-	else if (nvlist_exists_binary(xo->xo_nv, key)) {
-		xotmp = (void *)nvlist_get_number(xo->xo_nv, key);
-		return (xotmp->xo_uint);
-	}
-	return (0);
-#endif
-
-	xpc_api_misuse("%s: function unimplemented", __PRETTY_FUNCTION__);
+	xpc_assert_type(xo, _XPC_TYPE_ENDPOINT);
+	return xo->xo_port;
 }
 
 void
