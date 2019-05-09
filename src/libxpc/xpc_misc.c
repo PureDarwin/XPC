@@ -409,8 +409,10 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
-	if (xpc_pack(xo, &message->data, &size) != 0)
+	if (xpc_pack(xo, &message->data, &size) != 0) {
+		debugf("Could not pack XPC message for transport");
 		return (EINVAL);
+	}
 
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND,
@@ -420,9 +422,10 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	message->id = id;
 	message->size = size;
 	kr = mach_msg_send(&message->header);
-	if (kr != KERN_SUCCESS)
+	if (kr != KERN_SUCCESS) {
+		debugf("mach_msg_send() failed, kr=%d", kr);
 		err = (kr == KERN_INVALID_TASK) ? EPIPE : EINVAL;
-	else
+	} else
 		err = 0;
 	free(message);
 	return (err);	
