@@ -11367,6 +11367,13 @@ xpc_process_service_kill(job_t j, xpc_object_t request, xpc_object_t *reply)
 		return EALREADY;
 	}
 
+	if (j2kill->p == 1) {
+		// Don't allow the system launchd process to be killed using this API.
+		// Required since the anonymous job that is used to listen for this message
+		// shows up in the output of launchctl list.
+		return EINVAL;
+	}
+
 	xpc_object_t reply2 = xpc_dictionary_create_reply(request);
 	if (!reply2) {
 		return EINVAL;
