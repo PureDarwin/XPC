@@ -168,6 +168,7 @@
 		1F48936C2145F89B0060BEBE /* xpc_error.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = xpc_error.c; path = src/libxpc/xpc_error.c; sourceTree = "<group>"; };
 		1F950471227F9BF900424594 /* darwinbuild.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = darwinbuild.xcconfig; sourceTree = "<group>"; };
 		1FAA31302283970900DABA25 /* shim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shim.h; path = src/launchd/shim.h; sourceTree = "<group>"; };
+		1FCBCFF12283B17D0091E136 /* private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = private.h; path = headers/usr/include/xpc/private.h; sourceTree = "<group>"; };
 		1FD343DC213880EE003FE9D1 /* xpc_debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = xpc_debug.c; path = src/libxpc/xpc_debug.c; sourceTree = "<group>"; };
 		1FD61BFC213711BC00A5A7BA /* xpc_entitlements_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xpc_entitlements_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xpc_entitlements_test.c; path = tests/xpc_entitlements_test.c; sourceTree = "<group>"; };
@@ -286,6 +287,7 @@
 				1791F1DE205D45FD00344BA5 /* xpc_private.c */,
 				1FD343DC213880EE003FE9D1 /* xpc_debug.c */,
 				1F48936C2145F89B0060BEBE /* xpc_error.c */,
+				1FCBCFF12283B17D0091E136 /* private.h */,
 			);
 			name = libxpc;
 			sourceTree = "<group>";
