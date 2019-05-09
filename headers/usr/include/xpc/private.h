@@ -13,8 +13,6 @@ int _xpc_runtime_is_app_sandboxed();
 typedef struct _xpc_pipe_s* xpc_pipe_t;
 
 void xpc_pipe_invalidate(xpc_pipe_t pipe);
-int xpc_pipe_send(xpc_object_t obj, mach_port_t dst, mach_port_t local, uint64_t id);
-int xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result, uint64_t *id);
 
 xpc_pipe_t xpc_pipe_create(int name, int arg2);
 

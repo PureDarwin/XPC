@@ -162,6 +162,10 @@ __private_extern__ const char *_xpc_get_type_name(xpc_object_t obj);
 __private_extern__ struct xpc_object *nv2xpc(const nvlist_t *nv);
 __private_extern__ nvlist_t *xpc2nv(struct xpc_object *xo);
 __private_extern__ void xpc_object_destroy(struct xpc_object *xo);
+__private_extern__ int xpc_pipe_send(xpc_object_t obj, mach_port_t dst,
+    mach_port_t local, uint64_t id);
+__private_extern__ int xpc_pipe_receive(mach_port_t local, mach_port_t *remote,
+    xpc_object_t *result, uint64_t *id);
 __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((noreturn, format(printf, 1, 2)));
 
 #define xpc_precondition(cond, message, ...) \
