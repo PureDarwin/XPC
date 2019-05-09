@@ -342,7 +342,7 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 		return (EINVAL);
 	size = nvlist_size(nvlist);
 	msg_size = size + sizeof(mach_msg_header_t) + sizeof(size_t);
-	if ((message = malloc(msg_size)) == NULL)
+	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
