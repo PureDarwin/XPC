@@ -490,7 +490,7 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 		return (TRUE);
 	}
 	debugf("demux returned false\n");
-	data_size = request->msgh_size;
+	data_size = message.size;
 	debugf("unpacking data_size=%d", data_size);
 
 	nvlist_t *nvlist = nvlist_unpack(&message.data, data_size);
