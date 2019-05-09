@@ -3886,7 +3886,7 @@ kill_cmd(int argc, char *const argv[]) {
 		else IF_SIGNAL_NAME(USR1);
 		else IF_SIGNAL_NAME(USR2);
 		else {
-			launchctl_log(LOG_ERR, "error: Unknown signal name %s", argv[0]);
+			launchctl_log(LOG_ERR, "error: Unknown signal name %s", argv[1]);
 			return 1;
 		}
 #undef IF_SIGNAL_NAME
