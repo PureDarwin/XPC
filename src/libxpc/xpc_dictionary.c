@@ -56,6 +56,7 @@ nv2xpc(const nvlist_t *nv)
 	xpc_u val;
 	const nvlist_t *nvtmp;
 
+	xpc_assert(nv != NULL, "%s: nvlist_t is NULL", __FUNCTION__);
 	xpc_assert(nvlist_type(nv) == NV_TYPE_NVLIST_DICTIONARY || nvlist_type(nv) == NV_TYPE_NVLIST_ARRAY, "nvlist_t %p is not dictionary or array", nv);
 
 	if (nvlist_type(nv) == NV_TYPE_NVLIST_DICTIONARY)
