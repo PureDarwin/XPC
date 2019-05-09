@@ -59,7 +59,7 @@ typedef enum {
 	XPC_PROCESS_SERVICE_DETACH,
 	XPC_PROCESS_SERVICE_GET_PROPERTIES,
 	XPC_PROCESS_SERVICE_KILL
-} xpc_jetsam_t;
+} xpc_process_command_t;
 
 
 #ifdef __cplusplus
