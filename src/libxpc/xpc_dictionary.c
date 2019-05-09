@@ -224,7 +224,7 @@ xpc2nv(struct xpc_object *xo)
 		return nv;
 	}
 
-	assert(0 && "xpc_object not array or dictionary");
+	xpc_assert(0, "xpc_object not of %s type", "array or dictionary");
 	return NULL;
 }
 

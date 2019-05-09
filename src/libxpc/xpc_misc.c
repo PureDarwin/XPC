@@ -336,7 +336,7 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	int err;
 
 	xo = xobj;
-	assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY);
+	xpc_assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
 	nvlist_t *nvlist = xpc2nv(xobj);
 	if (nvlist == NULL)
 		return (EINVAL);
@@ -370,7 +370,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	int err;
 
 	xo = xobj;
-	assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY);
+	xpc_assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
 
 	nvlist_t *nvl = xpc2nv(xo);
 	size = nvlist_size(nvl);
