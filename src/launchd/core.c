@@ -11815,11 +11815,11 @@ jobmgr_init(bool sflag)
 
 	if (os_likely(launchd_xpc_job != NULL)) {
 		mach_port_t process_service_port = MACH_PORT_NULL;
-		struct machservice *launchd_process_service = machservice_new(launchd_xpc_job, "org.puredarwin.private.libxpc.launchd", &process_service_port, false);
+		struct machservice *launchd_process_service = machservice_new(launchd_xpc_job, XPC_LAUNCHD_SERVICE_NAME, &process_service_port, false);
 
 		kern_return_t kr = runtime_add_mport(process_service_port, runtime_xpc_server_demux);
 		if (os_unlikely(kr != KERN_SUCCESS)) {
-			job_log(launchd_xpc_job, LOG_ERR, "Could not register org.puredarwin.private.libxpc.launchd XPC service. System functionality may be degraded.");
+			job_log(launchd_xpc_job, LOG_ERR, "Could not register %s XPC service. System functionality may be degraded.", XPC_LAUNCHD_SERVICE_NAME);
 		}
 	} else {
 		jobmgr_log(_s_xpc_system_domain, LOG_ERR, "Could not create anonymous job for libxpc process routines. System functionality may be degraded.");
