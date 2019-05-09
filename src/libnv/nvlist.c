@@ -881,7 +881,7 @@ nvlist_unpack_header(nvlist_t *nvl, const unsigned char *ptr, size_t nfds,
 {
 	struct nvlist_header nvlhdr;
 
-	if (*leftp < sizeof(nvlhdr)) PJDLOG_ABORT("nvlist %p buffer too small to contain nvlist_header", nvl);
+	if (*leftp < sizeof(nvlhdr)) PJDLOG_ABORT("nvlist buffer too small (length=%zu) to contain nvlist_header", *leftp);
 
 	memcpy(&nvlhdr, ptr, sizeof(nvlhdr));
 
