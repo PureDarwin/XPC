@@ -52,6 +52,16 @@ void xpc_dictionary_set_mach_send(xpc_object_t object, const char* key, mach_por
 // Completely random. Not sure what the "actual" one is
 #define XPC_PIPE_FLAG_PRIVILEGED 7
 
+typedef enum {
+	XPC_PROCESS_JETSAM_SET_BAND,
+	XPC_PROCESS_JETSAM_SET_MEMORY_LIMIT,
+	XPC_PROCESS_SERVICE_ATTACH,
+	XPC_PROCESS_SERVICE_DETACH,
+	XPC_PROCESS_SERVICE_GET_PROPERTIES,
+	XPC_PROCESS_SERVICE_KILL
+} xpc_jetsam_t;
+
+
 #ifdef __cplusplus
 }
 #endif
