@@ -881,25 +881,20 @@ nvlist_unpack_header(nvlist_t *nvl, const unsigned char *ptr, size_t nfds,
 {
 	struct nvlist_header nvlhdr;
 
-	if (*leftp < sizeof(nvlhdr))
-		goto failed;
+	if (*leftp < sizeof(nvlhdr)) PJDLOG_ABORT("nvlist %p buffer too small to contain nvlist_header", nvl);
 
 	memcpy(&nvlhdr, ptr, sizeof(nvlhdr));
 
-	if (!nvlist_check_header(&nvlhdr))
-		goto failed;
+	if (!nvlist_check_header(&nvlhdr)) PJDLOG_ABORT("%s failed", "nvlist_check_header");
 
-	if (nvlhdr.nvlh_size != *leftp - sizeof(nvlhdr))
-		goto failed;
+	if (nvlhdr.nvlh_size != *leftp - sizeof(nvlhdr)) PJDLOG_ABORT("nvlhdr.nvlh_size (%llu) different than message size (%lu)", nvlhdr.nvlh_size, *leftp - sizeof(nvlhdr));
 
 	/*
 	 * nvlh_descriptors might be smaller than nfds in embedded nvlists.
 	 */
-	if (nvlhdr.nvlh_descriptors > nfds)
-		goto failed;
+	if (nvlhdr.nvlh_descriptors > nfds) PJDLOG_ABORT("nvlhdr.nvlh_descriptors (%llu) <= nfds (%zu)", nvlhdr.nvlh_descriptors, nfds);
 
-	if ((nvlhdr.nvlh_flags & ~NV_FLAG_ALL_MASK) != 0)
-		goto failed;
+	if ((nvlhdr.nvlh_flags & ~NV_FLAG_ALL_MASK) != 0) PJDLOG_ABORT("Invalid nvlh_flags %d", nvlhdr.nvlh_flags);
 
 	nvl->nvl_flags = (nvlhdr.nvlh_flags & NV_FLAG_PUBLIC_MASK);
 
@@ -910,9 +905,6 @@ nvlist_unpack_header(nvlist_t *nvl, const unsigned char *ptr, size_t nfds,
 
 	nvl->nvl_type = nvlhdr.nvlh_type;
 	return (ptr);
-failed:
-	RESTORE_ERRNO(EINVAL);
-	return (NULL);
 }
 
 nvlist_t *
@@ -929,17 +921,14 @@ nvlist_xunpack(const void *buf, size_t size, const int *fds, size_t nfds)
 
 	tmpnvl = NULL;
 	nvl = retnvl = nvlist_create(0);
-	if (nvl == NULL)
-		goto failed;
+	if (nvl == NULL) PJDLOG_ABORT("nvlist_create returned %s", "NULL");
 
 	ptr = nvlist_unpack_header(nvl, ptr, nfds, &isbe, &left);
-	if (ptr == NULL)
-		goto failed;
+	if (ptr == NULL) PJDLOG_ABORT("Could not unpack nvlist header: (isbe=%s, left=%zu)", isbe ? "true" : "false", left);
 
 	while (left > 0) {
 		ptr = nvpair_unpack(isbe, ptr, &left, &nvp);
-		if (ptr == NULL)
-			goto failed;
+		if (ptr == NULL) PJDLOG_ABORT("Could not unpack nvlist (left=%zu)", left);
 		switch (nvpair_type(nvp)) {
 		case NV_TYPE_NULL:
 			ptr = nvpair_unpack_null(isbe, nvp, ptr, &left);
@@ -960,14 +949,12 @@ nvlist_xunpack(const void *buf, size_t size, const int *fds, size_t nfds)
 		case NV_TYPE_NVLIST:
 		case NV_TYPE_NVLIST_ARRAY:
 		case NV_TYPE_NVLIST_DICTIONARY:
-			ptr = nvpair_unpack_nvlist(isbe, nvp, ptr, &left, nfds,
-			    &tmpnvl);
+			ptr = nvpair_unpack_nvlist(isbe, nvp, ptr, &left, nfds, &tmpnvl);
 			nvlist_set_parent(tmpnvl, nvp);
 			break;
 #ifndef _KERNEL
 		case NV_TYPE_DESCRIPTOR:
-			ptr = nvpair_unpack_descriptor(isbe, nvp, ptr, &left,
-			    fds, nfds);
+			ptr = nvpair_unpack_descriptor(isbe, nvp, ptr, &left, fds, nfds);
 			break;
 #endif
 		case NV_TYPE_BINARY:
@@ -975,15 +962,13 @@ nvlist_xunpack(const void *buf, size_t size, const int *fds, size_t nfds)
 			ptr = nvpair_unpack_binary(isbe, nvp, ptr, &left);
 			break;
 		case NV_TYPE_NVLIST_UP:
-			if (nvl->nvl_parent == NULL)
-				goto failed;
+			if (nvl->nvl_parent == NULL) PJDLOG_ABORT("nvlist_t %p has no parent", nvl);
 			nvl = nvpair_nvlist(nvl->nvl_parent);
 			continue;
 		default:
 			PJDLOG_ABORT("Invalid type (%d).", nvpair_type(nvp));
 		}
-		if (ptr == NULL)
-			goto failed;
+		if (ptr == NULL) PJDLOG_ABORT("ptr == NULL (nvp=%p)", nvp);
 		nvlist_move_nvpair(nvl, nvp);
 		if (tmpnvl != NULL) {
 			nvl = tmpnvl;
@@ -992,9 +977,6 @@ nvlist_xunpack(const void *buf, size_t size, const int *fds, size_t nfds)
 	}
 
 	return (retnvl);
-failed:
-	nvlist_destroy(retnvl);
-	return (NULL);
 }
 
 nvlist_t *
