@@ -3852,7 +3852,7 @@ kill_cmd(int argc, char *const argv[]) {
 
 	char *end_of_signo;
 	int signo = strtol(argv[0], &end_of_signo, 10);
-	if (*end_of_signo != '\0') {
+	if (signo == 0) {
 #define IF_SIGNAL_NAME(name) if (strcmp(argv[1], #name) == 0 || strcmp(argv[1], "SIG" #name) == 0) signo = SIG##name
 		IF_SIGNAL_NAME(HUP);
 		else IF_SIGNAL_NAME(INT);
