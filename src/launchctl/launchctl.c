@@ -18,7 +18,7 @@
  * @APPLE_APACHE_LICENSE_HEADER_END@
  */
 
-// Turn off deprecation warnings so we can see what eles is wrong
+// Turn off deprecation warnings so we can see what else is wrong
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
@@ -200,7 +200,6 @@ static void do_single_user_mode(bool);
 static bool do_single_user_mode2(void);
 static void do_crash_debug_mode(void);
 static bool do_crash_debug_mode2(void);
-static void read_launchd_conf(void);
 static bool job_disabled_logic(launch_data_t obj);
 static void fix_bogus_file_metadata(void);
 static void do_file_init(void) __attribute__((constructor));
@@ -243,7 +242,6 @@ static int managerpid_cmd(int argc __attribute__((unused)), char * const argv[] 
 static int manageruid_cmd(int argc __attribute__((unused)), char * const argv[] __attribute__((unused)));
 static int managername_cmd(int argc __attribute__((unused)), char * const argv[] __attribute__((unused)));
 static int asuser_cmd(int argc, char * const argv[]);
-static int exit_cmd(int argc, char *const argv[]) __attribute__((noreturn));
 static int help_cmd(int argc, char *const argv[]);
 
 static const struct {
@@ -280,8 +278,6 @@ static const struct {
 	{ "manageruid",		manageruid_cmd,			"Print the UID of the launchd managing this Mach bootstrap." },
 	{ "managername",	managername_cmd,		"Print the name of this Mach bootstrap." },
 	{ "asuser",			asuser_cmd,				"Execute a subcommand in the given user's context." },
-	{ "exit",			exit_cmd,				"Exit the interactive invocation of launchctl" },
-	{ "quit",			exit_cmd,				"Quit the interactive invocation of launchctl" },
 	{ "help",			help_cmd,				"This help output" },
 };
 
@@ -310,8 +306,6 @@ static CFDictionaryRef _launchctl_jetsam_defaults_cached = NULL;
 int
 main(int argc, char *const argv[])
 {
-	char *l;
-
 	if (getenv(LAUNCH_ENV_BOOTSTRAPPINGSYSTEM)) {
 		/* We're bootstrapping the install environment, so we can't talk to
 		 * mDNSResponder or opendirectoryd.
@@ -393,32 +387,10 @@ main(int argc, char *const argv[])
 		}
 	}
 
-	if (argc == 0) {
-		while ((l = readline(_launchctl_istty ? "launchd% " : NULL))) {
-			char *inputstring = l, *argv2[100], **ap = argv2;
-			int i = 0;
-
-			while ((*ap = strsep(&inputstring, " \t"))) {
-				if (**ap != '\0') {
-					ap++;
-					i++;
-				}
-			}
-
-			if (i > 0) {
-				demux_cmd(i, argv2);
-			}
-
-			free(l);
-		}
-
-		if (_launchctl_istty) {
-			fputc('\n', stdout);
-		}
-	}
-
 	if (argc > 0) {
 		exit(demux_cmd(argc, argv));
+	} else {
+		help_cmd(argc, argv);
 	}
 
 	exit(EXIT_SUCCESS);
@@ -474,49 +446,6 @@ launchctl_log_CFString(int level, CFStringRef string)
 	(void)CFStringGetCString(string, buff, 4096, kCFStringEncodingUTF8);
 	launchctl_log(level, "%s", buff);
 	free(buff);
-}
-
-void
-read_launchd_conf(void)
-{
-#if !TARGET_OS_EMBEDDED
-	char s[1000], *c, *av[100];
-	const char *file;
-	size_t len;
-	int i;
-	FILE *f;
-
-	if (getppid() == 1) {
-		file = "/etc/launchd.conf";
-	} else {
-		file = "/etc/launchd-user.conf";
-	}
-
-	if (!(f = fopen(file, "r"))) {
-		return;
-	}
-
-	while ((c = fgets(s, (int) sizeof s, f))) {
-		len = strlen(c);
-		if (len && c[len - 1] == '\n') {
-			c[len - 1] = '\0';
-		}
-
-		i = 0;
-
-		while ((av[i] = strsep(&c, " \t"))) {
-			if (*(av[i]) != '\0') {
-				i++;
-			}
-		}
-
-		if (i > 0) {
-			demux_cmd(i, av);
-		}
-	}
-
-	fclose(f);
-#endif // !TARGET_OS_EMBEDDED
 }
 
 static CFPropertyListRef
@@ -2117,12 +2046,6 @@ help_cmd(int argc, char *const argv[])
 }
 
 int
-exit_cmd(int argc __attribute__((unused)), char *const argv[] __attribute__((unused)))
-{
-	exit(0);
-}
-
-int
 _fd(int fd)
 {
 	if (fd >= 0)
@@ -2418,8 +2341,6 @@ system_specific_bootstrap(bool sflag)
 		(void)posix_assumes_zero(fwexec(rcserver_tool, NULL));
 	}
 
-	read_launchd_conf();
-
 	if (path_check("/var/account/acct")) {
 		(void)posix_assumes_zero(acct("/var/account/acct"));
 	}
@@ -2610,7 +2531,6 @@ bootstrap_cmd(int argc, char *const argv[])
 				 * session from the launchd that it resides in.
 				 */
 				_launchctl_peruser_bootstrap = true;
-				read_launchd_conf();
 			}
 		}
 
