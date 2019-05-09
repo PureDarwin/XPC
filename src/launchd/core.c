@@ -11815,7 +11815,7 @@ jobmgr_init(bool sflag)
 
 	if (os_likely(launchd_xpc_job != NULL)) {
 		mach_port_t process_service_port = MACH_PORT_NULL;
-		struct machservice *launchd_process_service = machservice_new(launchd_xpc_job, XPC_LAUNCHD_SERVICE_NAME, &process_service_port, false);
+		machservice_new(launchd_xpc_job, XPC_LAUNCHD_SERVICE_NAME, &process_service_port, false);
 
 		kern_return_t kr = runtime_add_mport(process_service_port, runtime_xpc_server_demux);
 		if (os_unlikely(kr != KERN_SUCCESS)) {
