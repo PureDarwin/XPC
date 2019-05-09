@@ -12,6 +12,7 @@
 #include <mach/mach_port.h>
 #include <mach/mach_vm.h>
 #include <mach/host_priv.h>
+#include <xpc/private.h>
 
 // _sjc_ this is to get a version of malloc_size which doesn't rely on the missing sallocx()
 #include <malloc/malloc.h>
@@ -51,19 +52,6 @@ typedef char event_name_t[64];
 #define XPC_EVENT_ROUTINE_KEY_STATE "XPC key state"
 #define XPC_EVENT_ROUTINE_KEY_OP "XPC key op"
 #define XPC_EVENT_ROUTINE_KEY_ERROR "XPC key error"
-#define XPC_PROCESS_ROUTINE_KEY_LABEL "XPC process key label"
-#define XPC_PROCESS_ROUTINE_KEY_ERROR "XPC process key error"
-#define XPC_PROCESS_ROUTINE_KEY_HANDLE "XPC process key handle"
-#define XPC_PROCESS_ROUTINE_KEY_NAME "XPC process key name"
-#define XPC_PROCESS_ROUTINE_KEY_PATH "XPC process key path"
-#define XPC_PROCESS_ROUTINE_KEY_ARGV "XPC process key argv"
-#define XPC_PROCESS_ROUTINE_KEY_TYPE "XPC process key type"
-#define XPC_PROCESS_ROUTINE_KEY_OP "XPC process key op"
-#define XPC_PROCESS_ROUTINE_KEY_PID "XPC process key pid"
-#define XPC_PROCESS_ROUTINE_KEY_RCDATA "XPC process key rcdata"
-#define XPC_PROCESS_ROUTINE_KEY_SIGNAL "XPC process key signal"
-#define XPC_PROCESS_ROUTINE_KEY_PRIORITY_BAND "XPC process key priority band"
-#define XPC_PROCESS_ROUTINE_KEY_MEMORY_LIMIT "XPC process key memory limit"
 #define XPC_SERVICE_ENTITLEMENT_ATTACH "XPC service entitlement attach"
 #define XPC_SERVICE_RENDEZVOUS_TOKEN "XPC service rendezvous token"
 #define XPC_PROCESS_ROUTINE_KEY_NEW_INSTANCE_PORT "XPC process key new instance port"
