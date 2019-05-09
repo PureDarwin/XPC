@@ -3845,7 +3845,7 @@ asuser_cmd(int argc, char * const argv[])
 
 int
 kill_cmd(int argc, char *const argv[]) {
-	if (argc != 2) {
+	if (argc != 3) {
 		launchctl_log(LOG_ERR, "Usage: launchctl kill <signal-number|signal-name> <service-target>");
 		return 1;
 	}
@@ -3853,7 +3853,7 @@ kill_cmd(int argc, char *const argv[]) {
 	char *end_of_signo;
 	int signo = strtol(argv[0], &end_of_signo, 10);
 	if (*end_of_signo != '\0') {
-#define IF_SIGNAL_NAME(name) if (strcmp(argv[0], #name) == 0 || strcmp(argv[0], "SIG" #name) == 0) signo = SIG##name
+#define IF_SIGNAL_NAME(name) if (strcmp(argv[1], #name) == 0 || strcmp(argv[1], "SIG" #name) == 0) signo = SIG##name
 		IF_SIGNAL_NAME(HUP);
 		else IF_SIGNAL_NAME(INT);
 		else IF_SIGNAL_NAME(QUIT);
@@ -3895,7 +3895,7 @@ kill_cmd(int argc, char *const argv[]) {
 	xpc_object_t xdict = xpc_dictionary_create(NULL, NULL, 0);
 	xpc_dictionary_set_uint64(xdict, XPC_PROCESS_ROUTINE_KEY_OP, XPC_PROCESS_SERVICE_KILL);
 	xpc_dictionary_set_int64(xdict, XPC_PROCESS_ROUTINE_KEY_SIGNAL, signo);
-	xpc_dictionary_set_string(xdict, XPC_PROCESS_ROUTINE_KEY_NAME, argv[1]);
+	xpc_dictionary_set_string(xdict, XPC_PROCESS_ROUTINE_KEY_NAME, argv[2]);
 
 	xpc_connection_t connection = xpc_connection_create_mach_service(XPC_LAUNCHD_SERVICE_NAME, dispatch_get_current_queue(), 0);
 	if (connection == NULL) {
