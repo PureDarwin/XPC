@@ -415,7 +415,7 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	mach_msg_header_t *request;
 	kern_return_t kr;
 	mach_msg_trailer_t *tr;
-	int data_size;
+	size_t data_size;
 	struct xpc_object *xo;
 	audit_token_t *auditp;
 	xpc_u val;
@@ -434,8 +434,8 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 		debugf("mach_msg_receive returned %d\n", kr);
 	*remote = request->msgh_remote_port;
 	*id = message.id;
-	data_size = (int)message.size;
-	debugf("unpacking data_size=%d", data_size);
+	data_size = message.size;
+	debugf("unpacking data_size=%zu", data_size);
 
 	nvlist_t *nv = nvlist_unpack(&message.data, data_size);
 	xo = nv2xpc(nv);
