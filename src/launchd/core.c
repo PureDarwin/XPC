@@ -11810,6 +11810,20 @@ jobmgr_init(bool sflag)
 		}
 	}
 	s_no_hang_fd = _fd(s_no_hang_fd);
+
+	job_t launchd_xpc_job = job_new_anonymous(_s_xpc_system_domain, 1);
+
+	if (os_likely(launchd_xpc_job != NULL)) {
+		mach_port_t process_service_port = MACH_PORT_NULL;
+		struct machservice *launchd_process_service = machservice_new(launchd_xpc_job, "org.puredarwin.private.libxpc.launchd", &process_service_port, false);
+
+		kern_return_t kr = runtime_add_mport(process_service_port, runtime_xpc_server_demux);
+		if (os_unlikely(kr != KERN_SUCCESS)) {
+			job_log(launchd_xpc_job, LOG_ERR, "Could not register org.puredarwin.private.libxpc.launchd XPC service. System functionality may be degraded.");
+		}
+	} else {
+		jobmgr_log(_s_xpc_system_domain, LOG_ERR, "Could not create anonymous job for libxpc process routines. System functionality may be degraded.");
+	}
 }
 
 size_t
