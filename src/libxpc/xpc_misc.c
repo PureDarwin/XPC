@@ -428,12 +428,6 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	return (err);	
 }
 
-#define LOG(...)	\
-	do {            \
-	syslog(LOG_ERR, "%s:%u: ", __FILE__, __LINE__);	\
-	syslog(LOG_ERR, __VA_ARGS__);					\
-	} while (0)
-
 int
 xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
     uint64_t *id)
@@ -458,11 +452,11 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	    MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 
 	if (kr != 0)
-		LOG("mach_msg_receive returned %d\n", kr);
+		debugf("mach_msg_receive returned %d\n", kr);
 	*remote = request->msgh_remote_port;
 	*id = message.id;
 	data_size = (int)message.size;
-	LOG("unpacking data_size=%d", data_size);
+	debugf("unpacking data_size=%d", data_size);
 	xo = xpc_unpack(&message.data, data_size);
 
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
@@ -504,7 +498,7 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 	    MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 
 	if (kr != 0)
-		LOG("mach_msg_receive returned %d\n", kr);
+		debugf("mach_msg_receive returned %d\n", kr);
 	*rcvport = request->msgh_remote_port;
 	if (demux(request, response)) {
 		(void)mach_msg_send(response);
@@ -513,9 +507,9 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 		*/
 		return (TRUE);
 	}
-	LOG("demux returned false\n");
+	debugf("demux returned false\n");
 	data_size = request->msgh_size;
-	LOG("unpacking data_size=%d", data_size);
+	debugf("unpacking data_size=%d", data_size);
 	xo = xpc_unpack(&message.data, data_size);
 	/* is padding for alignment enforced in the kernel?*/
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
