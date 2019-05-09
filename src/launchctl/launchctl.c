@@ -31,6 +31,7 @@
 #include "vproc_internal.h"
 #include "bootstrap_priv.h"
 #include "launch_internal.h"
+#include <xpc/private.h>
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreFoundation/CFPriv.h>
@@ -243,6 +244,7 @@ static int manageruid_cmd(int argc __attribute__((unused)), char * const argv[] 
 static int managername_cmd(int argc __attribute__((unused)), char * const argv[] __attribute__((unused)));
 static int asuser_cmd(int argc, char * const argv[]);
 static int help_cmd(int argc, char *const argv[]);
+static int kill_cmd(int argc, char *const argv[]);
 
 static const struct {
 	const char *name;
@@ -279,6 +281,7 @@ static const struct {
 	{ "managername",	managername_cmd,		"Print the name of this Mach bootstrap." },
 	{ "asuser",			asuser_cmd,				"Execute a subcommand in the given user's context." },
 	{ "help",			help_cmd,				"This help output" },
+	{ "kill",			kill_cmd,				"Sends a signal to a job" },
 };
 
 static bool _launchctl_istty;
@@ -3834,6 +3837,79 @@ asuser_cmd(int argc, char * const argv[])
 	setenv(LAUNCH_ENV_KEEPCONTEXT, "1", 1);
 	if (fwexec((const char *const *)argv + 2, NULL) == -1) {
 		launchctl_log(LOG_ERR, "Couldn't spawn command: %s", argv[2]);
+		return 1;
+	}
+
+	return 0;
+}
+
+int
+kill_cmd(int argc, char *const argv[]) {
+	if (argc != 2) {
+		launchctl_log(LOG_ERR, "Usage: launchctl kill <signal-number|signal-name> <service-target>");
+		return 1;
+	}
+
+	char *end_of_signo;
+	int signo = strtol(argv[0], &end_of_signo, 10);
+	if (*end_of_signo != '\0') {
+#define IF_SIGNAL_NAME(name) if (strcmp(argv[0], #name) == 0 || strcmp(argv[0], "SIG" #name) == 0) signo = SIG##name
+		IF_SIGNAL_NAME(HUP);
+		else IF_SIGNAL_NAME(INT);
+		else IF_SIGNAL_NAME(QUIT);
+		else IF_SIGNAL_NAME(ILL);
+		else IF_SIGNAL_NAME(TRAP);
+		else IF_SIGNAL_NAME(ABRT);
+		else IF_SIGNAL_NAME(EMT);
+		else IF_SIGNAL_NAME(FPE);
+		else IF_SIGNAL_NAME(KILL);
+		else IF_SIGNAL_NAME(BUS);
+		else IF_SIGNAL_NAME(SEGV);
+		else IF_SIGNAL_NAME(SYS);
+		else IF_SIGNAL_NAME(PIPE);
+		else IF_SIGNAL_NAME(ALRM);
+		else IF_SIGNAL_NAME(TERM);
+		else IF_SIGNAL_NAME(URG);
+		else IF_SIGNAL_NAME(STOP);
+		else IF_SIGNAL_NAME(TSTP);
+		else IF_SIGNAL_NAME(CONT);
+		else IF_SIGNAL_NAME(CHLD);
+		else IF_SIGNAL_NAME(TTIN);
+		else IF_SIGNAL_NAME(TTOU);
+		else IF_SIGNAL_NAME(IO);
+		else IF_SIGNAL_NAME(XCPU);
+		else IF_SIGNAL_NAME(XFSZ);
+		else IF_SIGNAL_NAME(VTALRM);
+		else IF_SIGNAL_NAME(PROF);
+		else IF_SIGNAL_NAME(WINCH);
+		else IF_SIGNAL_NAME(INFO);
+		else IF_SIGNAL_NAME(USR1);
+		else IF_SIGNAL_NAME(USR2);
+		else {
+			launchctl_log(LOG_ERR, "error: Unknown signal name %s", argv[0]);
+			return 1;
+		}
+#undef IF_SIGNAL_NAME
+	}
+
+	xpc_object_t xdict = xpc_dictionary_create(NULL, NULL, 0);
+	xpc_dictionary_set_uint64(xdict, XPC_PROCESS_ROUTINE_KEY_OP, XPC_PROCESS_SERVICE_KILL);
+	xpc_dictionary_set_int64(xdict, XPC_PROCESS_ROUTINE_KEY_SIGNAL, signo);
+	xpc_dictionary_set_string(xdict, XPC_PROCESS_ROUTINE_KEY_NAME, argv[1]);
+
+	xpc_connection_t connection = xpc_connection_create_mach_service(XPC_LAUNCHD_SERVICE_NAME, dispatch_get_current_queue(), 0);
+	if (connection == NULL) {
+		launchctl_log(LOG_ERR, "Could not lookup Mach service %s", XPC_LAUNCHD_SERVICE_NAME);
+		return 1;
+	}
+
+	xpc_object_t response = xpc_connection_send_message_with_reply_sync(connection, xdict);
+	xpc_release(xdict);
+	xpc_release(connection);
+
+	errno = xpc_dictionary_get_int64(response, XPC_PROCESS_ROUTINE_KEY_ERROR);
+	if (errno != 0) {
+		launchctl_log(LOG_ERR, "Could not signal %s: %s", argv[1], strerror(errno));
 		return 1;
 	}
 
