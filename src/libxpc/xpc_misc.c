@@ -405,7 +405,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	size = nvlist_size(nvl);
 	nvlist_destroy(nvl);
 
-	msg_size = /*_sjc_ can't find __ALIGN*/(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
+	msg_size = __DARWIN_ALIGN(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
 	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
