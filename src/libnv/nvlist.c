@@ -75,15 +75,13 @@ __FBSDID("$FreeBSD$");
 #define	PJDLOG_RASSERT(expr, ...)	KASSERT(expr, (__VA_ARGS__))
 #define	PJDLOG_ABORT(...)		panic(__VA_ARGS__)
 #else
-#include <assert.h>
-#define	PJDLOG_ASSERT(...)		assert(__VA_ARGS__)
-#define	PJDLOG_RASSERT(expr, ...)	assert(expr)
-#define	PJDLOG_ABORT(...)		do {				\
-	fprintf(stderr, "%s:%u: ", __FILE__, __LINE__);			\
-	fprintf(stderr, __VA_ARGS__);					\
-	fprintf(stderr, "\n");						\
-	abort();							\
+#include <sys/reason.h>
+#define	PJDLOG_ABORT(msg, ...)		do {				\
+	char *reason_string; asprintf(&reason_string, "%s:%u: " msg, __FILE__, __LINE__, __VA_ARGS__); \
+	abort_with_reason(OS_REASON_LIBXPC, 1, reason_string, OS_REASON_FLAG_GENERATE_CRASH_REPORT); \
 } while (0)
+#define	PJDLOG_ASSERT(expr)		if (!(expr)) PJDLOG_ABORT("Assertion failed: %s", #expr)
+#define	PJDLOG_RASSERT(expr, ...)	PJDLOG_ASSERT(expr)
 #endif
 #endif
 
