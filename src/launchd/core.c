@@ -11800,19 +11800,7 @@ jobmgr_init(bool sflag)
 	SLIST_INIT(&s_curious_jobs);
 	LIST_INIT(&s_needing_sessions);
 
-	mach_port_t root_bootstrap_port;
-	kern_return_t kr = launchd_mport_create_recv(&root_bootstrap_port);
-	if (os_likely(kr == KERN_SUCCESS)) {
-		kr = launchd_mport_make_send(root_bootstrap_port);
-		if (os_unlikely(kr != KERN_SUCCESS)) {
-			launchd_mport_close_recv(root_bootstrap_port);
-			root_bootstrap_port = MACH_PORT_NULL;
-		}
-	} else {
-		root_bootstrap_port = MACH_PORT_NULL;
-	}
-
-	os_assert((root_jobmgr = jobmgr_new(NULL, MACH_PORT_NULL, root_bootstrap_port, sflag, root_session_type, false, MACH_PORT_NULL)) != NULL);
+	os_assert((root_jobmgr = jobmgr_new(NULL, MACH_PORT_NULL, MACH_PORT_NULL, sflag, root_session_type, false, MACH_PORT_NULL)) != NULL);
 	os_assert((_s_xpc_system_domain = jobmgr_new_xpc_singleton_domain(root_jobmgr, strdup("com.apple.xpc.system"))) != NULL);
 	_s_xpc_system_domain->req_asid = launchd_audit_session;
 	_s_xpc_system_domain->req_asport = launchd_audit_port;
@@ -11829,11 +11817,6 @@ jobmgr_init(bool sflag)
 		}
 	}
 	s_no_hang_fd = _fd(s_no_hang_fd);
-
-	// This call must wait until after the jobmgr_new() call, since jobmgr_log() requires a valid job manager.
-	if (root_bootstrap_port == MACH_PORT_NULL) {
-		jobmgr_log(root_jobmgr, LOG_CRIT, "Could not create root bootstrap port!");
-	}
 }
 
 size_t
