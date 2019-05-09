@@ -148,9 +148,11 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 		break;
 
 	case _XPC_TYPE_CONNECTION:
+		xpc_api_misuse("Cannot serialize object of type connection");
 		break;
 
 	case _XPC_TYPE_ENDPOINT:
+		xpc_api_misuse("Cannot serialize object of type endpoint");
 		break;
 
 	case _XPC_TYPE_INT64:
@@ -162,7 +164,8 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 		break;
 
 	case _XPC_TYPE_DATE:
-		break;	
+		xpc_api_misuse("Cannot serialize object of type date");
+		break;
 
 	case _XPC_TYPE_DATA:
 		nvlist_add_binary(nv, key,
@@ -184,12 +187,15 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 		break;
 
 	case _XPC_TYPE_SHMEM:
+		xpc_api_misuse("Cannot serialize object of type shared memory");
 		break;
 
 	case _XPC_TYPE_ERROR:
+		xpc_api_misuse("Cannot serialize object of type error");
 		break;
 
 	case _XPC_TYPE_DOUBLE:
+		xpc_api_misuse("Cannot serialize object of type double");
 		break;
 	}
 }
