@@ -365,16 +365,16 @@ static void
 xpc_send(xpc_connection_t xconn, xpc_object_t message, uint64_t id)
 {
 	struct xpc_connection *conn;
-	kern_return_t kr;
+	int error_code;
 
 	debugf("connection=%p, message=%p, id=%llu", xconn, message, id);
 
 	conn = xconn;
-	kr = xpc_pipe_send(message, conn->xc_remote_port,
+	error_code = xpc_pipe_send(message, conn->xc_remote_port,
 	    conn->xc_local_port, id);
 
-	if (kr != KERN_SUCCESS)
-		debugf("send failed, kr=%d", kr);
+	if (error_code != 0)
+		debugf("send failed, errno=%s", strerror(error_code));
 }
 
 static void
