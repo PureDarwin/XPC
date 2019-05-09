@@ -412,6 +412,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 		err = (kr == KERN_INVALID_TASK) ? EPIPE : EINVAL;
 	} else
 		err = 0;
+	free(packed);
 	free(message);
 	nvlist_destroy(nvl);
 	return (err);
