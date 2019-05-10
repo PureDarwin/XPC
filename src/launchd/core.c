@@ -3436,7 +3436,9 @@ job_mig_intran(mach_port_t p)
 
 	if (!jr) {
 		struct proc_bsdshortinfo proc;
-		if (proc_pidinfo(ldc->pid, PROC_PIDT_SHORTBSDINFO, 1, &proc, PROC_PIDT_SHORTBSDINFO_SIZE) == 0) {
+		if (proc_pidinfo(ldc->pid, PROC_PIDT_SHORTBSDINFO, 1, &proc, PROC_PIDT_SHORTBSDINFO_SIZE) > 0) {
+			jr = jobmgr_find_by_pid_deep(root_jobmgr, ldc->pid, true);
+		} else {
 			if (errno != ESRCH) {
 				(void)jobmgr_assumes_zero(root_jobmgr, errno);
 			} else {
