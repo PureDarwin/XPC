@@ -345,11 +345,12 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	if (nvlist == NULL)
 		return (EINVAL);
 	size = nvlist_size(nvlist);
-	msg_size = size + sizeof(mach_msg_header_t) + sizeof(size_t);
+	msg_size = __DARWIN_ALIGN(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
 	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
+	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND);
 	message->header.msgh_remote_port = xpc_dictionary_copy_mach_send(xobj, XPC_RPORT);
 	xpc_assert(message->header.msgh_remote_port != MACH_PORT_NULL, "'%s' key not found in reply", XPC_RPORT);
 	message->header.msgh_local_port = MACH_PORT_NULL;
