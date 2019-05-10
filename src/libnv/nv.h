@@ -209,6 +209,7 @@ int		 nvlist_get_descriptor(const nvlist_t *nvl, const char *name);
 #endif
 const void	*nvlist_get_binary(const nvlist_t *nvl, const char *name, size_t *sizep);
 const uuid_t	*nvlist_get_uuid(const nvlist_t *nvl, const char *name);
+bool	nvlist_contains_key(const nvlist_t *nvl, const char *name);
 
 /*
  * The nvlist_take functions returns value associated with the given name and

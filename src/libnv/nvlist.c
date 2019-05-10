@@ -2052,6 +2052,13 @@ NVLIST_GET(const uuid_t *, uuid, uuid, UUID)
 
 #undef	NVLIST_GET
 
+bool
+nvlist_contains_key(const nvlist_t *nvl, const char *name)
+{
+	const nvpair_t *nvp = nvlist_find(nvl, NV_TYPE_NONE, name);
+	return nvp != NULL;
+}
+
 const void *
 nvlist_get_binary(const nvlist_t *nvl, const char *name, size_t *sizep)
 {
