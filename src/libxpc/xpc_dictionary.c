@@ -350,6 +350,8 @@ xpc_dictionary_copy_mach_send(xpc_object_t xdict, const char *key)
 	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
 
 	xpc_object_t value = xpc_dictionary_get_value(xdict, key);
+	if (value == NULL) return MACH_PORT_NULL;
+
 	struct xpc_object *xovalue = value;
 	xpc_assert_type(xovalue, _XPC_TYPE_ENDPOINT);
 
