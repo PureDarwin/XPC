@@ -8648,10 +8648,11 @@ job_mig_reboot2(job_t j, uint64_t flags)
 	}
 
 #if !TARGET_OS_EMBEDDED
-	if (unlikely(ldc->euid)) {
+	if (unlikely(ldc->euid))
 #else
-	if (unlikely(ldc->euid) && !j->embedded_god) {
+	if (unlikely(ldc->euid) && !j->embedded_god)
 #endif
+	{
 		return BOOTSTRAP_NOT_PRIVILEGED;
 	}
 
