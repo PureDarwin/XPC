@@ -3897,12 +3897,13 @@ kill_cmd(int argc, char *const argv[]) {
 	xpc_dictionary_set_int64(xdict, XPC_PROCESS_ROUTINE_KEY_SIGNAL, signo);
 	xpc_dictionary_set_string(xdict, XPC_PROCESS_ROUTINE_KEY_NAME, argv[2]);
 
-	xpc_connection_t connection = xpc_connection_create_mach_service("bootstrap", dispatch_get_current_queue(), 0);
+	xpc_connection_t connection = xpc_connection_create_mach_service("bootstrap", dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), 0);
 	if (connection == NULL) {
 		launchctl_log(LOG_ERR, "Could not lookup bootstrap Mach service");
 		return 1;
 	}
 
+	xpc_connection_resume(connection);
 	xpc_object_t response = xpc_connection_send_message_with_reply_sync(connection, xdict);
 	xpc_release(xdict);
 	xpc_release(connection);
