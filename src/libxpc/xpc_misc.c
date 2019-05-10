@@ -454,6 +454,7 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 
 	xpc_dictionary_set_mach_send(xo, XPC_RPORT, request->msgh_remote_port);
 	xpc_dictionary_set_uint64(xo, XPC_SEQID, message.id);
+	xo->xo_flags |= _XPC_FROM_WIRE;
 	*result = xo;
 	return (0);
 }
@@ -511,6 +512,7 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 
 	xpc_dictionary_set_mach_send(xo, XPC_RPORT, request->msgh_remote_port);
 	xpc_dictionary_set_uint64(xo, XPC_SEQID, message.id);
+	xo->xo_flags |= _XPC_FROM_WIRE;
 	*requestobj = xo;
 	return (0);
 }
