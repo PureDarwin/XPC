@@ -59,8 +59,30 @@ nv2xpc(const nvlist_t *nv)
 	xpc_assert(nv != NULL, "%s: nvlist_t is NULL", __FUNCTION__);
 	xpc_assert(nvlist_type(nv) == NV_TYPE_NVLIST_DICTIONARY || nvlist_type(nv) == NV_TYPE_NVLIST_ARRAY, "nvlist_t %p is not dictionary or array", nv);
 
-	if (nvlist_type(nv) == NV_TYPE_NVLIST_DICTIONARY)
+	if (nvlist_type(nv) == NV_TYPE_NVLIST_DICTIONARY) {
+		if (nvlist_contains_key(nv, NVLIST_XPC_TYPE)) {
+			const char *type = nvlist_get_string(nv, NVLIST_XPC_TYPE);
+
+			if (strcmp(type, "connection") == 0) {
+				val.i = nvlist_get_int64(nv, "connection");
+				return _xpc_prim_create(_XPC_TYPE_CONNECTION, val, 0);
+			} else if (strcmp(type, "endpoint") == 0) {
+				val.i = nvlist_get_int64(nv, "endpoint");
+				return _xpc_prim_create(_XPC_TYPE_ENDPOINT, val, 0);
+			} else if (strcmp(type, "date") == 0) {
+				return xpc_date_create(nvlist_get_int64(nv, "date"));
+			} else if (strcmp(type, "double") == 0) {
+				size_t value_size;
+				double *value = (double *)nvlist_get_binary(nv, "date", &value_size);
+				xpc_assert(value_size == sizeof(double), "nvlist data of type date has incorrect size (expected %lu, got %zu)", sizeof(double), value_size);
+				return xpc_double_create(*value);
+			} else {
+				xpc_api_misuse("Unexpected NVLIST_XPC_TYPE in dictionary: %s", type);
+			}
+		}
+
 		xo = xpc_dictionary_create(NULL, NULL, 0);
+	}
 
 	if (nvlist_type(nv) == NV_TYPE_NVLIST_ARRAY)
 		xo = xpc_array_create(NULL, 0);
