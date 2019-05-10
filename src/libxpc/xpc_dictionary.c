@@ -306,7 +306,6 @@ mach_port_t
 xpc_dictionary_copy_mach_send(xpc_object_t xdict, const char *key)
 {
 	struct xpc_object *xo = xdict;
-	const struct xpc_object *xotmp;
 
 	xpc_assert_nonnull(xdict);
 	xpc_assert_type(xo, _XPC_TYPE_ENDPOINT);
