@@ -33,7 +33,7 @@ void xpc_dictionary_set_mach_send(xpc_object_t object, const char* key, mach_por
 // This must be reesonably unique, because it is tested against all
 // XPC dictionaries sent to launchd, and we want to minimize the possibility
 // of false matches. The other dictionary keys do not need to be as unique.
-#define XPC_PROCESS_ROUTINE_KEY_OP "org.puredarwin.private.libxpc.process-routine-operation"
+#define XPC_PROCESS_ROUTINE_KEY_OP "process-routine-operation"
 #define XPC_PROCESS_ROUTINE_KEY_LABEL "label"
 #define XPC_PROCESS_ROUTINE_KEY_ERROR "error"
 #define XPC_PROCESS_ROUTINE_KEY_HANDLE "handle"
