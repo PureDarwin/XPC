@@ -352,6 +352,7 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_remote_port = xpc_dictionary_copy_mach_send(xobj, XPC_RPORT);
+	xpc_assert(message->header.msgh_remote_port != MACH_PORT_NULL, "'%s' key not found in reply", XPC_RPORT);
 	message->header.msgh_local_port = MACH_PORT_NULL;
 	message->size = size;
 	memcpy(&message->data, nvlist, size);
