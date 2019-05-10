@@ -3910,7 +3910,7 @@ kill_cmd(int argc, char *const argv[]) {
 
 	errno = xpc_dictionary_get_uint64(response, XPC_PROCESS_ROUTINE_KEY_ERROR);
 	if (errno != 0) {
-		launchctl_log(LOG_ERR, "Could not signal %s: %s", argv[1], strerror(errno));
+		launchctl_log(LOG_ERR, "Could not signal %s: %s", argv[2], strerror(errno));
 		return 1;
 	}
 
