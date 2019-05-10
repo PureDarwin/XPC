@@ -4459,11 +4459,11 @@ job_start(job_t j)
 		}
 		break;
 	case 0:
-        // _sjc_ because _vproc_post_fork_ping will fail without a valid bootstrap_port
-        if (!bootstrap_port) {
-            bootstrap_init();
-        }
-        if (unlikely(_vproc_post_fork_ping())) {
+		// _sjc_ because _vproc_post_fork_ping will fail without a valid bootstrap_port
+		if (!bootstrap_port) {
+			bootstrap_init();
+		}
+		if (unlikely(_vproc_post_fork_ping())) {
 			_exit(EXIT_FAILURE);
 		}
 
