@@ -11432,12 +11432,14 @@ xpc_process_demux(mach_port_t p, xpc_object_t request, xpc_object_t *reply)
 		error = EDOM;
 	}
 
-	xpc_object_t reply2 = xpc_dictionary_create_reply(request);
-	if (reply2) {
-		xpc_dictionary_set_uint64(reply2, XPC_PROCESS_ROUTINE_KEY_ERROR, error);
-	}
+	if (error) {
+		xpc_object_t reply2 = xpc_dictionary_create_reply(request);
+		if (reply2) {
+			xpc_dictionary_set_uint64(reply2, XPC_PROCESS_ROUTINE_KEY_ERROR, error);
+		}
 
-	*reply = reply2;
+		*reply = reply2;
+	}
 
 	return true;
 }
