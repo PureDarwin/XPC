@@ -133,6 +133,7 @@ static void
 xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 {
 	struct xpc_object *xotmp = value;
+	nvlist_t *inner_nv;
 
 	switch (xotmp->xo_xpc_type) {
 	case _XPC_TYPE_DICTIONARY:
@@ -148,11 +149,19 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 		break;
 
 	case _XPC_TYPE_CONNECTION:
-		xpc_api_misuse("Cannot serialize object of type connection");
+		inner_nv = nvlist_create_dictionary(0);
+		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "connection");
+		nvlist_add_int64(inner_nv, "connection", xotmp->xo_port);
+		nvlist_add_nvlist(nv, key, inner_nv);
+		nvlist_destroy(inner_nv);
 		break;
 
 	case _XPC_TYPE_ENDPOINT:
-		xpc_api_misuse("Cannot serialize object of type endpoint");
+			inner_nv = nvlist_create_dictionary(0);
+			nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "endpoint");
+			nvlist_add_int64(inner_nv, "endpoint", xotmp->xo_port);
+			nvlist_add_nvlist(nv, key, inner_nv);
+			nvlist_destroy(inner_nv);
 		break;
 
 	case _XPC_TYPE_INT64:
@@ -164,7 +173,11 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 		break;
 
 	case _XPC_TYPE_DATE:
-		xpc_api_misuse("Cannot serialize object of type date");
+			inner_nv = nvlist_create_dictionary(0);
+			nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "date");
+			nvlist_add_int64(inner_nv, "date", xotmp->xo_u.i);
+			nvlist_add_nvlist(nv, key, inner_nv);
+			nvlist_destroy(inner_nv);
 		break;
 
 	case _XPC_TYPE_DATA:
@@ -195,7 +208,11 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 		break;
 
 	case _XPC_TYPE_DOUBLE:
-		xpc_api_misuse("Cannot serialize object of type double");
+		inner_nv = nvlist_create_dictionary(0);
+		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "double");
+		nvlist_add_binary(inner_nv, "double", &xotmp->xo_u.d, sizeof(double));
+		nvlist_add_nvlist(nv, key, inner_nv);
+		nvlist_destroy(inner_nv);
 		break;
 	}
 }
