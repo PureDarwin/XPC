@@ -329,6 +329,8 @@ mach_msg_send(mach_msg_header_t *header);
 int
 xpc_pipe_routine_reply(xpc_object_t xobj)
 {
+	xpc_assert_nonnull(xobj);
+
 	struct xpc_object *xo;
 	size_t size, msg_size;
 	struct xpc_message *message;
