@@ -473,36 +473,59 @@ xpc_dictionary_set_uuid(xpc_object_t xdict, const char *key, const uuid_t uuid)
 bool
 xpc_dictionary_get_bool(xpc_object_t xdict, const char *key)
 {
-	xpc_object_t xo = xpc_dictionary_get_value(xdict, key);
-	return (xpc_bool_get_value(xo));
+	xpc_object_t value = xpc_dictionary_get_value(xdict, key);
+	if (value == NULL) return FALSE;
+
+	struct xpc_object *xo = value;
+	if (xo->xo_xpc_type != _XPC_TYPE_BOOL) return FALSE;
+
+	return (xpc_bool_get_value(value));
 }
 
 int64_t
 xpc_dictionary_get_int64(xpc_object_t xdict, const char *key)
 {
-	xpc_object_t xo = xpc_dictionary_get_value(xdict, key);
-	return (xpc_int64_get_value(xo));
+	xpc_object_t value = xpc_dictionary_get_value(xdict, key);
+	if (value == NULL) return 0;
+
+	struct xpc_object *xo = value;
+	if (xo->xo_xpc_type != _XPC_TYPE_INT64) return 0;
+
+	return (xpc_int64_get_value(value));
 }
 
 uint64_t
 xpc_dictionary_get_uint64(xpc_object_t xdict, const char *key)
 {
-	xpc_object_t xo = xpc_dictionary_get_value(xdict, key);
-	return (xpc_uint64_get_value(xo));
+	xpc_object_t value = xpc_dictionary_get_value(xdict, key);
+	if (value == NULL) return 0;
+
+	struct xpc_object *xo = value;
+	if (xo->xo_xpc_type != _XPC_TYPE_UINT64) return 0;
+
+	return (xpc_uint64_get_value(value));
 }
 
 const char *
 xpc_dictionary_get_string(xpc_object_t xdict, const char *key)
 {
-	xpc_object_t xo = xpc_dictionary_get_value(xdict, key);
-	return (xpc_string_get_string_ptr(xo));
+	xpc_object_t value = xpc_dictionary_get_value(xdict, key);
+	if (value == NULL) return 0;
+
+	struct xpc_object *xo = value;
+	if (xo->xo_xpc_type != _XPC_TYPE_STRING) return NULL;
+
+	return (xpc_string_get_string_ptr(value));
 }
 
 const void *
 xpc_dictionary_get_data(xpc_object_t xdict, const char *key, size_t *length)
 {
 	xpc_object_t xdata = xpc_dictionary_get_value(xdict, key);
-	xpc_assert_type(((struct xpc_object *)xdata), _XPC_TYPE_DATA);
+	if (xdata == NULL) return NULL;
+
+	struct xpc_object *xo = xdata;
+	if (xo->xo_xpc_type != _XPC_TYPE_DATA) return NULL;
 
 	if (length != NULL) *length = xpc_data_get_length(xdata);
 	return xpc_data_get_bytes_ptr(xdata);
