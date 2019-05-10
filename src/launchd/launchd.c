@@ -393,7 +393,9 @@ do_pid1_crash_diagnosis_mode2(const char *msg)
 	fprintf(stdout, "    gdb attach %d\n", getppid());
 	fprintf(stdout, "To exit this shell and shut down:\n");
 	fprintf(stdout, "    kill -9 1\n");
+#if 0
 	fprintf(stdout, "A sample of PID 1 has been written to %s\n", PID1_CRASH_LOGFILE);
+#endif
 	fprintf(stdout, "\n");
 	fflush(stdout);
 
