@@ -11323,7 +11323,7 @@ xpc_process_service_kill(job_t j, xpc_object_t request, xpc_object_t *reply)
 		return ESRCH;
 	}
 
-	jobmgr_t jm = _xpc_process_find_target_manager(j, XPC_SERVICE_TYPE_BUNDLED, j->p);
+	jobmgr_t jm = _xpc_process_find_target_manager(j, XPC_SERVICE_TYPE_LAUNCHD, j->p);
 	if (!jm) {
 		return ENOENT;
 	}
