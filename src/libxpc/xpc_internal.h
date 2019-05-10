@@ -63,6 +63,7 @@
 #define _XPC_TYPE_MAX			_XPC_TYPE_DOUBLE
 
 #define	XPC_SEQID	"XPC sequence number"
+#define	XPC_RPORT	"XPC remote port"
 
 struct xpc_object;
 struct xpc_dict_pair;

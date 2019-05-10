@@ -328,7 +328,6 @@ xpc_copy_entitlement_for_token(const char *key __unused, audit_token_t *token __
 extern kern_return_t
 mach_msg_send(mach_msg_header_t *header);
 
-#define XPC_RPORT "XPC remote port"
 int
 xpc_pipe_routine_reply(xpc_object_t xobj)
 {

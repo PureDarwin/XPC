@@ -300,7 +300,14 @@ xpc_dictionary_create_reply(xpc_object_t original)
 	if ((xo_orig->xo_flags & _XPC_FROM_WIRE) == 0)
 		return (NULL);
 
-	return xpc_dictionary_create(NULL, NULL, 0);
+	xpc_object_t reply = xpc_dictionary_create(NULL, NULL, 0);
+
+	mach_port_t rport = xpc_dictionary_copy_mach_send(original, XPC_RPORT);
+	if (rport != MACH_PORT_NULL) xpc_dictionary_set_mach_send(reply, XPC_RPORT, rport);
+	uint64_t seqid = xpc_dictionary_get_uint64(original, XPC_SEQID);
+	if (seqid != 0) xpc_dictionary_set_uint64(reply, XPC_SEQID, seqid);
+
+	return reply;
 }
 
 void
