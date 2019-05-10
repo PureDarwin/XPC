@@ -709,7 +709,7 @@ const unsigned char *
 nvpair_unpack(bool isbe, const unsigned char *ptr, size_t *leftp,
     nvpair_t **nvpp)
 {
-	nvpair_t *nvp, *tmp;
+	nvpair_t *nvp;
 
 	nvp = nv_calloc(1, sizeof(*nvp) + NV_NAME_MAX);
 	if (nvp == NULL)
@@ -719,13 +719,8 @@ nvpair_unpack(bool isbe, const unsigned char *ptr, size_t *leftp,
 	ptr = nvpair_unpack_header(isbe, nvp, ptr, leftp);
 	if (ptr == NULL)
 		goto failed;
-	tmp = nv_realloc(nvp, sizeof(*nvp) + strlen(nvp->nvp_name) + 1);
-	if (tmp == NULL)
-		goto failed;
-	nvp = tmp;
 
 	/* Update nvp_name after realloc(). */
-	nvp->nvp_name = (char *)(nvp + 1);
 	nvp->nvp_data = 0x00;
 	nvp->nvp_magic = NVPAIR_MAGIC;
 	*nvpp = nvp;
