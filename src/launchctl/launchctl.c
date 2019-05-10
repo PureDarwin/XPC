@@ -3908,7 +3908,7 @@ kill_cmd(int argc, char *const argv[]) {
 	xpc_release(xdict);
 	xpc_release(connection);
 
-	errno = xpc_dictionary_get_int64(response, XPC_PROCESS_ROUTINE_KEY_ERROR);
+	errno = xpc_dictionary_get_uint64(response, XPC_PROCESS_ROUTINE_KEY_ERROR);
 	if (errno != 0) {
 		launchctl_log(LOG_ERR, "Could not signal %s: %s", argv[1], strerror(errno));
 		return 1;
