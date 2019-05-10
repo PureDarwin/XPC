@@ -349,19 +349,31 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
+	void *packed = nvlist_pack_buffer(nvlist, NULL, &size);
+	if (packed == NULL) {
+		debugf("Could not pack XPC message for transport");
+		free(message);
+		nvlist_destroy(nvlist);
+		return EINVAL;
+	}
+
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND);
 	message->header.msgh_remote_port = xpc_dictionary_copy_mach_send(xobj, XPC_RPORT);
 	xpc_assert(message->header.msgh_remote_port != MACH_PORT_NULL, "'%s' key not found in reply", XPC_RPORT);
 	message->header.msgh_local_port = MACH_PORT_NULL;
 	message->size = size;
-	memcpy(&message->data, nvlist, size);
+	message->id = xpc_dictionary_get_uint64(xobj, XPC_SEQID);
+	xpc_assert(message->id != 0, "'%s' key not found in reply", XPC_SEQID);
+	memcpy(&message->data, packed, size);
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS)
 		err = (kr == KERN_INVALID_TASK) ? EPIPE : EINVAL;
 	else
 		err = 0;
 	free(message);
+	free(packed);
+	nvlist_destroy(nvlist);
 	return (err);
 }
 
