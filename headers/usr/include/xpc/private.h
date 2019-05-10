@@ -47,8 +47,6 @@ void xpc_dictionary_set_mach_send(xpc_object_t object, const char* key, mach_por
 #define XPC_PROCESS_ROUTINE_KEY_PRIORITY_BAND "priority band"
 #define XPC_PROCESS_ROUTINE_KEY_MEMORY_LIMIT "memory limit"
 
-#define XPC_LAUNCHD_SERVICE_NAME "org.puredarwin.private.libxpc.launchd"
-
 // Completely random. Not sure what the "actual" one is
 #define XPC_PIPE_FLAG_PRIVILEGED 7
 
