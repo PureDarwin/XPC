@@ -3436,7 +3436,9 @@ job_mig_intran(mach_port_t p)
 
 	if (!jr) {
 		struct proc_bsdshortinfo proc;
-		if (proc_pidinfo(ldc->pid, PROC_PIDT_SHORTBSDINFO, 1, &proc, PROC_PIDT_SHORTBSDINFO_SIZE) == 0) {
+		if (proc_pidinfo(ldc->pid, PROC_PIDT_SHORTBSDINFO, 1, &proc, PROC_PIDT_SHORTBSDINFO_SIZE) > 0) {
+			jr = jobmgr_find_by_pid_deep(root_jobmgr, ldc->pid, true);
+		} else {
 			if (errno != ESRCH) {
 				(void)jobmgr_assumes_zero(root_jobmgr, errno);
 			} else {
@@ -4459,11 +4461,11 @@ job_start(job_t j)
 		}
 		break;
 	case 0:
-        // _sjc_ because _vproc_post_fork_ping will fail without a valid bootstrap_port
-        if (!bootstrap_port) {
-            bootstrap_init();
-        }
-        if (unlikely(_vproc_post_fork_ping())) {
+		// _sjc_ because _vproc_post_fork_ping will fail without a valid bootstrap_port
+		if (!bootstrap_port) {
+			bootstrap_init();
+		}
+		if (unlikely(_vproc_post_fork_ping())) {
 			_exit(EXIT_FAILURE);
 		}
 
@@ -8648,10 +8650,11 @@ job_mig_reboot2(job_t j, uint64_t flags)
 	}
 
 #if !TARGET_OS_EMBEDDED
-	if (unlikely(ldc->euid)) {
+	if (unlikely(ldc->euid))
 #else
-	if (unlikely(ldc->euid) && !j->embedded_god) {
+	if (unlikely(ldc->euid) && !j->embedded_god)
 #endif
+	{
 		return BOOTSTRAP_NOT_PRIVILEGED;
 	}
 
@@ -11322,7 +11325,7 @@ xpc_process_service_kill(job_t j, xpc_object_t request, xpc_object_t *reply)
 		return ESRCH;
 	}
 
-	jobmgr_t jm = _xpc_process_find_target_manager(j, XPC_SERVICE_TYPE_BUNDLED, j->p);
+	jobmgr_t jm = _xpc_process_find_target_manager(j, XPC_SERVICE_TYPE_LAUNCHD, j->p);
 	if (!jm) {
 		return ENOENT;
 	}
@@ -11365,6 +11368,11 @@ xpc_process_service_kill(job_t j, xpc_object_t request, xpc_object_t *reply)
 
 	if (!j2kill->p) {
 		return EALREADY;
+	}
+
+	if (j2kill->p == 1) {
+		// Don't allow the system launchd process to be killed using this API.
+		return EINVAL;
 	}
 
 	xpc_object_t reply2 = xpc_dictionary_create_reply(request);

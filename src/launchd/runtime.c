@@ -696,6 +696,14 @@ runtime_set_timeout(timeout_callback to_cb, unsigned int sec)
 	runtime_idle_timeout = sec * 1000;
 }
 
+
+boolean_t
+runtime_xpc_server_demux(mach_msg_header_t *InHeadP, mach_msg_header_t *OutHeadP) {
+	// This routine only exists to convince runtime_add_mport() to add the Mach
+	// port to the ipc_port_set, so that it can be listened to for incoming XPC messages.
+	return FALSE;
+}
+
 kern_return_t
 runtime_add_mport(mach_port_t name, mig_callback demux)
 {

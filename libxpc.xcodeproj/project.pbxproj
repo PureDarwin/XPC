@@ -167,6 +167,8 @@
 		1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csops_entitlements_blob_test.c; path = tests/csops_entitlements_blob_test.c; sourceTree = "<group>"; };
 		1F48936C2145F89B0060BEBE /* xpc_error.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = xpc_error.c; path = src/libxpc/xpc_error.c; sourceTree = "<group>"; };
 		1F950471227F9BF900424594 /* darwinbuild.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = darwinbuild.xcconfig; sourceTree = "<group>"; };
+		1FAA31302283970900DABA25 /* shim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shim.h; path = src/launchd/shim.h; sourceTree = "<group>"; };
+		1FCBCFF12283B17D0091E136 /* private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = private.h; path = headers/usr/include/xpc/private.h; sourceTree = "<group>"; };
 		1FD343DC213880EE003FE9D1 /* xpc_debug.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = xpc_debug.c; path = src/libxpc/xpc_debug.c; sourceTree = "<group>"; };
 		1FD61BFC213711BC00A5A7BA /* xpc_entitlements_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xpc_entitlements_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xpc_entitlements_test.c; path = tests/xpc_entitlements_test.c; sourceTree = "<group>"; };
@@ -285,6 +287,7 @@
 				1791F1DE205D45FD00344BA5 /* xpc_private.c */,
 				1FD343DC213880EE003FE9D1 /* xpc_debug.c */,
 				1F48936C2145F89B0060BEBE /* xpc_error.c */,
+				1FCBCFF12283B17D0091E136 /* private.h */,
 			);
 			name = libxpc;
 			sourceTree = "<group>";
@@ -312,6 +315,7 @@
 				176107BF2055A00B00CD3B02 /* ipc.c */,
 				1791F20C205E72B700344BA5 /* runtime.h */,
 				17E13E01205725AB002309E2 /* runtime.c */,
+				1FAA31302283970900DABA25 /* shim.h */,
 				1791F20D205E72CE00344BA5 /* kill2.h */,
 				17E13E1320586546002309E2 /* kill2.c */,
 				1791F20E205E72DE00344BA5 /* ktrace.h */,
@@ -1134,6 +1138,7 @@
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
 			};
 			name = Debug;
 		};
@@ -1155,6 +1160,7 @@
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
 			};
 			name = Release;
 		};

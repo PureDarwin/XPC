@@ -93,35 +93,6 @@ xpc_array_destroy(struct xpc_object *dict)
 	}
 }
 
-static int
-xpc_pack(struct xpc_object *xo, void *buf, size_t *size)
-{
-	nvlist_t *nv;
-	void *packed;
-
-	nv = xpc2nv(xo);
-
-	packed = nvlist_pack_buffer(nv, NULL, size);
-	if (packed == NULL) {
-		errno = EINVAL;
-		return (-1);
-	}
-
-	memcpy(buf, packed, *size);
-	return 0;
-}
-
-static struct xpc_object *
-xpc_unpack(void *buf, size_t size)
-{
-	struct xpc_object *xo;
-	nvlist_t *nv;
-
-	nv = nvlist_unpack(buf, size);
-	xo = nv2xpc(nv);
-	return (xo);
-}
-
 void
 xpc_object_destroy(struct xpc_object *xo)
 {
@@ -136,6 +107,9 @@ xpc_object_destroy(struct xpc_object *xo)
 
 	if (xo->xo_xpc_type == _XPC_TYPE_DATA)
 		free((void *)xo->xo_u.ptr);
+
+	if (xo->xo_audit_token != NULL)
+		free(xo->xo_audit_token);
 
 	free(xo);
 }
@@ -354,10 +328,11 @@ xpc_copy_entitlement_for_token(const char *key __unused, audit_token_t *token __
 extern kern_return_t
 mach_msg_send(mach_msg_header_t *header);
 
-#define XPC_RPORT "XPC remote port"
 int
 xpc_pipe_routine_reply(xpc_object_t xobj)
 {
+	xpc_assert_nonnull(xobj);
+
 	struct xpc_object *xo;
 	size_t size, msg_size;
 	struct xpc_message *message;
@@ -365,26 +340,40 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	int err;
 
 	xo = xobj;
-	assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY);
+	xpc_assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
 	nvlist_t *nvlist = xpc2nv(xobj);
 	if (nvlist == NULL)
 		return (EINVAL);
 	size = nvlist_size(nvlist);
-	msg_size = size + sizeof(mach_msg_header_t) + sizeof(size_t);
-	if ((message = malloc(msg_size)) == NULL)
+	msg_size = __DARWIN_ALIGN(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
+	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
+	void *packed = nvlist_pack_buffer(nvlist, NULL, &size);
+	if (packed == NULL) {
+		debugf("Could not pack XPC message for transport");
+		free(message);
+		nvlist_destroy(nvlist);
+		return EINVAL;
+	}
+
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
+	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND);
 	message->header.msgh_remote_port = xpc_dictionary_copy_mach_send(xobj, XPC_RPORT);
+	xpc_assert(message->header.msgh_remote_port != MACH_PORT_NULL, "'%s' key not found in reply", XPC_RPORT);
 	message->header.msgh_local_port = MACH_PORT_NULL;
 	message->size = size;
-	memcpy(message->data, nvlist, size);
+	message->id = xpc_dictionary_get_uint64(xobj, XPC_SEQID);
+	xpc_assert(message->id != 0, "'%s' key not found in reply", XPC_SEQID);
+	memcpy(&message->data, packed, size);
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS)
 		err = (kr == KERN_INVALID_TASK) ? EPIPE : EINVAL;
 	else
 		err = 0;
 	free(message);
+	free(packed);
+	nvlist_destroy(nvlist);
 	return (err);
 }
 
@@ -399,18 +388,22 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	int err;
 
 	xo = xobj;
-	assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY);
+	xpc_assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
 
 	nvlist_t *nvl = xpc2nv(xo);
 	size = nvlist_size(nvl);
-	nvlist_destroy(nvl);
 
-	msg_size = /*_sjc_ can't find __ALIGN*/(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
-	if ((message = malloc(msg_size)) == NULL)
+	msg_size = __DARWIN_ALIGN(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
+	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
-	if (xpc_pack(xo, &message->data, &size) != 0)
+	void *packed = nvlist_pack_buffer(nvl, NULL, &size);
+	if (packed == NULL) {
+		debugf("Could not pack XPC message for transport");
+		free(message);
+		nvlist_destroy(nvl);
 		return (EINVAL);
+	}
 
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND,
@@ -419,20 +412,18 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	message->header.msgh_local_port = local;
 	message->id = id;
 	message->size = size;
+	memcpy(&message->data, packed, size);
 	kr = mach_msg_send(&message->header);
-	if (kr != KERN_SUCCESS)
+	if (kr != KERN_SUCCESS) {
+		debugf("mach_msg_send() failed, kr=0x%X", kr);
 		err = (kr == KERN_INVALID_TASK) ? EPIPE : EINVAL;
-	else
+	} else
 		err = 0;
+	free(packed);
 	free(message);
-	return (err);	
+	nvlist_destroy(nvl);
+	return (err);
 }
-
-#define LOG(...)	\
-	do {            \
-	syslog(LOG_ERR, "%s:%u: ", __FILE__, __LINE__);	\
-	syslog(LOG_ERR, __VA_ARGS__);					\
-	} while (0)
 
 int
 xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
@@ -442,7 +433,7 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	mach_msg_header_t *request;
 	kern_return_t kr;
 	mach_msg_trailer_t *tr;
-	int data_size;
+	size_t data_size;
 	struct xpc_object *xo;
 	audit_token_t *auditp;
 	xpc_u val;
@@ -458,12 +449,15 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	    MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 
 	if (kr != 0)
-		LOG("mach_msg_receive returned %d\n", kr);
+		debugf("mach_msg_receive returned %d\n", kr);
 	*remote = request->msgh_remote_port;
 	*id = message.id;
-	data_size = (int)message.size;
-	LOG("unpacking data_size=%d", data_size);
-	xo = xpc_unpack(&message.data, data_size);
+	data_size = message.size;
+	debugf("unpacking data_size=%zu", data_size);
+
+	nvlist_t *nv = nvlist_unpack(&message.data, data_size);
+	xo = nv2xpc(nv);
+	nvlist_destroy(nv);
 
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
 	auditp = &((mach_msg_audit_trailer_t *)tr)->msgh_audit;
@@ -473,6 +467,7 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 
 	xpc_dictionary_set_mach_send(xo, XPC_RPORT, request->msgh_remote_port);
 	xpc_dictionary_set_uint64(xo, XPC_SEQID, message.id);
+	xo->xo_flags |= _XPC_FROM_WIRE;
 	*result = xo;
 	return (0);
 }
@@ -504,7 +499,7 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 	    MACH_MSG_TIMEOUT_NONE, MACH_PORT_NULL);
 
 	if (kr != 0)
-		LOG("mach_msg_receive returned %d\n", kr);
+		debugf("mach_msg_receive returned %d\n", kr);
 	*rcvport = request->msgh_remote_port;
 	if (demux(request, response)) {
 		(void)mach_msg_send(response);
@@ -513,10 +508,14 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 		*/
 		return (TRUE);
 	}
-	LOG("demux returned false\n");
-	data_size = request->msgh_size;
-	LOG("unpacking data_size=%d", data_size);
-	xo = xpc_unpack(&message.data, data_size);
+	debugf("demux returned false\n");
+	data_size = message.size;
+	debugf("unpacking data_size=%d", data_size);
+
+	nvlist_t *nvlist = nvlist_unpack(&message.data, data_size);
+	xo = nv2xpc(nvlist);
+	nvlist_destroy(nvlist);
+
 	/* is padding for alignment enforced in the kernel?*/
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
 	auditp = &((mach_msg_audit_trailer_t *)tr)->msgh_audit;
@@ -526,6 +525,7 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 
 	xpc_dictionary_set_mach_send(xo, XPC_RPORT, request->msgh_remote_port);
 	xpc_dictionary_set_uint64(xo, XPC_SEQID, message.id);
+	xo->xo_flags |= _XPC_FROM_WIRE;
 	*requestobj = xo;
 	return (0);
 }

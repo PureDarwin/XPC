@@ -130,4 +130,6 @@ kern_return_t launchd_mport_close_recv(mach_port_t name);
 
 uint64_t runtime_get_uniqueid(void);
 
+boolean_t runtime_xpc_server_demux(mach_msg_header_t *InHeadP, mach_msg_header_t *OutHeadP);
+
 #endif /* __LAUNCHD_RUNTIME_H__ */
