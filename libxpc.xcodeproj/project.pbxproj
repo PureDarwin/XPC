@@ -56,6 +56,18 @@
 		1F0F396721364BB5003E244C /* csops_entitlements_blob_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */; };
 		1F1CCB8721273CEA00A89642 /* libxpc.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 17C13B19205456CF001CE9DD /* libxpc.dylib */; };
 		1F48936D2145F89B0060BEBE /* xpc_error.c in Sources */ = {isa = PBXBuildFile; fileRef = 1F48936C2145F89B0060BEBE /* xpc_error.c */; };
+		1F79932522E2329B001E1F68 /* xpc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79931E22E2329B001E1F68 /* xpc.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1F79932622E2329B001E1F68 /* activity.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79931F22E2329B001E1F68 /* activity.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1F79932722E2329B001E1F68 /* endpoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79932022E2329B001E1F68 /* endpoint.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1F79932822E2329B001E1F68 /* launchd.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79932122E2329B001E1F68 /* launchd.h */; };
+		1F79932922E2329B001E1F68 /* base.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79932222E2329B001E1F68 /* base.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1F79932A22E2329B001E1F68 /* connection.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79932322E2329B001E1F68 /* connection.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1F79932B22E2329B001E1F68 /* debug.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79932422E2329B001E1F68 /* debug.h */; };
+		1F79932C22E232CA001E1F68 /* private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FCBCFF12283B17D0091E136 /* private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		1F799A7722E23309001E1F68 /* bootstrap_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F799A7322E232F7001E1F68 /* bootstrap_priv.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		1F799A7822E23309001E1F68 /* bootstrap.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F799A7422E232F7001E1F68 /* bootstrap.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1F799A7922E23309001E1F68 /* vproc_priv.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79932D22E232E4001E1F68 /* vproc_priv.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		1F799A7A22E23309001E1F68 /* vproc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79932E22E232E4001E1F68 /* vproc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1FD343DD213880EE003FE9D1 /* xpc_debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FD343DC213880EE003FE9D1 /* xpc_debug.c */; };
 		1FD61C05213711D900A5A7BA /* xpc_entitlements_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */; };
 		1FF7B65221262AA800BE3BFB /* sys_endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64A21262AA800BE3BFB /* sys_endian.h */; };
@@ -166,6 +178,17 @@
 		1F0F395E21364785003E244C /* csops_entitlement_blob_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = csops_entitlement_blob_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		1F0F396621364BB5003E244C /* csops_entitlements_blob_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = csops_entitlements_blob_test.c; path = tests/csops_entitlements_blob_test.c; sourceTree = "<group>"; };
 		1F48936C2145F89B0060BEBE /* xpc_error.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = xpc_error.c; path = src/libxpc/xpc_error.c; sourceTree = "<group>"; };
+		1F79931E22E2329B001E1F68 /* xpc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = xpc.h; path = headers/usr/include/xpc/xpc.h; sourceTree = "<group>"; };
+		1F79931F22E2329B001E1F68 /* activity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = activity.h; path = headers/usr/include/xpc/activity.h; sourceTree = "<group>"; };
+		1F79932022E2329B001E1F68 /* endpoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = endpoint.h; path = headers/usr/include/xpc/endpoint.h; sourceTree = "<group>"; };
+		1F79932122E2329B001E1F68 /* launchd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = launchd.h; path = headers/usr/include/xpc/launchd.h; sourceTree = "<group>"; };
+		1F79932222E2329B001E1F68 /* base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = base.h; path = headers/usr/include/xpc/base.h; sourceTree = "<group>"; };
+		1F79932322E2329B001E1F68 /* connection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = connection.h; path = headers/usr/include/xpc/connection.h; sourceTree = "<group>"; };
+		1F79932422E2329B001E1F68 /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = debug.h; path = headers/usr/include/xpc/debug.h; sourceTree = "<group>"; };
+		1F79932D22E232E4001E1F68 /* vproc_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vproc_priv.h; path = headers/usr/include/vproc_priv.h; sourceTree = "<group>"; };
+		1F79932E22E232E4001E1F68 /* vproc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vproc.h; path = headers/usr/include/vproc.h; sourceTree = "<group>"; };
+		1F799A7322E232F7001E1F68 /* bootstrap_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bootstrap_priv.h; path = headers/usr/include/bootstrap_priv.h; sourceTree = "<group>"; };
+		1F799A7422E232F7001E1F68 /* bootstrap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bootstrap.h; path = headers/usr/include/bootstrap.h; sourceTree = "<group>"; };
 		1F950471227F9BF900424594 /* darwinbuild.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = darwinbuild.xcconfig; sourceTree = "<group>"; };
 		1FAA31302283970900DABA25 /* shim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shim.h; path = src/launchd/shim.h; sourceTree = "<group>"; };
 		1FCBCFF12283B17D0091E136 /* private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = private.h; path = headers/usr/include/xpc/private.h; sourceTree = "<group>"; };
@@ -253,6 +276,10 @@
 		1791F1CB205D1D9400344BA5 /* liblaunch */ = {
 			isa = PBXGroup;
 			children = (
+				1F799A7322E232F7001E1F68 /* bootstrap_priv.h */,
+				1F799A7422E232F7001E1F68 /* bootstrap.h */,
+				1F79932D22E232E4001E1F68 /* vproc_priv.h */,
+				1F79932E22E232E4001E1F68 /* vproc.h */,
 				1791F1CC205D1DB400344BA5 /* pd-liblaunch.c */,
 				17AC89B720679337008FB2ED /* IndirectSymbols */,
 			);
@@ -270,6 +297,7 @@
 		17C13B1D205456D6001CE9DD /* libxpc */ = {
 			isa = PBXGroup;
 			children = (
+				1F79931D22E23290001E1F68 /* headers */,
 				1791F1D3205D319600344BA5 /* helper.defs */,
 				1791F206205E6FF700344BA5 /* job.defs */,
 				1791F1D5205D31CC00344BA5 /* vproc_internal.h */,
@@ -287,7 +315,6 @@
 				1791F1DE205D45FD00344BA5 /* xpc_private.c */,
 				1FD343DC213880EE003FE9D1 /* xpc_debug.c */,
 				1F48936C2145F89B0060BEBE /* xpc_error.c */,
-				1FCBCFF12283B17D0091E136 /* private.h */,
 			);
 			name = libxpc;
 			sourceTree = "<group>";
@@ -332,6 +359,21 @@
 				1FD61C07213716D300A5A7BA /* xpc_entitlements_test.entitlements */,
 			);
 			name = tests;
+			sourceTree = "<group>";
+		};
+		1F79931D22E23290001E1F68 /* headers */ = {
+			isa = PBXGroup;
+			children = (
+				1F79931F22E2329B001E1F68 /* activity.h */,
+				1F79932222E2329B001E1F68 /* base.h */,
+				1F79932322E2329B001E1F68 /* connection.h */,
+				1F79932422E2329B001E1F68 /* debug.h */,
+				1F79932022E2329B001E1F68 /* endpoint.h */,
+				1F79932122E2329B001E1F68 /* launchd.h */,
+				1F79931E22E2329B001E1F68 /* xpc.h */,
+				1FCBCFF12283B17D0091E136 /* private.h */,
+			);
+			name = headers;
 			sourceTree = "<group>";
 		};
 		1FF7B64921262A9D00BE3BFB /* libnv */ = {
@@ -379,6 +421,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F799A7922E23309001E1F68 /* vproc_priv.h in Headers */,
+				1F799A7722E23309001E1F68 /* bootstrap_priv.h in Headers */,
+				1F799A7822E23309001E1F68 /* bootstrap.h in Headers */,
+				1F799A7A22E23309001E1F68 /* vproc.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,6 +432,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1F79932922E2329B001E1F68 /* base.h in Headers */,
+				1F79932522E2329B001E1F68 /* xpc.h in Headers */,
+				1F79932C22E232CA001E1F68 /* private.h in Headers */,
+				1F79932B22E2329B001E1F68 /* debug.h in Headers */,
+				1F79932A22E2329B001E1F68 /* connection.h in Headers */,
+				1F79932622E2329B001E1F68 /* activity.h in Headers */,
+				1F79932822E2329B001E1F68 /* launchd.h in Headers */,
+				1F79932722E2329B001E1F68 /* endpoint.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -784,6 +838,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				PUBLIC_HEADERS_FOLDER_PATH = /usr/include;
 			};
 			name = Debug;
 		};
@@ -819,6 +874,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				PUBLIC_HEADERS_FOLDER_PATH = /usr/include;
 			};
 			name = Release;
 		};
@@ -925,8 +981,10 @@
 					"-lsystem_blocks",
 					"-lCrashReporterClient",
 				);
+				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/xpc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/xpc;
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
 				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
 			};
@@ -973,8 +1031,10 @@
 					"-lsystem_blocks",
 					"-lCrashReporterClient",
 				);
+				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/xpc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/xpc;
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
 				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
 			};
