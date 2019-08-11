@@ -832,6 +832,7 @@
 				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_LDFLAGS = (
+					"-L/usr/lib/system",
 					"-umbrella",
 					System,
 					"-Wl,-reexported_symbols_list,$(SRCROOT)/src/liblaunch/IndirectSymbols",
@@ -868,6 +869,7 @@
 				LINK_WITH_STANDARD_LIBRARIES = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_LDFLAGS = (
+					"-L/usr/lib/system",
 					"-umbrella",
 					System,
 					"-Wl,-reexported_symbols_list,$(SRCROOT)/src/liblaunch/IndirectSymbols",
