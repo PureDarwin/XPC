@@ -405,6 +405,13 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 		return (EINVAL);
 	}
 
+	if (size > XPC_RECV_SIZE) {
+		debugf("XPC message too big, would be truncated upon receive");
+		free(message);
+		nvlist_destroy(nvl);
+		return EINVAL;
+	}
+
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND,
 	    MACH_MSG_TYPE_MAKE_SEND);
