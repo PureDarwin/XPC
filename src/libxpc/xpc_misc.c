@@ -120,6 +120,10 @@ xpc_retain(xpc_object_t obj)
 	struct xpc_object *xo;
 
 	xo = obj;
+	if ((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) == _XPC_STATIC_OBJECT_FLAG)
+		// Don't change the reference count of statically compiled objects.
+		return obj;
+
 	//atomic_add_int(&xo->xo_refcnt, 1); _sjc_ removed because linker couldn't find atomic_add_int()
 	xo->xo_refcnt++;
 	return (obj);
@@ -131,10 +135,10 @@ xpc_release(xpc_object_t obj)
 	struct xpc_object *xo;
 	xo = obj;
 
-	// Don't destroy statically allocated objects. (These are compiled
-	// into a binary, and as such we can't call free() on them.)
-	if ((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) != 0 && xo->xo_refcnt == 1)
+	if ((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) == _XPC_STATIC_OBJECT_FLAG)
+		// Don't change the reference count of statically compiled objects.
 		return;
+
 	if ( --(xo->xo_refcnt) > 1 )
 		return;
 
