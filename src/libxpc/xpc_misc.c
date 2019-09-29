@@ -38,27 +38,12 @@
 
 #include "xpc_internal.h"
 
-#define MAX_RECV 8192
-#define XPC_RECV_SIZE			\
-    MAX_RECV - 				\
-    sizeof(mach_msg_header_t) - 	\
-    sizeof(mach_msg_trailer_t) - 	\
-    sizeof(uint64_t) - 			\
-    sizeof(size_t)
-
 struct xpc_message {
 	mach_msg_header_t header;
+	mach_msg_body_t body;
+	mach_msg_ool_descriptor_t ool_data;
 	size_t size;
 	uint64_t id;
-	char data[0];
-	mach_msg_trailer_t trailer;
-};
-
-struct xpc_recv_message {
-	mach_msg_header_t header;
-	size_t size;
-	uint64_t id;
-	char data[XPC_RECV_SIZE];
 	mach_msg_trailer_t trailer;
 };
 
@@ -327,7 +312,7 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	if (nvlist == NULL)
 		return (EINVAL);
 	size = nvlist_size(nvlist);
-	msg_size = __DARWIN_ALIGN(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
+	msg_size = __DARWIN_ALIGN(sizeof(struct xpc_message));
 	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
@@ -340,14 +325,26 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	}
 
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
-	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND);
+	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND, MACH_MSG_TYPE_MAKE_SEND) | MACH_MSGH_BITS_COMPLEX;
 	message->header.msgh_remote_port = xpc_dictionary_copy_mach_send(xobj, XPC_RPORT);
 	xpc_assert(message->header.msgh_remote_port != MACH_PORT_NULL, "'%s' key not found in reply", XPC_RPORT);
 	message->header.msgh_local_port = MACH_PORT_NULL;
 	message->size = size;
 	message->id = xpc_dictionary_get_uint64(xobj, XPC_SEQID);
 	xpc_assert(message->id != 0, "'%s' key not found in reply", XPC_SEQID);
-	memcpy(&message->data, packed, size);
+
+	const mach_msg_ool_descriptor_t ool_data = {
+		packed, // address
+		size, // size
+		FALSE, // deal
+		MACH_MSG_VIRTUAL_COPY, // copy
+		0, // pad2
+		MACH_MSG_OOL_DESCRIPTOR // descriptor
+	};
+
+	message->body.msgh_descriptor_count = 1;
+	message->ool_data = ool_data;
+
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS)
 		err = (kr == KERN_INVALID_TASK) ? EPIPE : EINVAL;
@@ -375,7 +372,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	nvlist_t *nvl = xpc2nv(xo);
 	size = nvlist_size(nvl);
 
-	msg_size = __DARWIN_ALIGN(size + sizeof(mach_msg_header_t) + sizeof(size_t) + sizeof(uint64_t));
+	msg_size = __DARWIN_ALIGN(sizeof(struct xpc_message));
 	if ((message = calloc(msg_size, 1)) == NULL)
 		return (ENOMEM);
 
@@ -387,21 +384,26 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 		return (EINVAL);
 	}
 
-	if (size > XPC_RECV_SIZE) {
-		debugf("XPC message too big, would be truncated upon receive");
-		free(message);
-		nvlist_destroy(nvl);
-		return EINVAL;
-	}
-
 	message->header.msgh_size = (mach_msg_size_t)msg_size;
 	message->header.msgh_bits = MACH_MSGH_BITS(MACH_MSG_TYPE_COPY_SEND,
-	    MACH_MSG_TYPE_MAKE_SEND);
+	    MACH_MSG_TYPE_MAKE_SEND) | MACH_MSGH_BITS_COMPLEX;
 	message->header.msgh_remote_port = dst;
 	message->header.msgh_local_port = local;
 	message->id = id;
 	message->size = size;
-	memcpy(&message->data, packed, size);
+
+	const mach_msg_ool_descriptor_t ool_data = {
+		packed, // address
+		size, // size
+		FALSE, // deal
+		MACH_MSG_VIRTUAL_COPY, // copy
+		0, // pad2
+		MACH_MSG_OOL_DESCRIPTOR // descriptor
+	};
+
+	message->body.msgh_descriptor_count = 1;
+	message->ool_data = ool_data;
+
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS) {
 		debugf("mach_msg_send() failed, kr=0x%X", kr);
@@ -418,7 +420,7 @@ int
 xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
     uint64_t *id)
 {
-	struct xpc_recv_message message;
+	struct xpc_message message;
 	mach_msg_header_t *request;
 	kern_return_t kr;
 	mach_msg_trailer_t *tr;
@@ -428,8 +430,7 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	xpc_u val;
 
 	request = &message.header;
-	/* should be size - but what about arbitrary XPC data? */
-	request->msgh_size = MAX_RECV;
+	request->msgh_size = sizeof(struct xpc_message);
 	request->msgh_local_port = local;
 	kr = mach_msg(request, MACH_RCV_MSG |
 	    MACH_RCV_TRAILER_TYPE(MACH_MSG_TRAILER_FORMAT_0) |
@@ -441,12 +442,16 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 		debugf("mach_msg_receive returned %d\n", kr);
 	*remote = request->msgh_remote_port;
 	*id = message.id;
-	data_size = message.size;
+	data_size = message.ool_data.size;
 	debugf("unpacking data_size=%zu", data_size);
 
-	nvlist_t *nv = nvlist_unpack(&message.data, data_size);
+	nvlist_t *nv = nvlist_unpack(&message.ool_data.address, data_size);
 	xo = nv2xpc(nv);
 	nvlist_destroy(nv);
+
+	mig_deallocate((vm_address_t)message.ool_data.address, message.ool_data.size);
+	message.ool_data.address = NULL;
+	message.ool_data.size = 0;
 
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
 	auditp = &((mach_msg_audit_trailer_t *)tr)->msgh_audit;
@@ -466,8 +471,8 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 	boolean_t (*demux)(mach_msg_header_t *, mach_msg_header_t *), mach_msg_size_t msgsize __unused,
 	int flags __unused)
 {
-	struct xpc_recv_message message;
-	struct xpc_recv_message rsp_message;
+	struct xpc_message message;
+	struct xpc_message rsp_message;
 	mach_msg_header_t *request;
 	kern_return_t kr;
 	mach_msg_header_t *response;
@@ -478,8 +483,7 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 
 	request = &message.header;
 	response = &rsp_message.header;
-	/* should be size - but what about arbitrary XPC data? */
-	request->msgh_size = MAX_RECV;
+	request->msgh_size = sizeof(struct xpc_message);
 	request->msgh_local_port = portset;
 	kr = mach_msg(request, MACH_RCV_MSG |
 	    MACH_RCV_TRAILER_TYPE(MACH_MSG_TRAILER_FORMAT_0) |
@@ -498,12 +502,16 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 		return (TRUE);
 	}
 	debugf("demux returned false\n");
-	data_size = message.size;
+	data_size = message.ool_data.size;
 	debugf("unpacking data_size=%d", data_size);
 
-	nvlist_t *nvlist = nvlist_unpack(&message.data, data_size);
+	nvlist_t *nvlist = nvlist_unpack(&message.ool_data.address, data_size);
 	xo = nv2xpc(nvlist);
 	nvlist_destroy(nvlist);
+
+	mig_deallocate((vm_address_t)message.ool_data.address, message.ool_data.size);
+	message.ool_data.address = NULL;
+	message.ool_data.size = 0;
 
 	/* is padding for alignment enforced in the kernel?*/
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
