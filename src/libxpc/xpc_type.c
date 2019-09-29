@@ -37,7 +37,7 @@ struct _xpc_type_s {
 };
 
 typedef const struct _xpc_type_s xt;
-xt _xpc_type_invalid = { "<invalid> "};
+xt _xpc_type_invalid = { "<invalid>" };
 xt _xpc_type_array = { "array" };
 xt _xpc_type_bool = { "bool" };
 xt _xpc_type_connection = { "connection" };
