@@ -55,12 +55,25 @@ xt _xpc_type_double;
 
 
 struct _xpc_bool_s {
+	struct xpc_object object;
 };
 
-typedef const struct _xpc_bool_s xb;
-
-xb _xpc_bool_true;
-xb _xpc_bool_false;
+const struct _xpc_bool_s _xpc_bool_true = { .object = {
+	.xo_xpc_type = XPC_TYPE_BOOL,
+	.xo_size = sizeof(bool),
+	.xo_refcnt = 1,
+	.xo_u = {
+		.b = true
+	}
+} };
+const struct _xpc_bool_s _xpc_bool_false = { .object = {
+	.xo_xpc_type = XPC_TYPE_BOOL,
+	.xo_size = sizeof(bool),
+	.xo_refcnt = 1,
+	.xo_u = {
+		.b = false
+	}
+} };
 
 static size_t xpc_data_hash(const uint8_t *data, size_t length);
 
@@ -147,10 +160,7 @@ xpc_null_create(void)
 xpc_object_t
 xpc_bool_create(bool value)
 {
-	xpc_u val;
-
-	val.b = value;
-	return _xpc_prim_create(_XPC_TYPE_BOOL, val, 1);
+	return value ? XPC_BOOL_TRUE : XPC_BOOL_FALSE;
 }
 
 bool
