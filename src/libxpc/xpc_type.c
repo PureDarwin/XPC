@@ -64,6 +64,7 @@ const struct _xpc_bool_s _xpc_bool_true = { .object = {
 	.xo_xpc_type = XPC_TYPE_BOOL,
 	.xo_size = sizeof(bool),
 	.xo_refcnt = 1,
+	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 	.xo_u = {
 		.b = true
 	}
@@ -72,6 +73,7 @@ const struct _xpc_bool_s _xpc_bool_false = { .object = {
 	.xo_xpc_type = XPC_TYPE_BOOL,
 	.xo_size = sizeof(bool),
 	.xo_refcnt = 1,
+	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 	.xo_u = {
 		.b = false
 	}
@@ -79,7 +81,8 @@ const struct _xpc_bool_s _xpc_bool_false = { .object = {
 static const struct xpc_object _xpc_null_instance = {
 	.xo_xpc_type = XPC_TYPE_NULL,
 	.xo_size = 0,
-	.xo_refcnt = 1
+	.xo_refcnt = 1,
+	.xo_flags = _XPC_STATIC_OBJECT_FLAG
 };
 
 static size_t xpc_data_hash(const uint8_t *data, size_t length);
