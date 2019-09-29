@@ -395,7 +395,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	const mach_msg_ool_descriptor_t ool_data = {
 		packed, // address
 		size, // size
-		FALSE, // deal
+		FALSE, // deallocate
 		MACH_MSG_VIRTUAL_COPY, // copy
 		0, // pad2
 		MACH_MSG_OOL_DESCRIPTOR // descriptor
