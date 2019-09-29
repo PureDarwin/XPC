@@ -31,7 +31,8 @@
 #include "xpc_internal.h"
 #include <assert.h>
 
-#define NVLIST_XPC_TYPE		"__XPC_TYPE"
+#define NVLIST_KEY_PREFIX       "__XPC_IMPL$"
+#define NVLIST_XPC_TYPE         "__XPC_IMPL$ Object Type"
 
 static void xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value);
 
@@ -65,10 +66,10 @@ nv2xpc(const nvlist_t *nv)
 
 			if (strcmp(type, "connection") == 0) {
 				val.i = nvlist_get_int64(nv, "connection");
-				return _xpc_prim_create(_XPC_TYPE_CONNECTION, val, 0);
+				return _xpc_prim_create(XPC_TYPE_CONNECTION, val, 0);
 			} else if (strcmp(type, "endpoint") == 0) {
 				val.i = nvlist_get_int64(nv, "endpoint");
-				return _xpc_prim_create(_XPC_TYPE_ENDPOINT, val, 0);
+				return _xpc_prim_create(XPC_TYPE_ENDPOINT, val, 0);
 			} else if (strcmp(type, "date") == 0) {
 				return xpc_date_create(nvlist_get_int64(nv, "date"));
 			} else if (strcmp(type, "double") == 0) {
@@ -114,7 +115,7 @@ nv2xpc(const nvlist_t *nv)
 
 		case NV_TYPE_DESCRIPTOR:
 			val.fd = nvlist_get_descriptor(nv, key);
-			xotmp = _xpc_prim_create(_XPC_TYPE_FD, val, 0);
+			xotmp = _xpc_prim_create(XPC_TYPE_FD, val, 0);
 			break;
 
 		case NV_TYPE_PTR:
@@ -126,7 +127,7 @@ nv2xpc(const nvlist_t *nv)
 		case NV_TYPE_UUID:
 			memcpy(&val.uuid, nvlist_get_uuid(nv, key),
 			    sizeof(uuid_t));
-			xotmp = _xpc_prim_create(_XPC_TYPE_UUID, val, 0);
+			xotmp = _xpc_prim_create(XPC_TYPE_UUID, val, 0);
 
 		case NV_TYPE_NVLIST_ARRAY:
 			nvtmp = nvlist_get_nvlist_array(nv, key);
@@ -157,85 +158,54 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 	struct xpc_object *xotmp = value;
 	nvlist_t *inner_nv;
 
-	switch (xotmp->xo_xpc_type) {
-	case _XPC_TYPE_DICTIONARY:
+	if (xotmp->xo_xpc_type == XPC_TYPE_DICTIONARY) {
 		nvlist_add_nvlist_dictionary(nv, key, xpc2nv(xotmp));
-		break;
-
-	case _XPC_TYPE_ARRAY:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_ARRAY) {
 		nvlist_add_nvlist_array(nv, key, xpc2nv(xotmp));
-		break;
-
-	case _XPC_TYPE_BOOL:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_BOOL) {
 		nvlist_add_bool(nv, key, xpc_bool_get_value(xotmp));
-		break;
-
-	case _XPC_TYPE_CONNECTION:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_CONNECTION) {
 		inner_nv = nvlist_create_dictionary(0);
 		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "connection");
 		nvlist_add_int64(inner_nv, "connection", xotmp->xo_port);
 		nvlist_add_nvlist(nv, key, inner_nv);
 		nvlist_destroy(inner_nv);
-		break;
-
-	case _XPC_TYPE_ENDPOINT:
-			inner_nv = nvlist_create_dictionary(0);
-			nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "endpoint");
-			nvlist_add_int64(inner_nv, "endpoint", xotmp->xo_port);
-			nvlist_add_nvlist(nv, key, inner_nv);
-			nvlist_destroy(inner_nv);
-		break;
-
-	case _XPC_TYPE_INT64:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_ENDPOINT) {
+		inner_nv = nvlist_create_dictionary(0);
+		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "endpoint");
+		nvlist_add_int64(inner_nv, "endpoint", xotmp->xo_port);
+		nvlist_add_nvlist(nv, key, inner_nv);
+		nvlist_destroy(inner_nv);
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_INT64) {
 		nvlist_add_int64(nv, key, xpc_int64_get_value(xotmp));
-		break;
-
-	case _XPC_TYPE_UINT64:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_UINT64) {
 		nvlist_add_uint64(nv, key,  xpc_uint64_get_value(xotmp));
-		break;
-
-	case _XPC_TYPE_DATE:
-			inner_nv = nvlist_create_dictionary(0);
-			nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "date");
-			nvlist_add_int64(inner_nv, "date", xotmp->xo_u.i);
-			nvlist_add_nvlist(nv, key, inner_nv);
-			nvlist_destroy(inner_nv);
-		break;
-
-	case _XPC_TYPE_DATA:
-		nvlist_add_binary(nv, key,
-		    xpc_data_get_bytes_ptr(xotmp),
-		    xpc_data_get_length(xotmp));
-		break;
-
-	case _XPC_TYPE_STRING:
-		nvlist_add_string(nv, key,
-		    xpc_string_get_string_ptr(xotmp));
-		break;
-
-	case _XPC_TYPE_UUID:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_DATE) {
+		inner_nv = nvlist_create_dictionary(0);
+		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "date");
+		nvlist_add_int64(inner_nv, "date", xotmp->xo_u.i);
+		nvlist_add_nvlist(nv, key, inner_nv);
+		nvlist_destroy(inner_nv);
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_DATA) {
+		nvlist_add_binary(nv, key, xpc_data_get_bytes_ptr(xotmp), xpc_data_get_length(xotmp));
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_STRING) {
+		nvlist_add_string(nv, key, xpc_string_get_string_ptr(xotmp));
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_UUID) {
 		nvlist_add_uuid(nv, key, (uuid_t*)xpc_uuid_get_bytes(xotmp));
-		break;
-
-	case _XPC_TYPE_FD:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_FD) {
 		nvlist_add_descriptor(nv, key, xotmp->xo_fd);
-		break;
-
-	case _XPC_TYPE_SHMEM:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_SHMEM) {
 		xpc_api_misuse("Cannot serialize object of type shared memory");
-		break;
-
-	case _XPC_TYPE_ERROR:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_ERROR) {
 		xpc_api_misuse("Cannot serialize object of type error");
-		break;
-
-	case _XPC_TYPE_DOUBLE:
+	} else if (xotmp->xo_xpc_type == XPC_TYPE_DOUBLE) {
 		inner_nv = nvlist_create_dictionary(0);
 		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "double");
 		nvlist_add_binary(inner_nv, "double", &xotmp->xo_u.d, sizeof(double));
 		nvlist_add_nvlist(nv, key, inner_nv);
 		nvlist_destroy(inner_nv);
-		break;
+	} else {
+		xpc_api_misuse("Unknown XPC type for object");
 	}
 }
 
@@ -245,7 +215,7 @@ xpc2nv(struct xpc_object *xo)
 	nvlist_t *nv;
 	struct xpc_object *xotmp;
 
-	if (xo->xo_xpc_type == _XPC_TYPE_DICTIONARY) {
+	if (xo->xo_xpc_type == XPC_TYPE_DICTIONARY) {
 		nv = nvlist_create_dictionary(0);
 		printf("nv = %p\n", nv);
 		xpc_dictionary_apply(xo, ^(const char *k, xpc_object_t v) {
@@ -256,7 +226,7 @@ xpc2nv(struct xpc_object *xo)
 		return nv;
 	}
 
-	if (xo->xo_xpc_type == _XPC_TYPE_ARRAY) {
+	if (xo->xo_xpc_type == XPC_TYPE_ARRAY) {
 		char *key = NULL;
 		nv = nvlist_create_array(0);
 		xpc_array_apply(xo, ^(size_t index, xpc_object_t v) {
@@ -281,7 +251,7 @@ xpc_dictionary_create(const char * const *keys, const xpc_object_t *values,
 	size_t i;
 	xpc_u val = {0};
 
-	xo = _xpc_prim_create(_XPC_TYPE_DICTIONARY, val, count);
+	xo = _xpc_prim_create(XPC_TYPE_DICTIONARY, val, count);
 	
 	for (i = 0; i < count; i++)
 		xpc_dictionary_set_value(xo, keys[i], values[i]);
@@ -325,13 +295,13 @@ xpc_dictionary_set_mach_recv(xpc_object_t xdict, const char *key, mach_port_t po
 {
 	struct xpc_object *xo = xdict;
 	xpc_assert_nonnull(xo);
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
 
 	struct xpc_object *xotmp;
 	xpc_u val;
 
 	val.port = port;
-	xotmp = _xpc_prim_create(_XPC_TYPE_ENDPOINT, val, 0);
+	xotmp = _xpc_prim_create(XPC_TYPE_ENDPOINT, val, 0);
 
 	xpc_dictionary_set_value(xdict, key, xotmp);
 }
@@ -343,7 +313,7 @@ xpc_dictionary_set_mach_send(xpc_object_t xdict, const char *key, mach_port_t po
 	xpc_u val;
 
 	val.port = port;
-	xotmp = _xpc_prim_create(_XPC_TYPE_ENDPOINT, val, 0);
+	xotmp = _xpc_prim_create(XPC_TYPE_ENDPOINT, val, 0);
 
 	xpc_dictionary_set_value(xdict, key, xotmp);
 }
@@ -354,13 +324,13 @@ xpc_dictionary_copy_mach_send(xpc_object_t xdict, const char *key)
 	struct xpc_object *xo = xdict;
 
 	xpc_assert_nonnull(xdict);
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
 
 	xpc_object_t value = xpc_dictionary_get_value(xdict, key);
 	if (value == NULL) return MACH_PORT_NULL;
 
 	struct xpc_object *xovalue = value;
-	xpc_assert_type(xovalue, _XPC_TYPE_ENDPOINT);
+	xpc_assert_type(xovalue, XPC_TYPE_ENDPOINT);
 
 	return xovalue->xo_port;
 }
@@ -372,8 +342,11 @@ xpc_dictionary_set_value(xpc_object_t xdict, const char *key, xpc_object_t value
 	struct xpc_dict_head *head;
 	struct xpc_dict_pair *pair;
 
+	bool is_reserved_key = strncmp(key, NVLIST_XPC_TYPE, strlen(NVLIST_XPC_TYPE)) == 0;
+	xpc_precondition(!is_reserved_key, "Cannot add key %s to dictionary, as it is reserved for internal use", key);
+
 	xpc_assert_nonnull(xdict);
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
 
 	xo = xdict;
 	head = &xo->xo_dict;
@@ -403,7 +376,7 @@ xpc_dictionary_get_value(xpc_object_t xdict, const char *key)
 	struct xpc_dict_pair *pair;
 
 	xo = xdict;
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
 	head = &xo->xo_dict;
 
 	TAILQ_FOREACH(pair, head, xo_link) {
@@ -422,7 +395,7 @@ xpc_dictionary_get_count(xpc_object_t xdict)
 	struct xpc_object *xo;
 
 	xo = xdict;
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
 	return (xo->xo_size);
 }
 
@@ -432,7 +405,7 @@ xpc_dictionary_set_bool(xpc_object_t xdict, const char *key, bool value)
 	struct xpc_object *xo = xdict, *xotmp;
 
 	xpc_assert_nonnull(xdict);
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
 
 	xo = xdict;
 	xotmp = xpc_bool_create(value);
@@ -445,7 +418,7 @@ xpc_dictionary_set_int64(xpc_object_t xdict, const char *key, int64_t value)
 	struct xpc_object *xo = xdict, *xotmp;
 
 	xpc_assert_nonnull(xdict);
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
 
 	xo = xdict;
 	xotmp = xpc_int64_create(value);
@@ -458,7 +431,7 @@ xpc_dictionary_set_uint64(xpc_object_t xdict, const char *key, uint64_t value)
 	struct xpc_object *xo = xdict, *xotmp;
 
 	xpc_assert_nonnull(xdict);
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
 
 	xo = xdict;
 	xotmp = xpc_uint64_create(value);
@@ -486,7 +459,7 @@ xpc_dictionary_get_bool(xpc_object_t xdict, const char *key)
 	if (value == NULL) return FALSE;
 
 	struct xpc_object *xo = value;
-	if (xo->xo_xpc_type != _XPC_TYPE_BOOL) return FALSE;
+	if (xo->xo_xpc_type != XPC_TYPE_BOOL) return FALSE;
 
 	return (xpc_bool_get_value(value));
 }
@@ -498,7 +471,7 @@ xpc_dictionary_get_int64(xpc_object_t xdict, const char *key)
 	if (value == NULL) return 0;
 
 	struct xpc_object *xo = value;
-	if (xo->xo_xpc_type != _XPC_TYPE_INT64) return 0;
+	if (xo->xo_xpc_type != XPC_TYPE_INT64) return 0;
 
 	return (xpc_int64_get_value(value));
 }
@@ -510,7 +483,7 @@ xpc_dictionary_get_uint64(xpc_object_t xdict, const char *key)
 	if (value == NULL) return 0;
 
 	struct xpc_object *xo = value;
-	if (xo->xo_xpc_type != _XPC_TYPE_UINT64) return 0;
+	if (xo->xo_xpc_type != XPC_TYPE_UINT64) return 0;
 
 	return (xpc_uint64_get_value(value));
 }
@@ -522,7 +495,7 @@ xpc_dictionary_get_string(xpc_object_t xdict, const char *key)
 	if (value == NULL) return 0;
 
 	struct xpc_object *xo = value;
-	if (xo->xo_xpc_type != _XPC_TYPE_STRING) return NULL;
+	if (xo->xo_xpc_type != XPC_TYPE_STRING) return NULL;
 
 	return (xpc_string_get_string_ptr(value));
 }
@@ -534,7 +507,7 @@ xpc_dictionary_get_data(xpc_object_t xdict, const char *key, size_t *length)
 	if (xdata == NULL) return NULL;
 
 	struct xpc_object *xo = xdata;
-	if (xo->xo_xpc_type != _XPC_TYPE_DATA) return NULL;
+	if (xo->xo_xpc_type != XPC_TYPE_DATA) return NULL;
 
 	if (length != NULL) *length = xpc_data_get_length(xdata);
 	return xpc_data_get_bytes_ptr(xdata);
@@ -548,7 +521,7 @@ xpc_dictionary_apply(xpc_object_t xdict, xpc_dictionary_applier_t applier)
 	struct xpc_dict_pair *pair;
 
 	xpc_assert_nonnull(xdict);
-	xpc_assert_type(xo, _XPC_TYPE_DICTIONARY);
+	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
 
 	head = &xo->xo_dict;
 
