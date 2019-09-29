@@ -65,7 +65,6 @@ typedef union {
 	bool b;
 	double d;
 	uintptr_t ptr;
-	int fd;
 	uuid_t uuid;
 	mach_port_t port;
 } xpc_u;	

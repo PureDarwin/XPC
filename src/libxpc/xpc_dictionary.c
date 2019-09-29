@@ -70,6 +70,9 @@ nv2xpc(const nvlist_t *nv)
 			} else if (strcmp(type, "endpoint") == 0) {
 				val.i = nvlist_get_int64(nv, "endpoint");
 				return _xpc_prim_create(XPC_TYPE_ENDPOINT, val, 0);
+			} else if (strcmp(type, "fileport") == 0) {
+				val.port = nvlist_get_int64(nv, "fileport");
+				return _xpc_prim_create(XPC_TYPE_FD, val, 0);
 			} else if (strcmp(type, "date") == 0) {
 				return xpc_date_create(nvlist_get_int64(nv, "date"));
 			} else if (strcmp(type, "double") == 0) {
@@ -114,8 +117,7 @@ nv2xpc(const nvlist_t *nv)
 			break;
 
 		case NV_TYPE_DESCRIPTOR:
-			val.fd = nvlist_get_descriptor(nv, key);
-			xotmp = _xpc_prim_create(XPC_TYPE_FD, val, 0);
+			xpc_api_misuse("NV_TYPE_DESCRIPTOR should not appear in received nvlist_t");
 			break;
 
 		case NV_TYPE_PTR:
@@ -193,7 +195,11 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_UUID) {
 		nvlist_add_uuid(nv, key, (uuid_t*)xpc_uuid_get_bytes(xotmp));
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_FD) {
-		nvlist_add_descriptor(nv, key, xotmp->xo_fd);
+		inner_nv = nvlist_create_dictionary(0);
+		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "fileport");
+		nvlist_add_int64(inner_nv, "fileport", xotmp->xo_port);
+		nvlist_add_nvlist(nv, key, inner_nv);
+		nvlist_destroy(inner_nv);
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_SHMEM) {
 		xpc_api_misuse("Cannot serialize object of type shared memory");
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_ERROR) {
