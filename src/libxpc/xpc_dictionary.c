@@ -31,7 +31,7 @@
 #include "xpc_internal.h"
 #include <assert.h>
 
-#define NVLISTXPC_TYPE		"_XPC_TYPE"
+#define NVLIST_XPC_TYPE		"__XPC_TYPE"
 
 static void xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value);
 
@@ -60,8 +60,8 @@ nv2xpc(const nvlist_t *nv)
 	xpc_assert(nvlist_type(nv) == NV_TYPE_NVLIST_DICTIONARY || nvlist_type(nv) == NV_TYPE_NVLIST_ARRAY, "nvlist_t %p is not dictionary or array", nv);
 
 	if (nvlist_type(nv) == NV_TYPE_NVLIST_DICTIONARY) {
-		if (nvlist_contains_key(nv, NVLISTXPC_TYPE)) {
-			const char *type = nvlist_get_string(nv, NVLISTXPC_TYPE);
+		if (nvlist_contains_key(nv, NVLIST_XPC_TYPE)) {
+			const char *type = nvlist_get_string(nv, NVLIST_XPC_TYPE);
 
 			if (strcmp(type, "connection") == 0) {
 				val.i = nvlist_get_int64(nv, "connection");
@@ -77,7 +77,7 @@ nv2xpc(const nvlist_t *nv)
 				xpc_assert(value_size == sizeof(double), "nvlist data of type date has incorrect size (expected %lu, got %zu)", sizeof(double), value_size);
 				return xpc_double_create(*value);
 			} else {
-				xpc_api_misuse("Unexpected NVLISTXPC_TYPE in dictionary: %s", type);
+				xpc_api_misuse("Unexpected NVLIST_XPC_TYPE in dictionary: %s", type);
 			}
 		}
 
@@ -165,13 +165,13 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 		nvlist_add_bool(nv, key, xpc_bool_get_value(xotmp));
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_CONNECTION) {
 		inner_nv = nvlist_create_dictionary(0);
-		nvlist_add_string(inner_nv, NVLISTXPC_TYPE, "connection");
+		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "connection");
 		nvlist_add_int64(inner_nv, "connection", xotmp->xo_port);
 		nvlist_add_nvlist(nv, key, inner_nv);
 		nvlist_destroy(inner_nv);
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_ENDPOINT) {
 		inner_nv = nvlist_create_dictionary(0);
-		nvlist_add_string(inner_nv, NVLISTXPC_TYPE, "endpoint");
+		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "endpoint");
 		nvlist_add_int64(inner_nv, "endpoint", xotmp->xo_port);
 		nvlist_add_nvlist(nv, key, inner_nv);
 		nvlist_destroy(inner_nv);
@@ -181,7 +181,7 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 		nvlist_add_uint64(nv, key,  xpc_uint64_get_value(xotmp));
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_DATE) {
 		inner_nv = nvlist_create_dictionary(0);
-		nvlist_add_string(inner_nv, NVLISTXPC_TYPE, "date");
+		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "date");
 		nvlist_add_int64(inner_nv, "date", xotmp->xo_u.i);
 		nvlist_add_nvlist(nv, key, inner_nv);
 		nvlist_destroy(inner_nv);
@@ -199,7 +199,7 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 		xpc_api_misuse("Cannot serialize object of type error");
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_DOUBLE) {
 		inner_nv = nvlist_create_dictionary(0);
-		nvlist_add_string(inner_nv, NVLISTXPC_TYPE, "double");
+		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "double");
 		nvlist_add_binary(inner_nv, "double", &xotmp->xo_u.d, sizeof(double));
 		nvlist_add_nvlist(nv, key, inner_nv);
 		nvlist_destroy(inner_nv);
