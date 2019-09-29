@@ -76,6 +76,11 @@ const struct _xpc_bool_s _xpc_bool_false = { .object = {
 		.b = false
 	}
 } };
+static const struct xpc_object _xpc_null_instance = {
+	.xo_xpc_type = XPC_TYPE_NULL,
+	.xo_size = 0,
+	.xo_refcnt = 1
+};
 
 static size_t xpc_data_hash(const uint8_t *data, size_t length);
 
@@ -155,8 +160,7 @@ _xpc_prim_create_flags(xpc_type_t type, xpc_u value, size_t size, uint16_t flags
 xpc_object_t
 xpc_null_create(void)
 {
-	xpc_u val = {0};
-	return _xpc_prim_create(XPC_TYPE_NULL, val, 0);
+	return &_xpc_null_instance;
 }
 
 xpc_object_t
