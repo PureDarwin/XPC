@@ -37,7 +37,7 @@ xpc_array_create(const xpc_object_t *objects, size_t count)
 	size_t i;
 	xpc_u val; bzero(&val, sizeof(val));
 
-	xo = _xpc_prim_create(_XPC_TYPE_ARRAY, val, 0);
+	xo = _xpc_prim_create(XPC_TYPE_ARRAY, val, 0);
 	
 	for (i = 0; i < count; i++)
 		xpc_array_append_value(xo, objects[i]);
@@ -54,7 +54,7 @@ xpc_array_set_value(xpc_object_t xarray, size_t index, xpc_object_t value)
 
 	xo = xarray;
 	xpc_assert_nonnull(xo);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 	arr = &xo->xo_array;
 	i = 0;
 
@@ -84,7 +84,7 @@ xpc_array_append_value(xpc_object_t xarray, xpc_object_t value)
 	
 	xo = xarray;
 	xpc_assert_nonnull(xo);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 	arr = &xo->xo_array;
 
 	TAILQ_INSERT_TAIL(arr, (struct xpc_object *)value, xo_link);
@@ -101,7 +101,7 @@ xpc_array_get_value(xpc_object_t xarray, size_t index)
 
 	xo = xarray;
 	xpc_assert_nonnull(xo);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 	arr = &xo->xo_array;
 	i = 0;
 
@@ -123,7 +123,7 @@ xpc_array_get_count(xpc_object_t xarray)
 	xo = xarray;
 
 	xpc_assert_nonnull(xo);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	return (xo->xo_size);
 }
@@ -133,7 +133,7 @@ xpc_array_set_bool(xpc_object_t xarray, size_t index, bool value)
 {
 	struct xpc_object *xo = xarray, *xotmp;
 	xpc_assert_nonnull(xarray);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	xotmp = xpc_bool_create(value);
 	return (xpc_array_set_value(xarray, index, xotmp));
@@ -145,7 +145,7 @@ xpc_array_set_int64(xpc_object_t xarray, size_t index, int64_t value)
 {
 	struct xpc_object *xo = xarray, *xotmp;
 	xpc_assert_nonnull(xarray);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	xo = xarray;
 	xotmp = xpc_int64_create(value);
@@ -157,7 +157,7 @@ xpc_array_set_uint64(xpc_object_t xarray, size_t index, uint64_t value)
 {
 	struct xpc_object *xo = xarray, *xotmp;
 	xpc_assert_nonnull(xarray);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	xo = xarray;
 	xotmp = xpc_uint64_create(value);
@@ -169,7 +169,7 @@ xpc_array_set_double(xpc_object_t xarray, size_t index, double value)
 {
 	struct xpc_object *xo = xarray, *xotmp;
 	xpc_assert_nonnull(xarray);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	xo = xarray;
 	xotmp = xpc_double_create(value);
@@ -181,7 +181,7 @@ xpc_array_set_date(xpc_object_t xarray, size_t index, int64_t value)
 {
 	struct xpc_object *xo = xarray, *xotmp;
 	xpc_assert_nonnull(xarray);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	xo = xarray;
 	xotmp = xpc_date_create(value);
@@ -194,7 +194,7 @@ xpc_array_set_data(xpc_object_t xarray, size_t index, const void *data,
 {
 	struct xpc_object *xo = xarray, *xotmp;
 	xpc_assert_nonnull(xarray);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	xo = xarray;
 	xotmp = xpc_data_create(data, length);
@@ -206,7 +206,7 @@ xpc_array_set_string(xpc_object_t xarray, size_t index, const char *string)
 {
 	struct xpc_object *xo = xarray, *xotmp;
 	xpc_assert_nonnull(xarray);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	xo = xarray;
 	xotmp = xpc_string_create(string);
@@ -218,7 +218,7 @@ xpc_array_set_uuid(xpc_object_t xarray, size_t index, const uuid_t value)
 {
 	struct xpc_object *xo = xarray, *xotmp;
 	xpc_assert_nonnull(xarray);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	xo = xarray;
 	xotmp = xpc_uuid_create(value);
@@ -230,7 +230,7 @@ xpc_array_set_fd(xpc_object_t xarray, size_t index, int value)
 {
 	struct xpc_object *xo = xarray, *xotmp;
 	xpc_assert_nonnull(xarray);
-	xpc_assert_type(xo, _XPC_TYPE_ARRAY);
+	xpc_assert_type(xo, XPC_TYPE_ARRAY);
 
 	xo = xarray;
 	xotmp = xpc_fd_create(value);
@@ -308,7 +308,7 @@ int
 xpc_array_dup_fd(xpc_object_t array, size_t index)
 {
 	xpc_object_t xotmp = xpc_array_get_value(array, index);
-	xpc_assert_type(((struct xpc_object *)xotmp), _XPC_TYPE_FD);
+	xpc_assert_type(((struct xpc_object *)xotmp), XPC_TYPE_FD);
 	return xpc_fd_dup(xotmp);
 }
 

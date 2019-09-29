@@ -43,27 +43,11 @@
     	fprintf(stderr, "\n");			\
     } while(0);
 
-#define _XPC_TYPE_INVALID		0
-#define _XPC_TYPE_DICTIONARY		1
-#define _XPC_TYPE_ARRAY			2
-#define _XPC_TYPE_BOOL			3
-#define _XPC_TYPE_CONNECTION		4
-#define _XPC_TYPE_ENDPOINT		5
-#define	_XPC_TYPE_NULL			6
-#define _XPC_TYPE_INT64			8
-#define _XPC_TYPE_UINT64		9
-#define _XPC_TYPE_DATE			10
-#define _XPC_TYPE_DATA			11
-#define _XPC_TYPE_STRING		12
-#define _XPC_TYPE_UUID			13
-#define _XPC_TYPE_FD			14
-#define _XPC_TYPE_SHMEM			15
-#define _XPC_TYPE_ERROR			16
-#define _XPC_TYPE_DOUBLE		17
-#define _XPC_TYPE_MAX			_XPC_TYPE_DOUBLE
-
 #define	XPC_SEQID	"XPC sequence number"
 #define	XPC_RPORT	"XPC remote port"
+
+#define _XPC_TYPE_INVALID (&_xpc_type_int64)
+__XNU_PRIVATE_EXTERN extern XPC_TYPE(_xpc_type_invalid);
 
 struct xpc_object;
 struct xpc_dict_pair;
@@ -90,7 +74,7 @@ typedef union {
 #define _XPC_STATIC_OBJECT_FLAG 0x2
 
 struct xpc_object {
-	uint8_t			xo_xpc_type;
+	xpc_type_t		xo_xpc_type;
 	uint16_t		xo_flags;
 	volatile uint32_t	xo_refcnt;
 	size_t			xo_size;
@@ -155,9 +139,9 @@ struct xpc_service {
 #define xo_array xo_u.array
 #define xo_dict xo_u.dict
 
-__private_extern__ struct xpc_object *_xpc_prim_create(int type, xpc_u value,
+__private_extern__ struct xpc_object *_xpc_prim_create(xpc_type_t type, xpc_u value,
     size_t size);
-__private_extern__ struct xpc_object *_xpc_prim_create_flags(int type,
+__private_extern__ struct xpc_object *_xpc_prim_create_flags(xpc_type_t type,
     xpc_u value, size_t size, uint16_t flags);
 __private_extern__ const char *_xpc_get_type_name(xpc_object_t obj);
 __private_extern__ struct xpc_object *nv2xpc(const nvlist_t *nv);

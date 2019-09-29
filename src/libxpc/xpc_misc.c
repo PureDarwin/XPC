@@ -96,16 +96,16 @@ xpc_array_destroy(struct xpc_object *dict)
 void
 xpc_object_destroy(struct xpc_object *xo)
 {
-	if (xo->xo_xpc_type == _XPC_TYPE_DICTIONARY)
+	if (xo->xo_xpc_type == XPC_TYPE_DICTIONARY)
 		xpc_dictionary_destroy(xo);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_ARRAY)
+	if (xo->xo_xpc_type == XPC_TYPE_ARRAY)
 		xpc_array_destroy(xo);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_STRING)
+	if (xo->xo_xpc_type == XPC_TYPE_STRING)
 		free(xo->xo_u.str);
 
-	if (xo->xo_xpc_type == _XPC_TYPE_DATA)
+	if (xo->xo_xpc_type == XPC_TYPE_DATA)
 		free((void *)xo->xo_u.ptr);
 
 	if (xo->xo_audit_token != NULL)
@@ -162,8 +162,6 @@ static void
 xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level)
 {
 	struct xpc_object *xo = obj;
-	uuid_t id;
-	uuid_string_t uuid_str;
 
 	if (obj == NULL) {
 		sbuf_printf(sbuf, "<null value>\n");
@@ -172,64 +170,43 @@ xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level)
 
 	sbuf_printf(sbuf, "(%s) ", _xpc_get_type_name(obj));
 
-	switch (xo->xo_xpc_type) {
-	case _XPC_TYPE_DICTIONARY:
+	if (xo->xo_xpc_type == XPC_TYPE_DICTIONARY) {
 		sbuf_printf(sbuf, "\n");
 		xpc_dictionary_apply(xo, ^(const char *k, xpc_object_t v) {
 			sbuf_printf(sbuf, "%*s\"%s\": ", level * 4, " ", k);
 			xpc_copy_description_level(v, sbuf, level + 1);
 			return ((bool)true);
 		});
-		break;
-
-	case _XPC_TYPE_ARRAY:
+	} else if (xo->xo_xpc_type == XPC_TYPE_ARRAY) {
 		sbuf_printf(sbuf, "\n");
 		xpc_array_apply(xo, ^(size_t idx, xpc_object_t v) {
 			sbuf_printf(sbuf, "%*s%ld: ", level * 4, " ", idx);
 			xpc_copy_description_level(v, sbuf, level + 1);
 			return ((bool)true);
 		});
-		break;
-
-	case _XPC_TYPE_BOOL:
-		sbuf_printf(sbuf, "%s\n",
-		    xpc_bool_get_value(obj) ? "true" : "false");
-		break;
-
-	case _XPC_TYPE_STRING:
-		sbuf_printf(sbuf, "\"%s\"\n",
-		    xpc_string_get_string_ptr(obj));
-		break;
-
-	case _XPC_TYPE_INT64:
-		sbuf_printf(sbuf, "%lld\n",
-		    xpc_int64_get_value(obj));
-		break;
-
-	case _XPC_TYPE_UINT64:
-		sbuf_printf(sbuf, "0x%llx\n",
-		    xpc_uint64_get_value(obj));
-		break;
-
-	case _XPC_TYPE_DATE:
-		sbuf_printf(sbuf, "%llu\n",
-		    xpc_date_get_value(obj));
-		break;	
-
-	case _XPC_TYPE_UUID:
+	} else if (xo->xo_xpc_type == XPC_TYPE_BOOL) {
+		sbuf_printf(sbuf, "%s\n", xpc_bool_get_value(obj) ? "true" : "false");
+	} else if (xo->xo_xpc_type == XPC_TYPE_STRING) {
+		sbuf_printf(sbuf, "\"%s\"\n", xpc_string_get_string_ptr(obj));
+	} else if (xo->xo_xpc_type == XPC_TYPE_INT64) {
+		sbuf_printf(sbuf, "0x%llX\n", xpc_int64_get_value(obj));
+	} else if (xo->xo_xpc_type == XPC_TYPE_UINT64) {
+		sbuf_printf(sbuf, "0x%llX\n", xpc_uint64_get_value(obj));
+	} else if (xo->xo_xpc_type == XPC_TYPE_DATE) {
+		sbuf_printf(sbuf, "%llu\n", xpc_date_get_value(obj));
+	} else if (xo->xo_xpc_type == XPC_TYPE_UUID) {
+		uuid_t id;
+		uuid_string_t uuid_str;
 		memcpy(id, xpc_uuid_get_bytes(obj), sizeof(uuid_t));
 		uuid_unparse_upper(id, uuid_str);
 		sbuf_printf(sbuf, "%s\n", uuid_str);
 		free(uuid_str);
-		break;
-
-	case _XPC_TYPE_ENDPOINT:
+	} else if (xo->xo_xpc_type == XPC_TYPE_ENDPOINT) {
 		sbuf_printf(sbuf, "<%lld>\n", xo->xo_int);
-		break;
-
-	case _XPC_TYPE_NULL:
+	} else if (xo->xo_xpc_type == XPC_TYPE_NULL) {
 		sbuf_printf(sbuf, "<null>\n");
-		break;
+	} else {
+		xpc_api_misuse("Unknown XPC type");
 	}
 }
 
@@ -275,19 +252,20 @@ struct _launch_data {
 	};
 };
 
-static uint8_t ld_to_xpc_type[] = {
-	_XPC_TYPE_INVALID,
-	_XPC_TYPE_DICTIONARY,
-	_XPC_TYPE_ARRAY,
-	_XPC_TYPE_FD,
-	_XPC_TYPE_UINT64,
-	_XPC_TYPE_DOUBLE,
-	_XPC_TYPE_BOOL,
-	_XPC_TYPE_STRING,
-	_XPC_TYPE_DATA,
-	_XPC_TYPE_ERROR,
-	_XPC_TYPE_ENDPOINT
-};
+static xpc_type_t ld_to_xpc_type(uint64_t ld) {
+	if (ld == 0) return _XPC_TYPE_INVALID;
+	else if (ld == 1) return XPC_TYPE_DICTIONARY;
+	else if (ld == 2) return XPC_TYPE_ARRAY;
+	else if (ld == 3) return XPC_TYPE_FD;
+	else if (ld == 4) return XPC_TYPE_UINT64;
+	else if (ld == 5) return XPC_TYPE_DOUBLE;
+	else if (ld == 6) return XPC_TYPE_BOOL;
+	else if (ld == 7) return XPC_TYPE_STRING;
+	else if (ld == 8) return XPC_TYPE_DATA;
+	else if (ld == 9) return XPC_TYPE_ERROR;
+	else if (ld == 10) return XPC_TYPE_ENDPOINT;
+	else xpc_api_misuse("Unknown launch_data_t type");
+}
 	
 xpc_object_t
 ld2xpc(launch_data_t ld)
@@ -301,17 +279,17 @@ ld2xpc(launch_data_t ld)
 	if (ld->type == LAUNCH_DATA_STRING || ld->type == LAUNCH_DATA_OPAQUE) {
 		val.str = malloc(ld->string_len);
 		memcpy(__DECONST(void *, val.str), ld->string, ld->string_len);
-		xo = _xpc_prim_create(ld_to_xpc_type[ld->type], val, ld->string_len);
+		xo = _xpc_prim_create(ld_to_xpc_type(ld->type), val, ld->string_len);
 	} else if (ld->type == LAUNCH_DATA_BOOL) {
 		val.b = (bool)ld->boolean;
-		xo = _xpc_prim_create(ld_to_xpc_type[ld->type], val, 0);
+		xo = _xpc_prim_create(ld_to_xpc_type(ld->type), val, 0);
 	} else if (ld->type == LAUNCH_DATA_ARRAY) {
 		xo = xpc_array_create(NULL, 0);
 		for (uint64_t i = 0; i < ld->_array_cnt; i++)
 			xpc_array_append_value(xo, ld2xpc(ld->_array[i]));
 	} else {
 		val.ui = ld->mp;
-		xo = _xpc_prim_create(ld_to_xpc_type[ld->type], val, ld->string_len);	
+		xo = _xpc_prim_create(ld_to_xpc_type(ld->type), val, ld->string_len);	
 	}
 	return (xo);
 }
@@ -322,7 +300,7 @@ xpc_copy_entitlement_for_token(const char *key __unused, audit_token_t *token __
 	xpc_u val;
 
 	val.b = true;
-	return (_xpc_prim_create(_XPC_TYPE_BOOL, val,0));
+	return (_xpc_prim_create(XPC_TYPE_BOOL, val,0));
 }
 
 extern kern_return_t
@@ -340,7 +318,7 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	int err;
 
 	xo = xobj;
-	xpc_assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
+	xpc_assert(xo->xo_xpc_type == XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
 	nvlist_t *nvlist = xpc2nv(xobj);
 	if (nvlist == NULL)
 		return (EINVAL);
@@ -388,7 +366,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	int err;
 
 	xo = xobj;
-	xpc_assert(xo->xo_xpc_type == _XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
+	xpc_assert(xo->xo_xpc_type == XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
 
 	nvlist_t *nvl = xpc2nv(xo);
 	size = nvlist_size(nvl);

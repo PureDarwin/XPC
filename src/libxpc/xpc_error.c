@@ -47,7 +47,7 @@ struct _xpc_dictionary_s {
 const struct _xpc_dictionary_s _xpc_error_connection_interrupted;
 
 static const struct xpc_object _xpc_error_connection_interrupted_val = {
-	.xo_xpc_type = _XPC_TYPE_STRING,
+	.xo_xpc_type = XPC_TYPE_STRING,
 	.xo_size = 22,		/* strlen("Connection interrupted") */
 	.xo_refcnt = 1,
 	.xo_u = {
@@ -66,7 +66,7 @@ static const struct xpc_dict_pair _xpc_error_connection_interrupted_pair = {
 
 const struct _xpc_dictionary_s _xpc_error_connection_interrupted = {
 	.inner = {
-		.xo_xpc_type = _XPC_TYPE_DICTIONARY,
+		.xo_xpc_type = XPC_TYPE_DICTIONARY,
 		.xo_size = 1,
 		.xo_refcnt = 1,
 		.xo_u = {
@@ -83,7 +83,7 @@ const struct _xpc_dictionary_s _xpc_error_connection_interrupted = {
 const struct _xpc_dictionary_s _xpc_error_connection_invalid;
 
 static const struct xpc_object _xpc_error_connection_invalid_val = {
-	.xo_xpc_type = _XPC_TYPE_STRING,
+	.xo_xpc_type = XPC_TYPE_STRING,
 	.xo_size = 18,		/* strlen("Connection invalid") */
 	.xo_refcnt = 1,
 	.xo_u = {
@@ -102,7 +102,7 @@ static const struct xpc_dict_pair _xpc_error_connection_invalid_pair = {
 
 const struct _xpc_dictionary_s _xpc_error_connection_invalid = {
 	.inner = {
-		.xo_xpc_type = _XPC_TYPE_DICTIONARY,
+		.xo_xpc_type = XPC_TYPE_DICTIONARY,
 		.xo_size = 1,
 		.xo_refcnt = 1,
 		.xo_u = {
@@ -119,7 +119,7 @@ const struct _xpc_dictionary_s _xpc_error_connection_invalid = {
 const struct _xpc_dictionary_s _xpc_error_termination_imminent;
 
 static const struct xpc_object _xpc_error_termination_imminent_val = {
-	.xo_xpc_type = _XPC_TYPE_STRING,
+	.xo_xpc_type = XPC_TYPE_STRING,
 	.xo_size = 20,		/* strlen("Termination imminent") */
 	.xo_refcnt = 1,
 	.xo_u = {
@@ -138,7 +138,7 @@ static const struct xpc_dict_pair _xpc_error_termination_imminent_pair = {
 
 const struct _xpc_dictionary_s _xpc_error_termination_imminent = {
 	.inner = {
-		.xo_xpc_type = _XPC_TYPE_DICTIONARY,
+		.xo_xpc_type = XPC_TYPE_DICTIONARY,
 		.xo_size = 1,
 		.xo_refcnt = 1,
 		.xo_u = {
