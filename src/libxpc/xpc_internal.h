@@ -152,6 +152,7 @@ __private_extern__ int xpc_pipe_send(xpc_object_t obj, mach_port_t dst,
 __private_extern__ int xpc_pipe_receive(mach_port_t local, mach_port_t *remote,
     xpc_object_t *result, uint64_t *id);
 __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((noreturn, format(printf, 1, 2)));
+__private_extern__ void xpc_dictionary_set_value_nokeycheck(xpc_object_t xdict, const char *key, xpc_object_t value);
 
 #define xpc_precondition(cond, message, ...) \
 	do { if (!(cond)) xpc_api_misuse("Bug in client of libxpc: " message, ##__VA_ARGS__); } while (0)
