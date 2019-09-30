@@ -31,7 +31,7 @@
 #include "xpc_internal.h"
 #include <assert.h>
 
-#define NVLIST_KEY_PREFIX       "__XPC_IMPL$"
+#define XPC_RESERVED_KEY_PREFIX "__XPC_IMPL$"
 #define NVLIST_XPC_TYPE         "__XPC_IMPL$ Object Type"
 
 static void xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value);
@@ -348,7 +348,7 @@ xpc_dictionary_set_value(xpc_object_t xdict, const char *key, xpc_object_t value
 	struct xpc_dict_head *head;
 	struct xpc_dict_pair *pair;
 
-	bool is_reserved_key = strncmp(key, NVLIST_XPC_TYPE, strlen(NVLIST_XPC_TYPE)) == 0;
+	bool is_reserved_key = strncmp(key, XPC_RESERVED_KEY_PREFIX, strlen(XPC_RESERVED_KEY_PREFIX)) == 0;
 	xpc_precondition(!is_reserved_key, "Cannot add key %s to dictionary, as it is reserved for internal use", key);
 
 	xpc_assert_nonnull(xdict);
