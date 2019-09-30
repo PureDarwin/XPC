@@ -31,7 +31,6 @@
 #include "xpc_internal.h"
 #include <assert.h>
 
-#define XPC_RESERVED_KEY_PREFIX "__XPC_IMPL$"
 #define NVLIST_XPC_TYPE         "__XPC_IMPL$ Object Type"
 
 static void xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value);

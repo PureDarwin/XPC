@@ -44,6 +44,7 @@
 		os_release(logger); \
 	} while(0);
 
+#define XPC_RESERVED_KEY_PREFIX "__XPC_IMPL$"
 #define	XPC_SEQID	"XPC sequence number"
 #define	XPC_RPORT	"XPC remote port"
 
