@@ -45,8 +45,8 @@
 	} while(0);
 
 #define XPC_RESERVED_KEY_PREFIX "__XPC_IMPL$"
-#define	XPC_SEQID	"XPC sequence number"
-#define	XPC_RPORT	"XPC remote port"
+#define	XPC_SEQID	XPC_RESERVED_KEY_PREFIX "sequence number"
+#define	XPC_RPORT	XPC_RESERVED_KEY_PREFIX "remote port"
 
 #define _XPC_TYPE_INVALID (&_xpc_type_int64)
 __XNU_PRIVATE_EXTERN extern XPC_TYPE(_xpc_type_invalid);

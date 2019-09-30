@@ -459,8 +459,22 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	xo->xo_audit_token = malloc(sizeof(*auditp));
 	memcpy(xo->xo_audit_token, auditp, sizeof(*auditp));
 
-	xpc_dictionary_set_mach_send(xo, XPC_RPORT, request->msgh_remote_port);
-	xpc_dictionary_set_uint64(xo, XPC_SEQID, message.id);
+	{
+		struct xpc_object *xotmp;
+		xpc_u val;
+
+		val.port = request->msgh_remote_port;
+		xotmp = _xpc_prim_create(XPC_TYPE_ENDPOINT, val, 0);
+
+		xpc_dictionary_set_value_nokeycheck(xo, XPC_RPORT, xotmp);
+		xpc_release(xotmp);
+	}
+	{
+		xpc_object_t xotmp = xpc_uint64_create(message.id);
+		xpc_dictionary_set_value_nokeycheck(xo, XPC_SEQID, xotmp);
+		xpc_release(xotmp);
+	}
+
 	xo->xo_flags |= _XPC_FROM_WIRE;
 	*result = xo;
 	return (0);
