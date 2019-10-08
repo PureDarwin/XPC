@@ -33,7 +33,6 @@
 
 
 #include <queue.h> // to get TAILQ_HEAD()
-#include "xpc_internal.h" // to get xpc_array_head
 
 
 
