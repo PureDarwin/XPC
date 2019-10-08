@@ -29,6 +29,7 @@
 #define	_LIBXPC_XPC_INTERNAL_H
 
 #include "nv.h"
+#include <os/log.h>
 
 
 #include <queue.h> // to get TAILQ_HEAD()
@@ -36,12 +37,12 @@
 
 
 
-#define debugf(...) 				\
-    do { 					\
-    	fprintf(stderr, "%s: ", __func__);	\
-    	fprintf(stderr, __VA_ARGS__);		\
-    	fprintf(stderr, "\n");			\
-    } while(0);
+#define debugf(msg, ...) \
+	do { \
+		os_log_t logger = os_log_create("org.puredarwin.libxpc", "Debug"); \
+		os_log(logger, msg, ##__VA_ARGS__); \
+		os_release(logger); \
+	} while(0);
 
 #define	XPC_SEQID	"XPC sequence number"
 #define	XPC_RPORT	"XPC remote port"
