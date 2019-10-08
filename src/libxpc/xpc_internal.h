@@ -48,7 +48,7 @@
 #define	XPC_SEQID	XPC_RESERVED_KEY_PREFIX "sequence number"
 #define	XPC_RPORT	XPC_RESERVED_KEY_PREFIX "remote port"
 
-#define _XPC_TYPE_INVALID (&_xpc_type_int64)
+#define _XPC_TYPE_INVALID (&_xpc_type_invalid)
 __XNU_PRIVATE_EXTERN extern XPC_TYPE(_xpc_type_invalid);
 
 struct xpc_object;
