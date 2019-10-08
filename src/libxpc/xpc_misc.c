@@ -42,8 +42,15 @@ struct xpc_message {
 	mach_msg_header_t header;
 	mach_msg_body_t body;
 	mach_msg_ool_descriptor_t ool_data;
+	mach_msg_ool_ports_descriptor_t ool_ports;
 	uint64_t id;
 	mach_msg_trailer_t trailer;
+};
+
+struct xpc_port_set {
+	mach_port_t *buffer;
+	int64_t buffer_size;
+	int64_t port_count;
 };
 
 static void xpc_copy_description_level(xpc_object_t obj, struct sbuf *sbuf, int level);
@@ -305,9 +312,26 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	kern_return_t kr;
 	int err;
 
+	__block struct xpc_port_set port_set;
+	port_set.buffer = calloc(16, sizeof(mach_port_t));
+	port_set.buffer_size = 16;
+	port_set.port_count = 0;
+
 	xo = xobj;
 	xpc_assert(xo->xo_xpc_type == XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
-	nvlist_t *nvlist = xpc2nv(xobj);
+
+	nvlist_t *nvlist = xpc2nv(xobj, ^(mach_port_t port) {
+		int64_t port_index = port_set.port_count++;
+
+		if (port_index > port_set.buffer_size) {
+			port_set.buffer_size *= 2;
+			port_set.buffer = realloc(port_set.buffer, port_set.buffer_size * sizeof(mach_port_t));
+		}
+
+		port_set.buffer[port_index] = port;
+		return port_index;
+	});
+
 	if (nvlist == NULL)
 		return (EINVAL);
 	size = nvlist_size(nvlist);
@@ -340,8 +364,18 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 		MACH_MSG_OOL_DESCRIPTOR // descriptor
 	};
 
-	message->body.msgh_descriptor_count = 1;
+	const mach_msg_ool_ports_descriptor_t ool_ports = {
+		port_set.buffer,
+		port_set.port_count * sizeof(mach_port_t),
+		FALSE,
+		MACH_MSG_VIRTUAL_COPY,
+		MACH_MSG_TYPE_MAKE_SEND,
+		MACH_MSG_OOL_PORTS_DESCRIPTOR
+	};
+
+	message->body.msgh_descriptor_count = 2;
 	message->ool_data = ool_data;
+	message->ool_ports = ool_ports;
 
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS)
@@ -350,6 +384,7 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 		err = 0;
 	free(message);
 	free(packed);
+	free(port_set.buffer);
 	nvlist_destroy(nvlist);
 	return (err);
 }
@@ -364,10 +399,26 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	kern_return_t kr;
 	int err;
 
+	__block struct xpc_port_set port_set;
+	port_set.buffer = calloc(16, sizeof(mach_port_t));
+	port_set.buffer_size = 16;
+	port_set.port_count = 0;
+
 	xo = xobj;
 	xpc_assert(xo->xo_xpc_type == XPC_TYPE_DICTIONARY, "xpc_object_t not of %s type", "dictionary");
 
-	nvlist_t *nvl = xpc2nv(xo);
+	nvlist_t *nvl = xpc2nv(xobj, ^(mach_port_t port) {
+		int64_t port_index = port_set.port_count++;
+
+		if (port_index > port_set.buffer_size) {
+			port_set.buffer_size *= 2;
+			port_set.buffer = realloc(port_set.buffer, port_set.buffer_size * sizeof(mach_port_t));
+		}
+
+		port_set.buffer[port_index] = port;
+		return port_index;
+	});
+
 	size = nvlist_size(nvl);
 
 	msg_size = __DARWIN_ALIGN(sizeof(struct xpc_message));
@@ -398,8 +449,18 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 		MACH_MSG_OOL_DESCRIPTOR // descriptor
 	};
 
-	message->body.msgh_descriptor_count = 1;
+	const mach_msg_ool_ports_descriptor_t ool_ports = {
+		port_set.buffer,
+		port_set.port_count * sizeof(mach_port_t),
+		FALSE,
+		MACH_MSG_VIRTUAL_COPY,
+		MACH_MSG_TYPE_MAKE_SEND,
+		MACH_MSG_OOL_PORTS_DESCRIPTOR
+	};
+
+	message->body.msgh_descriptor_count = 2;
 	message->ool_data = ool_data;
+	message->ool_ports =  ool_ports;
 
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS) {
@@ -409,6 +470,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 		err = 0;
 	free(packed);
 	free(message);
+	free(port_set.buffer);
 	nvlist_destroy(nvl);
 	return (err);
 }
@@ -443,7 +505,10 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	debugf("unpacking data_size=%zu", data_size);
 
 	nvlist_t *nv = nvlist_unpack(&message.ool_data.address, data_size);
-	xo = nv2xpc(nv);
+	xo = nv2xpc(nv, ^(int64_t port_index) {
+		mach_port_t *ports = message.ool_ports.address;
+		return ports[port_index];
+	});
 	nvlist_destroy(nv);
 
 	mig_deallocate((vm_address_t)message.ool_data.address, message.ool_data.size);
@@ -517,7 +582,10 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 	debugf("unpacking data_size=%d", data_size);
 
 	nvlist_t *nvlist = nvlist_unpack(&message.ool_data.address, data_size);
-	xo = nv2xpc(nvlist);
+	xo = nv2xpc(nvlist, ^(int64_t port_index) {
+		mach_port_t *ports = message.ool_ports.address;
+		return ports[port_index];
+	});
 	nvlist_destroy(nvlist);
 
 	mig_deallocate((vm_address_t)message.ool_data.address, message.ool_data.size);

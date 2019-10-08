@@ -144,8 +144,8 @@ __private_extern__ struct xpc_object *_xpc_prim_create(xpc_type_t type, xpc_u va
 __private_extern__ struct xpc_object *_xpc_prim_create_flags(xpc_type_t type,
     xpc_u value, size_t size, uint16_t flags);
 __private_extern__ const char *_xpc_get_type_name(xpc_object_t obj);
-__private_extern__ struct xpc_object *nv2xpc(const nvlist_t *nv);
-__private_extern__ nvlist_t *xpc2nv(struct xpc_object *xo);
+__private_extern__ struct xpc_object *nv2xpc(const nvlist_t *nv, mach_port_t (^port_deserializer)(int64_t port_id));
+__private_extern__ nvlist_t *xpc2nv(struct xpc_object *xo, int64_t (^port_serializer)(mach_port_t port));
 __private_extern__ void xpc_object_destroy(struct xpc_object *xo);
 __private_extern__ int xpc_pipe_send(xpc_object_t obj, mach_port_t dst,
     mach_port_t local, uint64_t id);

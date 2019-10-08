@@ -32,8 +32,9 @@
 #include <assert.h>
 
 #define NVLIST_XPC_TYPE         XPC_RESERVED_KEY_PREFIX "object type"
+#define NVLIST_PORT_INDEX		XPC_RESERVED_KEY_PREFIX "port index"
 
-static void xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value);
+static void xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value, int64_t (^port_serializer)(mach_port_t port));
 
 __private_extern__ void
 nv_release_entry(nvlist_t *nv, const char *key)
@@ -47,7 +48,7 @@ nv_release_entry(nvlist_t *nv, const char *key)
 }
 
 struct xpc_object *
-nv2xpc(const nvlist_t *nv)
+nv2xpc(const nvlist_t *nv, mach_port_t (^port_deserializer)(int64_t port_id))
 {
 	struct xpc_object *xo = NULL, *xotmp = NULL;
 	void *cookiep;
@@ -64,13 +65,16 @@ nv2xpc(const nvlist_t *nv)
 			const char *type = nvlist_get_string(nv, NVLIST_XPC_TYPE);
 
 			if (strcmp(type, "connection") == 0) {
-				val.i = nvlist_get_int64(nv, "connection");
+				int64_t port_id = nvlist_get_int64(nv, NVLIST_PORT_INDEX);
+				val.port = port_deserializer(port_id);
 				return _xpc_prim_create(XPC_TYPE_CONNECTION, val, 0);
 			} else if (strcmp(type, "endpoint") == 0) {
-				val.i = nvlist_get_int64(nv, "endpoint");
+				int64_t port_id = nvlist_get_int64(nv, NVLIST_PORT_INDEX);
+				val.port = port_deserializer(port_id);
 				return _xpc_prim_create(XPC_TYPE_ENDPOINT, val, 0);
 			} else if (strcmp(type, "fileport") == 0) {
-				val.port = nvlist_get_int64(nv, "fileport");
+				int64_t port_id = nvlist_get_int64(nv, NVLIST_PORT_INDEX);
+				val.port = port_deserializer(port_id);
 				return _xpc_prim_create(XPC_TYPE_FD, val, 0);
 			} else if (strcmp(type, "date") == 0) {
 				return xpc_date_create(nvlist_get_int64(nv, "date"));
@@ -132,12 +136,12 @@ nv2xpc(const nvlist_t *nv)
 
 		case NV_TYPE_NVLIST_ARRAY:
 			nvtmp = nvlist_get_nvlist_array(nv, key);
-			xotmp = nv2xpc(nvtmp);
+			xotmp = nv2xpc(nvtmp, port_deserializer);
 			break;
 
 		case NV_TYPE_NVLIST_DICTIONARY:
 			nvtmp = nvlist_get_nvlist_dictionary(nv, key);
-			xotmp = nv2xpc(nvtmp);
+			xotmp = nv2xpc(nvtmp, port_deserializer);
 			break;
 		}
 
@@ -154,15 +158,15 @@ nv2xpc(const nvlist_t *nv)
 }
 
 static void
-xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
+xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value, int64_t (^port_serializer)(mach_port_t port))
 {
 	struct xpc_object *xotmp = value;
 	nvlist_t *inner_nv;
 
 	if (xotmp->xo_xpc_type == XPC_TYPE_DICTIONARY) {
-		nvlist_add_nvlist_dictionary(nv, key, xpc2nv(xotmp));
+		nvlist_add_nvlist_dictionary(nv, key, xpc2nv(xotmp, port_serializer));
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_ARRAY) {
-		nvlist_add_nvlist_array(nv, key, xpc2nv(xotmp));
+		nvlist_add_nvlist_array(nv, key, xpc2nv(xotmp, port_serializer));
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_BOOL) {
 		nvlist_add_bool(nv, key, xpc_bool_get_value(xotmp));
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_CONNECTION) {
@@ -196,7 +200,7 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_FD) {
 		inner_nv = nvlist_create_dictionary(0);
 		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "fileport");
-		nvlist_add_int64(inner_nv, "fileport", xotmp->xo_port);
+		nvlist_add_int64(inner_nv, NVLIST_PORT_INDEX, port_serializer(xotmp->xo_port));
 		nvlist_add_nvlist(nv, key, inner_nv);
 		nvlist_destroy(inner_nv);
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_SHMEM) {
@@ -215,7 +219,7 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value)
 }
 
 nvlist_t *
-xpc2nv(struct xpc_object *xo)
+xpc2nv(struct xpc_object *xo, int64_t (^port_serializer)(mach_port_t port))
 {
 	nvlist_t *nv;
 	struct xpc_object *xotmp;
@@ -224,7 +228,7 @@ xpc2nv(struct xpc_object *xo)
 		nv = nvlist_create_dictionary(0);
 		printf("nv = %p\n", nv);
 		xpc_dictionary_apply(xo, ^(const char *k, xpc_object_t v) {
-			xpc2nv_primitive(nv, k, v);
+			xpc2nv_primitive(nv, k, v, port_serializer);
 			return ((bool)true);
 		});
 
@@ -236,7 +240,7 @@ xpc2nv(struct xpc_object *xo)
 		nv = nvlist_create_array(0);
 		xpc_array_apply(xo, ^(size_t index, xpc_object_t v) {
 			asprintf(&key, "%ld", index);
-			xpc2nv_primitive(nv, key, v);
+			xpc2nv_primitive(nv, key, v, port_serializer);
 			free(key);
 			return ((bool)true);
 		});
