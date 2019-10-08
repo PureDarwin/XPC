@@ -506,6 +506,7 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 
 	nvlist_t *nv = nvlist_unpack(&message.ool_data.address, data_size);
 	xo = nv2xpc(nv, ^(int64_t port_index) {
+		xpc_assert(port_index <= message.ool_ports.count / sizeof(mach_port_t), "Port index greater than number of ports in buffer");
 		mach_port_t *ports = message.ool_ports.address;
 		return ports[port_index];
 	});
@@ -583,6 +584,7 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 
 	nvlist_t *nvlist = nvlist_unpack(&message.ool_data.address, data_size);
 	xo = nv2xpc(nvlist, ^(int64_t port_index) {
+		xpc_assert(port_index <= message.ool_ports.count / sizeof(mach_port_t), "Port index greater than number of ports in buffer");
 		mach_port_t *ports = message.ool_ports.address;
 		return ports[port_index];
 	});
