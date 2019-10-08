@@ -1073,6 +1073,7 @@
 				OTHER_LDFLAGS = "-lbsm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/headers/System/Library/Frameworks";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/usr/include";
 			};
 			name = Debug;
@@ -1104,6 +1105,7 @@
 				OTHER_LDFLAGS = "-lbsm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/headers/System/Library/Frameworks";
 				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/usr/include";
 			};
 			name = Release;
