@@ -42,7 +42,6 @@ struct xpc_message {
 	mach_msg_header_t header;
 	mach_msg_body_t body;
 	mach_msg_ool_descriptor_t ool_data;
-	size_t size;
 	uint64_t id;
 	mach_msg_trailer_t trailer;
 };
@@ -329,7 +328,6 @@ xpc_pipe_routine_reply(xpc_object_t xobj)
 	message->header.msgh_remote_port = xpc_dictionary_copy_mach_send(xobj, XPC_RPORT);
 	xpc_assert(message->header.msgh_remote_port != MACH_PORT_NULL, "'%s' key not found in reply", XPC_RPORT);
 	message->header.msgh_local_port = MACH_PORT_NULL;
-	message->size = size;
 	message->id = xpc_dictionary_get_uint64(xobj, XPC_SEQID);
 	xpc_assert(message->id != 0, "'%s' key not found in reply", XPC_SEQID);
 
@@ -390,7 +388,6 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 	message->header.msgh_remote_port = dst;
 	message->header.msgh_local_port = local;
 	message->id = id;
-	message->size = size;
 
 	const mach_msg_ool_descriptor_t ool_data = {
 		packed, // address
