@@ -35,6 +35,7 @@
 #include <syslog.h>
 #include <stdarg.h>
 #include <uuid/uuid.h>
+#include <stdatomic.h>
 
 #include "xpc_internal.h"
 
@@ -118,8 +119,7 @@ xpc_retain(xpc_object_t obj)
 		// Don't change the reference count of statically compiled objects.
 		return obj;
 
-	//atomic_add_int(&xo->xo_refcnt, 1); _sjc_ removed because linker couldn't find atomic_add_int()
-	xo->xo_refcnt++;
+	atomic_fetch_add(&xo->xo_refcnt, 1);
 	return (obj);
 }
 
@@ -133,7 +133,8 @@ xpc_release(xpc_object_t obj)
 		// Don't change the reference count of statically compiled objects.
 		return;
 
-	if ( --(xo->xo_refcnt) > 1 )
+	atomic_fetch_sub(&xo->xo_refcnt, 1);
+	if (xo->xo_refcnt != 0)
 		return;
 
 	xpc_object_destroy(xo);
