@@ -175,6 +175,7 @@ xpc_connection_set_event_handler(xpc_connection_t xconn,
 
 	debugf("connection=%p", xconn);
 	conn = xconn;
+	if (conn->xc_handler != NULL) Block_release(conn->xc_handler);
 	conn->xc_handler = Block_copy(handler);
 }
 
