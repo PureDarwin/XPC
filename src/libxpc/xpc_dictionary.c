@@ -341,6 +341,8 @@ xpc_dictionary_copy_mach_send(xpc_object_t xdict, const char *key)
 	struct xpc_object *xovalue = value;
 	xpc_assert_type(xovalue, XPC_TYPE_ENDPOINT);
 
+	kern_return_t kr = mach_port_insert_right(mach_task_self(), xovalue->xo_port, xovalue->xo_port, MACH_MSG_TYPE_MAKE_SEND);
+	xpc_assert(kr == KERN_SUCCESS, "mach_port_insert_right() failed");
 	return xovalue->xo_port;
 }
 
