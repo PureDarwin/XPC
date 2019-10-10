@@ -226,7 +226,7 @@ xpc2nv(struct xpc_object *xo, int64_t (^port_serializer)(mach_port_t port))
 
 	if (xo->xo_xpc_type == XPC_TYPE_DICTIONARY) {
 		nv = nvlist_create_dictionary(0);
-		printf("nv = %p\n", nv);
+		debugf("nv = %p\n", nv);
 		xpc_dictionary_apply(xo, ^(const char *k, xpc_object_t v) {
 			xpc2nv_primitive(nv, k, v, port_serializer);
 			return ((bool)true);
