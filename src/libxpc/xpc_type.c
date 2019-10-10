@@ -527,7 +527,7 @@ xpc_hash(xpc_object_t obj)
 		return (hash);
 	}
 
-    printf("end of unimplmented xpc_hash()\n");
+    debugf("xpc_hash() unimplemented for this object type");
     return 1; // _sjc_ nothing here, returned this now
 }
 
