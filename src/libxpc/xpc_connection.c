@@ -162,9 +162,7 @@ xpc_connection_set_event_handler(xpc_connection_t xconn,
 
 	debugf("connection=%p", xconn);
 	conn = xconn;
-    // _sjc_ because i'm not currently sure what should be linked to to get Block_copy()
-    printf("you hit a missing Block_copy() in libxpc\n");
-//    conn->xc_handler = (xpc_handler_t)Block_copy(handler);
+	conn->xc_handler = Block_copy(handler);
 }
 
 void
