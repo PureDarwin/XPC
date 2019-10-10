@@ -172,13 +172,13 @@ xpc2nv_primitive(nvlist_t *nv, const char *key, xpc_object_t value, int64_t (^po
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_CONNECTION) {
 		inner_nv = nvlist_create_dictionary(0);
 		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "connection");
-		nvlist_add_int64(inner_nv, "connection", xotmp->xo_port);
+		nvlist_add_int64(inner_nv, NVLIST_PORT_INDEX, port_serializer(xotmp->xo_port));
 		nvlist_add_nvlist(nv, key, inner_nv);
 		nvlist_destroy(inner_nv);
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_ENDPOINT) {
 		inner_nv = nvlist_create_dictionary(0);
 		nvlist_add_string(inner_nv, NVLIST_XPC_TYPE, "endpoint");
-		nvlist_add_int64(inner_nv, "endpoint", xotmp->xo_port);
+		nvlist_add_int64(inner_nv, NVLIST_PORT_INDEX, port_serializer(xotmp->xo_port));
 		nvlist_add_nvlist(nv, key, inner_nv);
 		nvlist_destroy(inner_nv);
 	} else if (xotmp->xo_xpc_type == XPC_TYPE_INT64) {
