@@ -415,6 +415,9 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 			port_set.buffer = realloc(port_set.buffer, port_set.buffer_size * sizeof(mach_port_t));
 		}
 
+		kern_return_t kr = mach_port_insert_right(mach_task_self(), port, port, MACH_MSG_TYPE_MAKE_SEND);
+		xpc_assert(kr == KERN_SUCCESS, "mach_port_insert_right() failed");
+
 		port_set.buffer[port_index] = port;
 		return port_index;
 	});
@@ -454,7 +457,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 		port_set.port_count * sizeof(mach_port_t),
 		FALSE,
 		MACH_MSG_VIRTUAL_COPY,
-		MACH_MSG_TYPE_MAKE_SEND,
+		MACH_MSG_TYPE_MOVE_SEND,
 		MACH_MSG_OOL_PORTS_DESCRIPTOR
 	};
 
