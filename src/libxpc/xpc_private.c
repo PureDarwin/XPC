@@ -2,6 +2,16 @@
 #include <xpc/private.h>
 #include <sys/codesign.h>
 #include <errno.h>
+#include "xpc_internal.h"
+
+os_log_t _xpc_debug_logger(void) {
+	static os_log_t logger = NULL;
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+		logger = os_log_create("org.puredarwin.libxpc", "Debug");
+	});
+	return logger;
+}
 
 int _xpc_runtime_is_app_sandboxed(void)
 {

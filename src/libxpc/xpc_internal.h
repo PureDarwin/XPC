@@ -37,11 +37,7 @@
 
 
 #define debugf(msg, ...) \
-	do { \
-		os_log_t logger = os_log_create("org.puredarwin.libxpc", "Debug"); \
-		os_log(logger, msg, ##__VA_ARGS__); \
-		os_release(logger); \
-	} while(0);
+	os_log(_xpc_debug_logger(), msg, ##__VA_ARGS__)
 
 #define XPC_RESERVED_KEY_PREFIX "__XPC_IMPL$"
 #define	XPC_SEQID	XPC_RESERVED_KEY_PREFIX "sequence number"
@@ -144,6 +140,7 @@ __private_extern__ struct xpc_object *_xpc_prim_create(xpc_type_t type, xpc_u va
 __private_extern__ struct xpc_object *_xpc_prim_create_flags(xpc_type_t type,
     xpc_u value, size_t size, uint16_t flags);
 __private_extern__ const char *_xpc_get_type_name(xpc_object_t obj);
+__private_extern__ os_log_t _xpc_debug_logger(void);
 __private_extern__ struct xpc_object *nv2xpc(const nvlist_t *nv, mach_port_t (^port_deserializer)(int64_t port_id));
 __private_extern__ nvlist_t *xpc2nv(struct xpc_object *xo, int64_t (^port_serializer)(mach_port_t port));
 __private_extern__ void xpc_object_destroy(struct xpc_object *xo);
