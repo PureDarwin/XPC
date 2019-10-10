@@ -103,6 +103,9 @@ xpc_object_destroy(struct xpc_object *xo)
 	if (xo->xo_xpc_type == XPC_TYPE_ENDPOINT)
 		mach_port_extract_right(mach_task_self(), xo->xo_port, MACH_PORT_TYPE_SEND, NULL, NULL);
 
+	if (xo->xo_xpc_type == XPC_TYPE_CONNECTION)
+		xpc_connection_destroy((xpc_connection_t)xo);
+
 	if (xo->xo_audit_token != NULL)
 		free(xo->xo_audit_token);
 

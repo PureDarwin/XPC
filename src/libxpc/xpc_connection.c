@@ -40,6 +40,16 @@
 static void xpc_connection_recv_message(void *);
 static void xpc_send(xpc_connection_t xconn, xpc_object_t message, uint64_t id);
 
+void
+xpc_connection_destroy(struct xpc_connection *xc) {
+	dispatch_release(xc->xc_send_queue);
+	dispatch_release(xc->xc_recv_queue);
+	dispatch_release(xc->xc_target_queue);
+	mach_port_deallocate(mach_task_self(), xc->xc_local_port);
+
+	if (xc->xc_handler != NULL) Block_release(xc->xc_handler);
+}
+
 xpc_connection_t
 xpc_connection_create(const char *name, dispatch_queue_t targetq)
 {
@@ -69,6 +79,7 @@ xpc_connection_create(const char *name, dispatch_queue_t targetq)
 
 	/* Create target queue */
 	conn->xc_target_queue = targetq ? targetq : dispatch_get_main_queue();
+	dispatch_retain(conn->xc_target_queue);
 
 	/* Receive queue is initially suspended */
 	dispatch_suspend(conn->xc_recv_queue);

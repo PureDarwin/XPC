@@ -145,6 +145,7 @@ __private_extern__ os_log_t _xpc_debug_logger(void);
 __private_extern__ struct xpc_object *nv2xpc(const nvlist_t *nv, mach_port_t (^port_deserializer)(int64_t port_id));
 __private_extern__ nvlist_t *xpc2nv(struct xpc_object *xo, int64_t (^port_serializer)(mach_port_t port));
 __private_extern__ void xpc_object_destroy(struct xpc_object *xo);
+__private_extern__ void xpc_connection_destroy(struct xpc_connection *xc);
 __private_extern__ int xpc_pipe_send(xpc_object_t obj, mach_port_t dst,
     mach_port_t local, uint64_t id);
 __private_extern__ int xpc_pipe_receive(mach_port_t local, mach_port_t *remote,
