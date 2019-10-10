@@ -47,12 +47,14 @@ xpc_connection_create(const char *name, dispatch_queue_t targetq)
 	char *qname;
 	struct xpc_connection *conn;
 
-	if ((conn = malloc(sizeof(struct xpc_connection))) == NULL) {
+	if ((conn = calloc(1, sizeof(struct xpc_connection))) == NULL) {
 		errno = ENOMEM;
 		return (NULL);
 	}
 
-	memset(conn, 0, sizeof(struct xpc_connection));
+	conn->xc_object.xo_xpc_type = XPC_TYPE_CONNECTION;
+	conn->xc_object.xo_refcnt = 1;
+	conn->xc_object.xo_flags = 0;
 	conn->xc_last_id = 1;
 	TAILQ_INIT(&conn->xc_peers);
 	TAILQ_INIT(&conn->xc_pending);

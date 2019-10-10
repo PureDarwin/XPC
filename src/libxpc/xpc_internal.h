@@ -94,6 +94,7 @@ struct xpc_pending_call {
 };
 
 struct xpc_connection {
+	struct xpc_object	xc_object;
 	const char *		xc_name;
 	mach_port_t		xc_remote_port;
 	mach_port_t		xc_local_port;
