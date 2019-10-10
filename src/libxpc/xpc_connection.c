@@ -164,7 +164,9 @@ xpc_connection_set_target_queue(xpc_connection_t xconn,
 
 	debugf("connection=%p", xconn);
 	conn = xconn;
-	conn->xc_target_queue = targetq;	
+	if (conn->xc_target_queue != NULL) dispatch_release(conn->xc_target_queue);
+	conn->xc_target_queue = targetq;
+	dispatch_retain(conn->xc_target_queue);
 }
 
 void
