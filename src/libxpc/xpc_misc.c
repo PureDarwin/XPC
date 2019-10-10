@@ -523,6 +523,10 @@ xpc_pipe_receive(mach_port_t local, mach_port_t *remote, xpc_object_t *result,
 	message.ool_data.address = NULL;
 	message.ool_data.size = 0;
 
+	mig_deallocate((vm_address_t)message.ool_ports.address, message.ool_ports.count * sizeof(mach_port_t));
+	message.ool_ports.address = NULL;
+	message.ool_ports.count = 0;
+
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
 	auditp = &((mach_msg_audit_trailer_t *)tr)->msgh_audit;
 
@@ -600,6 +604,10 @@ xpc_pipe_try_receive(mach_port_t portset, xpc_object_t *requestobj, mach_port_t 
 	mig_deallocate((vm_address_t)message.ool_data.address, message.ool_data.size);
 	message.ool_data.address = NULL;
 	message.ool_data.size = 0;
+
+	mig_deallocate((vm_address_t)message.ool_ports.address, message.ool_ports.count * sizeof(mach_port_t));
+	message.ool_ports.address = NULL;
+	message.ool_ports.count = 0;
 
 	/* is padding for alignment enforced in the kernel?*/
 	tr = (mach_msg_trailer_t *)(((char *)&message) + request->msgh_size);
