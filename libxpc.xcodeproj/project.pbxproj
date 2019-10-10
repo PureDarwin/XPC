@@ -990,7 +990,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/xpc;
-				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/usr/include $(inherited)";
 				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
 			};
 			name = Debug;
@@ -1041,7 +1041,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				PUBLIC_HEADERS_FOLDER_PATH = /usr/include/xpc;
-				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/** $(inherited)";
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/usr/include $(inherited)";
 				WARNING_CFLAGS = "-Wno-incompatible-pointer-types";
 			};
 			name = Release;
@@ -1073,7 +1073,8 @@
 				OTHER_LDFLAGS = "-lbsm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/headers/System/Library/Frameworks";
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/usr/include";
 			};
 			name = Debug;
 		};
@@ -1104,7 +1105,8 @@
 				OTHER_LDFLAGS = "-lbsm";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/**";
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/headers/System/Library/Frameworks";
+				SYSTEM_HEADER_SEARCH_PATHS = "${SRCROOT}/headers/usr/include";
 			};
 			name = Release;
 		};

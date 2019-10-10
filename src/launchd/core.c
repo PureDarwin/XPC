@@ -88,8 +88,8 @@
 #include <spawn.h>
 #include <spawn_private.h>
 #include <sys/spawn_internal.h>
-#include <spawn.h> // was <System/sys/spawn.h>
-#include <spawn_internal.h> // was <System/sys/spawn_internal.h>
+#include <System/sys/spawn.h>
+#include <System/sys/spawn_internal.h>
 
 #include <spawn_private.h>
 #include <time.h>
