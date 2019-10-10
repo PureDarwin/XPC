@@ -136,8 +136,9 @@ xpc_release(xpc_object_t obj)
 		// Don't change the reference count of statically compiled objects.
 		return;
 
-	atomic_fetch_sub(&xo->xo_refcnt, 1);
-	if (xo->xo_refcnt != 0)
+	// atomic_fetch_sub() works like 'xo_refcnt--', in that the *old* value is returned.
+	int refcount = atomic_fetch_sub(&xo->xo_refcnt, 1) - 1;
+	if (refcount != 0)
 		return;
 
 	xpc_object_destroy(xo);
