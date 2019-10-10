@@ -460,7 +460,7 @@ xpc_pipe_send(xpc_object_t xobj, mach_port_t dst, mach_port_t local,
 
 	message->body.msgh_descriptor_count = 2;
 	message->ool_data = ool_data;
-	message->ool_ports =  ool_ports;
+	message->ool_ports = ool_ports;
 
 	kr = mach_msg_send(&message->header);
 	if (kr != KERN_SUCCESS) {
