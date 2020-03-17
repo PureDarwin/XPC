@@ -60,10 +60,12 @@ xpc_connection_create(const char *name, dispatch_queue_t targetq)
 	/* Create send queue */
 	asprintf(&qname, "com.ixsystems.xpc.connection.sendq.%p", conn);
 	conn->xc_send_queue = dispatch_queue_create(qname, NULL);
+	free(qname);
 
 	/* Create recv queue */
 	asprintf(&qname, "com.ixsystems.xpc.connection.recvq.%p", conn);
 	conn->xc_recv_queue = dispatch_queue_create(qname, NULL);
+	free(qname);
 
 	/* Create target queue */
 	conn->xc_target_queue = targetq ? targetq : dispatch_get_main_queue();
