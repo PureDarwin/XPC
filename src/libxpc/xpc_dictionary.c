@@ -360,7 +360,12 @@ xpc_dictionary_set_value_nokeycheck(xpc_object_t xdict, const char *key, xpc_obj
 
 	TAILQ_FOREACH(pair, head, xo_link) {
 		if (!strcmp(pair->key, key)) {
-			pair->value = value;
+			if (value != NULL) {
+				pair->value = value;
+			} else {
+				TAILQ_REMOVE(head, pair, xo_link);
+			}
+
 			return;
 		}
 	}
