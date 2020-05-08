@@ -7693,11 +7693,10 @@ externalevent_setup(launch_data_t obj, const char *key, void *context)
 	 */
 	struct externalevent_iter_ctx *ctx = (struct externalevent_iter_ctx *)context;
 
-	xpc_object_t xobj = ld2xpc(obj);
-	if (xobj) {
+	if (obj) {
 		job_log(ctx->j, LOG_DEBUG, "Importing stream/event: %s/%s", ctx->sys->name, key);
-		externalevent_new(ctx->j, ctx->sys, key, xobj, 0);
-		xpc_release(xobj);
+		externalevent_new(ctx->j, ctx->sys, key, obj, 0);
+		xpc_release(obj);
 	} else {
 		job_log(ctx->j, LOG_ERR, "Could not import event for job: %s", key);
 	}
