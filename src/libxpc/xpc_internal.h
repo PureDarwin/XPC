@@ -152,6 +152,11 @@ __private_extern__ int xpc_pipe_receive(mach_port_t local, mach_port_t *remote,
     xpc_object_t *result, uint64_t *id);
 __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((noreturn, format(printf, 1, 2)));
 __private_extern__ void xpc_dictionary_set_value_nokeycheck(xpc_object_t xdict, const char *key, xpc_object_t value);
+__XNU_PRIVATE_EXTERN void xpc_int64_set_value(xpc_object_t xint, int64_t value);
+__XNU_PRIVATE_EXTERN xpc_object_t xpc_bool_create_distinct(bool value);
+__XNU_PRIVATE_EXTERN void xpc_bool_set_value(xpc_object_t xbool, bool value);
+__XNU_PRIVATE_EXTERN void xpc_double_set_value(xpc_object_t xo, double value);
+__XNU_PRIVATE_EXTERN mach_port_t xpc_object_get_machport(xpc_object_t obj);
 
 #define xpc_precondition(cond, message, ...) \
 	do { if (!(cond)) xpc_api_misuse("Bug in client of libxpc: " message, ##__VA_ARGS__); } while (0)

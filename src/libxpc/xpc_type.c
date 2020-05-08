@@ -172,6 +172,14 @@ xpc_bool_create(bool value)
 	return value ? XPC_BOOL_TRUE : XPC_BOOL_FALSE;
 }
 
+xpc_object_t
+xpc_bool_create_distinct(bool value)
+{
+	xpc_u val;
+	val.b = value;
+	return _xpc_prim_create(XPC_TYPE_BOOL, val, 1);
+}
+
 bool
 xpc_bool_get_value(xpc_object_t xbool)
 {
@@ -181,6 +189,17 @@ xpc_bool_get_value(xpc_object_t xbool)
 	xpc_assert_type(xo, XPC_TYPE_BOOL);
 
 	return (xo->xo_bool);
+}
+
+void
+xpc_bool_set_value(xpc_object_t xbool, bool value) {
+	struct xpc_object *xo = xbool;
+
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, XPC_TYPE_BOOL);
+	xpc_assert((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) == 0, "You cannot call xpc_bool_set_value() on the statically allocated xpc_bool instances");
+
+	xo->xo_bool = value;
 }
 
 xpc_object_t
@@ -201,6 +220,16 @@ xpc_int64_get_value(xpc_object_t xint)
 	xpc_assert_type(xo, XPC_TYPE_INT64);
 
 	return (xo->xo_int);
+}
+
+void
+xpc_int64_set_value(xpc_object_t xint, int64_t value) {
+	struct xpc_object *xo = xint;
+
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, XPC_TYPE_INT64);
+
+	xo->xo_int = value;
 }
 
 xpc_object_t
@@ -241,6 +270,17 @@ xpc_double_get_value(xpc_object_t xdouble)
 	xpc_assert_type(xo, XPC_TYPE_DOUBLE);
 
 	return (xo->xo_d);
+}
+
+void
+xpc_double_set_value(xpc_object_t xdouble, double value)
+{
+	struct xpc_object *xo = xdouble;
+
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, XPC_TYPE_DOUBLE);
+
+	xo->xo_d = value;
 }
 
 xpc_object_t
@@ -325,6 +365,19 @@ xpc_data_get_bytes(xpc_object_t xdata, void *buffer, size_t off, size_t length)
 	return length_to_copy;
 }
 
+void
+xpc_data_set_bytes(xpc_object_t xdata, void *buffer, size_t length)
+{
+	struct xpc_object *xo = xdata;
+
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, XPC_TYPE_DATA);
+
+	free(xo->xo_u.ptr);
+	xo->xo_u.ptr = malloc(length);
+	memcpy(xo->xo_u.ptr, buffer, length);
+}
+
 xpc_object_t
 xpc_fd_create(int fd)
 {
@@ -394,6 +447,17 @@ xpc_string_get_string_ptr(xpc_object_t xstring)
 	xpc_assert_type(xo, XPC_TYPE_STRING);
 
 	return (xo->xo_str);
+}
+
+void
+xpc_string_set_value(xpc_object_t xstring, const char *value) {
+	struct xpc_object *xo = xstring;
+
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, XPC_TYPE_STRING);
+
+	free(xo->xo_u.str);
+	xo->xo_u.str = strdup(value);
 }
 
 xpc_object_t
@@ -529,6 +593,17 @@ xpc_hash(xpc_object_t obj)
 
     debugf("xpc_hash() unimplemented for this object type");
     return 1; // _sjc_ nothing here, returned this now
+}
+
+mach_port_t
+xpc_object_get_machport(xpc_object_t object)
+{
+	struct xpc_object *xo = object;
+
+	xpc_assert_nonnull(xo);
+	xpc_assert_type(xo, XPC_TYPE_CONNECTION);
+
+	return xo->xo_u.port;
 }
 
 __private_extern__ const char *
