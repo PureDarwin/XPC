@@ -353,7 +353,12 @@ xpc_dictionary_set_value(xpc_object_t xdict, const char *key, xpc_object_t value
 
 	TAILQ_FOREACH(pair, head, xo_link) {
 		if (!strcmp(pair->key, key)) {
-			pair->value = value;
+			if (value != NULL) {
+				pair->value = value;
+			} else {
+				TAILQ_REMOVE(head, pair, xo_link);
+			}
+
 			return;
 		}
 	}
