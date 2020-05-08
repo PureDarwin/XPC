@@ -19,6 +19,5 @@ void xpc_dictionary_set_mach_recv(xpc_object_t, const char *, mach_port_t);
 void xpc_dictionary_set_mach_send(xpc_object_t, const char *, mach_port_t);
 mach_port_t xpc_dictionary_copy_mach_send(xpc_object_t, const char *);
 xpc_object_t xpc_copy_entitlements_for_pid(pid_t);
-xpc_object_t ld2xpc(launch_data_t);
 
 #endif
