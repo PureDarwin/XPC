@@ -985,6 +985,8 @@
 					"-lpthread",
 					"-lsystem_blocks",
 					"-lCrashReporterClient",
+					"-Xlinker",
+					"-upward-lsystem_trace",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/xpc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1036,6 +1038,8 @@
 					"-lpthread",
 					"-lsystem_blocks",
 					"-lCrashReporterClient",
+					"-Xlinker",
+					"-upward-lsystem_trace",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/xpc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
