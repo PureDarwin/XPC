@@ -77,7 +77,7 @@ typedef union {
 struct xpc_object {
 	xpc_type_t		xo_xpc_type;
 	uint16_t		xo_flags;
-	volatile uint32_t	xo_refcnt;
+	_Atomic(uint32_t)	xo_refcnt;
 	size_t			xo_size;
 	xpc_u			xo_u;
 	audit_token_t *		xo_audit_token;

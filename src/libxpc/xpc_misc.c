@@ -35,6 +35,7 @@
 #include <syslog.h>
 #include <stdarg.h>
 #include <uuid/uuid.h>
+#include <stdatomic.h>
 
 #include "xpc_internal.h"
 
