@@ -169,10 +169,12 @@ __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((nor
 #define xpc_assert_type(xo, type) \
 	xpc_precondition(xo->xo_xpc_type == type, "object type mismatch: Expected %s", #type);
 
+#ifndef OS_OBJECT_OBJC_CLASS_DECL
 #define OS_OBJECT_OBJC_CLASS_DECL(name) \
 	extern void *OS_OBJECT_CLASS_SYMBOL(name) \
 	asm(OS_OBJC_CLASS_RAW_SYMBOL_NAME(OS_OBJECT_CLASS(name)))
 #define OS_OBJECT_CLASS_SYMBOL(name) OS_##name##_class
 #define OS_OBJC_CLASS_RAW_SYMBOL_NAME(name) "_OBJC_CLASS_$_" OS_STRINGIFY(name)
+#endif
 
 #endif	/* _LIBXPC_XPC_INTERNAL_H */
