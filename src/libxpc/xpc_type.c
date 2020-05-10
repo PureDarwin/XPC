@@ -32,6 +32,8 @@
 #include <time.h>
 #include "xpc_internal.h"
 
+OS_OBJECT_OBJC_CLASS_DECL(xpc_object);
+
 struct _xpc_type_s {
 	const char *description;
 };
@@ -61,6 +63,7 @@ struct _xpc_bool_s {
 };
 
 const struct _xpc_bool_s _xpc_bool_true = { .object = {
+	.header = { .isa = &OS_xpc_object_class },
 	.xo_xpc_type = XPC_TYPE_BOOL,
 	.xo_size = sizeof(bool),
 	.xo_refcnt = 1,
@@ -70,6 +73,7 @@ const struct _xpc_bool_s _xpc_bool_true = { .object = {
 	}
 } };
 const struct _xpc_bool_s _xpc_bool_false = { .object = {
+	.header = { .isa = &OS_xpc_object_class },
 	.xo_xpc_type = XPC_TYPE_BOOL,
 	.xo_size = sizeof(bool),
 	.xo_refcnt = 1,
@@ -79,6 +83,7 @@ const struct _xpc_bool_s _xpc_bool_false = { .object = {
 	}
 } };
 static const struct xpc_object _xpc_null_instance = {
+	.header = { .isa = &OS_xpc_object_class },
 	.xo_xpc_type = XPC_TYPE_NULL,
 	.xo_size = 0,
 	.xo_refcnt = 1,
@@ -140,8 +145,8 @@ __private_extern__ struct xpc_object *
 _xpc_prim_create_flags(xpc_type_t type, xpc_u value, size_t size, uint16_t flags)
 {
 	struct xpc_object *xo;
-
-	if ((xo = malloc(sizeof(*xo))) == NULL)
+	xo = _os_object_alloc(OS_xpc_object_class, sizeof(struct xpc_object) - sizeof(struct xpc_object_header));
+	if (xo == NULL)
 		return (NULL);
 
 	xo->xo_size = size;

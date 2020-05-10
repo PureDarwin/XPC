@@ -40,6 +40,8 @@
 static void xpc_connection_recv_message(void *);
 static void xpc_send(xpc_connection_t xconn, xpc_object_t message, uint64_t id);
 
+OS_OBJECT_OBJC_CLASS_DECL(xpc_connection);
+
 xpc_connection_t
 xpc_connection_create(const char *name, dispatch_queue_t targetq)
 {
@@ -47,7 +49,8 @@ xpc_connection_create(const char *name, dispatch_queue_t targetq)
 	char *qname;
 	struct xpc_connection *conn;
 
-	if ((conn = malloc(sizeof(struct xpc_connection))) == NULL) {
+	conn = _os_object_alloc(OS_xpc_connection_class, sizeof(struct xpc_connection) - sizeof(struct xpc_object_header));
+	if (conn == NULL) {
 		errno = ENOMEM;
 		return (NULL);
 	}

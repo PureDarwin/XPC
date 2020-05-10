@@ -70,6 +70,7 @@
 		1F799A7A22E23309001E1F68 /* vproc.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F79932E22E232E4001E1F68 /* vproc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1FD343DD213880EE003FE9D1 /* xpc_debug.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FD343DC213880EE003FE9D1 /* xpc_debug.c */; };
 		1FD61C05213711D900A5A7BA /* xpc_entitlements_test.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */; };
+		1FEF383B2468BA680083D349 /* classes.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FEF383A2468BA540083D349 /* classes.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		1FF7B65221262AA800BE3BFB /* sys_endian.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64A21262AA800BE3BFB /* sys_endian.h */; };
 		1FF7B65321262AA800BE3BFB /* libsbuf.c in Sources */ = {isa = PBXBuildFile; fileRef = 1FF7B64B21262AA800BE3BFB /* libsbuf.c */; };
 		1FF7B65421262AA800BE3BFB /* nv.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B64C21262AA800BE3BFB /* nv.h */; };
@@ -196,6 +197,7 @@
 		1FD61BFC213711BC00A5A7BA /* xpc_entitlements_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xpc_entitlements_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FD61C04213711D900A5A7BA /* xpc_entitlements_test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = xpc_entitlements_test.c; path = tests/xpc_entitlements_test.c; sourceTree = "<group>"; };
 		1FD61C07213716D300A5A7BA /* xpc_entitlements_test.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; name = xpc_entitlements_test.entitlements; path = tests/xpc_entitlements_test.entitlements; sourceTree = "<group>"; };
+		1FEF383A2468BA540083D349 /* classes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = classes.m; path = src/libxpc/classes.m; sourceTree = "<group>"; };
 		1FF7B64521262A8400BE3BFB /* libxpc_nv.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libxpc_nv.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1FF7B64A21262AA800BE3BFB /* sys_endian.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sys_endian.h; path = src/libnv/sys_endian.h; sourceTree = "<group>"; };
 		1FF7B64B21262AA800BE3BFB /* libsbuf.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = libsbuf.c; path = src/libnv/libsbuf.c; sourceTree = "<group>"; };
@@ -315,6 +317,7 @@
 				1791F1DE205D45FD00344BA5 /* xpc_private.c */,
 				1FD343DC213880EE003FE9D1 /* xpc_debug.c */,
 				1F48936C2145F89B0060BEBE /* xpc_error.c */,
+				1FEF383A2468BA540083D349 /* classes.m */,
 			);
 			name = libxpc;
 			sourceTree = "<group>";
@@ -711,6 +714,7 @@
 				1F48936D2145F89B0060BEBE /* xpc_error.c in Sources */,
 				1791F1E2205D45FD00344BA5 /* xpc_private.c in Sources */,
 				1791F1D2205D30F100344BA5 /* libvproc.c in Sources */,
+				1FEF383B2468BA680083D349 /* classes.m in Sources */,
 				1791F1D8205D409400344BA5 /* xpc_misc.c in Sources */,
 				1791F1E3205D45FD00344BA5 /* xpc_dictionary.c in Sources */,
 				1791F1D7205D409400344BA5 /* xpc_type.c in Sources */,
@@ -987,6 +991,8 @@
 					"-lCrashReporterClient",
 					"-Xlinker",
 					"-upward-lsystem_trace",
+					"-Xlinker",
+					"-upward-lobjc",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/xpc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1040,6 +1046,8 @@
 					"-lCrashReporterClient",
 					"-Xlinker",
 					"-upward-lsystem_trace",
+					"-Xlinker",
+					"-upward-lobjc",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = /usr/local/include/xpc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
