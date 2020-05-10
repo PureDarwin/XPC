@@ -336,14 +336,11 @@ xpc_dictionary_copy_mach_send(xpc_object_t xdict, const char *key)
 }
 
 void
-xpc_dictionary_set_value(xpc_object_t xdict, const char *key, xpc_object_t value)
+xpc_dictionary_set_value_nokeycheck(xpc_object_t xdict, const char *key, xpc_object_t value)
 {
 	struct xpc_object *xo = xdict, *xotmp;
 	struct xpc_dict_head *head;
 	struct xpc_dict_pair *pair;
-
-	bool is_reserved_key = strncmp(key, NVLIST_XPC_TYPE, strlen(NVLIST_XPC_TYPE)) == 0;
-	xpc_precondition(!is_reserved_key, "Cannot add key %s to dictionary, as it is reserved for internal use", key);
 
 	xpc_assert_nonnull(xdict);
 	xpc_assert_type(xo, XPC_TYPE_DICTIONARY);
@@ -369,6 +366,14 @@ xpc_dictionary_set_value(xpc_object_t xdict, const char *key, xpc_object_t value
 	pair->value = value;
 	TAILQ_INSERT_TAIL(&xo->xo_dict, pair, xo_link);
 	xpc_retain(value);
+}
+
+void
+xpc_dictionary_set_value(xpc_object_t xdict, const char *key, xpc_object_t value) {
+	bool is_reserved_key = strncmp(key, NVLIST_XPC_TYPE, strlen(NVLIST_XPC_TYPE)) == 0;
+	xpc_precondition(!is_reserved_key, "Cannot add key %s to dictionary, as it is reserved for internal use", key);
+	xpc_dictionary_set_value_nokeycheck(xdict, key, value);
+
 }
 
 xpc_object_t

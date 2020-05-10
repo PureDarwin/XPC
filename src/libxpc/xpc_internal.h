@@ -157,6 +157,7 @@ __private_extern__ int xpc_pipe_send(xpc_object_t obj, mach_port_t dst,
     mach_port_t local, uint64_t id);
 __private_extern__ int xpc_pipe_receive(mach_port_t local, mach_port_t *remote,
     xpc_object_t *result, uint64_t *id);
+__private_extern__ void xpc_dictionary_set_value_nokeycheck(xpc_object_t xdict, const char *key, xpc_object_t value);
 __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((noreturn, format(printf, 1, 2)));
 
 #define xpc_precondition(cond, message, ...) \
@@ -168,6 +169,8 @@ __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((nor
 	xpc_precondition(xo != NULL, "Parameter cannot be NULL")
 #define xpc_assert_type(xo, type) \
 	xpc_precondition(xo->xo_xpc_type == type, "object type mismatch: Expected %s", #type);
+
+#define XPC_RESERVED_KEY_PREFIX	"__xpc_internal__:"
 
 #ifndef OS_OBJECT_OBJC_CLASS_DECL
 #define OS_OBJECT_OBJC_CLASS_DECL(name) \
