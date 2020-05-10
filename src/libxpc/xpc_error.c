@@ -20,6 +20,8 @@ along with Darling.  If not, see <http://www.gnu.org/licenses/>.
 #include "xpc/xpc.h"
 #include "xpc_internal.h"
 
+OS_OBJECT_OBJC_CLASS_DECL(xpc_object);
+
 /* The only key for XPC_ERROR_* dictionaries */
 #define _XPC_ERROR_KEY_DESCRIPTION_STR "XPCErrorDescription"
 const char *const _xpc_error_key_description = _XPC_ERROR_KEY_DESCRIPTION_STR;
@@ -47,9 +49,10 @@ struct _xpc_dictionary_s {
 const struct _xpc_dictionary_s _xpc_error_connection_interrupted;
 
 static const struct xpc_object _xpc_error_connection_interrupted_val = {
+	.header = { .isa = &OS_xpc_object_class },
+	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 	.xo_xpc_type = XPC_TYPE_STRING,
 	.xo_size = 22,		/* strlen("Connection interrupted") */
-	.xo_refcnt = 1,
 	.xo_u = {
 		.str = "Connection interrupted"
 	}
@@ -66,10 +69,10 @@ static const struct xpc_dict_pair _xpc_error_connection_interrupted_pair = {
 
 const struct _xpc_dictionary_s _xpc_error_connection_interrupted = {
 	.inner = {
+		.header = { .isa = &OS_xpc_object_class },
+		.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 		.xo_xpc_type = XPC_TYPE_DICTIONARY,
 		.xo_size = 1,
-		.xo_refcnt = 1,
-		.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 		.xo_u = {
 			.dict = {
 				.tqh_first = &_xpc_error_connection_interrupted_pair,
@@ -84,9 +87,10 @@ const struct _xpc_dictionary_s _xpc_error_connection_interrupted = {
 const struct _xpc_dictionary_s _xpc_error_connection_invalid;
 
 static const struct xpc_object _xpc_error_connection_invalid_val = {
+	.header = { .isa = &OS_xpc_object_class },
+	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 	.xo_xpc_type = XPC_TYPE_STRING,
 	.xo_size = 18,		/* strlen("Connection invalid") */
-	.xo_refcnt = 1,
 	.xo_u = {
 		.str = "Connection invalid"
 	}
@@ -103,10 +107,10 @@ static const struct xpc_dict_pair _xpc_error_connection_invalid_pair = {
 
 const struct _xpc_dictionary_s _xpc_error_connection_invalid = {
 	.inner = {
+		.header = { .isa = &OS_xpc_object_class },
+		.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 		.xo_xpc_type = XPC_TYPE_DICTIONARY,
 		.xo_size = 1,
-		.xo_refcnt = 1,
-		.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 		.xo_u = {
 			.dict = {
 				.tqh_first = &_xpc_error_connection_invalid_pair,
@@ -121,9 +125,10 @@ const struct _xpc_dictionary_s _xpc_error_connection_invalid = {
 const struct _xpc_dictionary_s _xpc_error_termination_imminent;
 
 static const struct xpc_object _xpc_error_termination_imminent_val = {
+	.header = { .isa = &OS_xpc_object_class },
+	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 	.xo_xpc_type = XPC_TYPE_STRING,
 	.xo_size = 20,		/* strlen("Termination imminent") */
-	.xo_refcnt = 1,
 	.xo_u = {
 		.str = "Termination imminent"
 	}
@@ -140,10 +145,10 @@ static const struct xpc_dict_pair _xpc_error_termination_imminent_pair = {
 
 const struct _xpc_dictionary_s _xpc_error_termination_imminent = {
 	.inner = {
+		.header = { .isa = &OS_xpc_object_class },
+		.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 		.xo_xpc_type = XPC_TYPE_DICTIONARY,
 		.xo_size = 1,
-		.xo_refcnt = 1,
-		.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 		.xo_u = {
 			.dict = {
 				.tqh_first = &_xpc_error_termination_imminent_pair,
