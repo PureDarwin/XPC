@@ -70,7 +70,6 @@ const struct _xpc_bool_s _xpc_bool_true = { .object = {
 	},
 	.xo_xpc_type = XPC_TYPE_BOOL,
 	.xo_size = sizeof(bool),
-	.xo_refcnt = 1,
 	.xo_u = {
 		.b = true
 	}
@@ -83,7 +82,6 @@ const struct _xpc_bool_s _xpc_bool_false = { .object = {
 	},
 	.xo_xpc_type = XPC_TYPE_BOOL,
 	.xo_size = sizeof(bool),
-	.xo_refcnt = 1,
 	.xo_u = {
 		.b = false
 	}
@@ -95,8 +93,7 @@ static const struct xpc_object _xpc_null_instance = {
 		.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
 	},
 	.xo_xpc_type = XPC_TYPE_NULL,
-	.xo_size = 0,
-	.xo_refcnt = 1
+	.xo_size = 0
 };
 
 static size_t xpc_data_hash(const uint8_t *data, size_t length);
@@ -162,7 +159,6 @@ _xpc_prim_create_flags(xpc_type_t type, xpc_u value, size_t size, uint16_t flags
 	xo->xo_xpc_type = type;
 	xo->xo_flags = flags;
 	xo->xo_u = value;
-	xo->xo_refcnt = 1;
 	xo->xo_audit_token = NULL;
 
 	if (type == XPC_TYPE_DICTIONARY)

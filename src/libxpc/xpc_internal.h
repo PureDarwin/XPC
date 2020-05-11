@@ -81,7 +81,6 @@ struct xpc_object {
 	struct xpc_object_header header;
 	xpc_type_t		xo_xpc_type;
 	uint16_t		xo_flags;
-	_Atomic(uint32_t)	xo_refcnt;
 	size_t			xo_size;
 	xpc_u			xo_u;
 	audit_token_t *		xo_audit_token;
