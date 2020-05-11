@@ -150,13 +150,14 @@ __private_extern__ struct xpc_object *_xpc_prim_create_flags(xpc_type_t type,
     xpc_u value, size_t size, uint16_t flags);
 __private_extern__ void xpc_object_destroy(struct xpc_object *xo);
 __private_extern__ const char *_xpc_get_type_name(xpc_object_t obj);
-__private_extern__ struct xpc_object *nv2xpc(const nvlist_t *nv);
-__private_extern__ nvlist_t *xpc2nv(struct xpc_object *xo);
+__private_extern__ nvlist_t *xpc2nv(struct xpc_object *xo, int64_t (^port_serializer)(mach_port_t port));
+__private_extern__ struct xpc_object *nv2xpc(const nvlist_t *nv, mach_port_t (^port_deserializer)(int64_t port_id));
 __private_extern__ void xpc_object_destroy(struct xpc_object *xo);
 __private_extern__ int xpc_pipe_send(xpc_object_t obj, mach_port_t dst,
     mach_port_t local, uint64_t id);
 __private_extern__ int xpc_pipe_receive(mach_port_t local, mach_port_t *remote,
     xpc_object_t *result, uint64_t *id);
+__private_extern__ void xpc_dictionary_set_value_nokeycheck(xpc_object_t xdict, const char *key, xpc_object_t value);
 __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((noreturn, format(printf, 1, 2)));
 
 #define xpc_precondition(cond, message, ...) \
@@ -169,10 +170,14 @@ __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((nor
 #define xpc_assert_type(xo, type) \
 	xpc_precondition(xo->xo_xpc_type == type, "object type mismatch: Expected %s", #type);
 
+#define XPC_RESERVED_KEY_PREFIX	"__xpc_internal__:"
+
+#ifndef OS_OBJECT_OBJC_CLASS_DECL
 #define OS_OBJECT_OBJC_CLASS_DECL(name) \
 	extern void *OS_OBJECT_CLASS_SYMBOL(name) \
 	asm(OS_OBJC_CLASS_RAW_SYMBOL_NAME(OS_OBJECT_CLASS(name)))
 #define OS_OBJECT_CLASS_SYMBOL(name) OS_##name##_class
 #define OS_OBJC_CLASS_RAW_SYMBOL_NAME(name) "_OBJC_CLASS_$_" OS_STRINGIFY(name)
+#endif
 
 #endif	/* _LIBXPC_XPC_INTERNAL_H */
