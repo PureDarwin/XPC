@@ -49,8 +49,11 @@ struct _xpc_dictionary_s {
 const struct _xpc_dictionary_s _xpc_error_connection_interrupted;
 
 static const struct xpc_object _xpc_error_connection_interrupted_val = {
-	.header = { .isa = &OS_xpc_object_class },
-	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
+	.header = {
+		.isa = &OS_xpc_object_class,
+		.ref_cnt = _OS_OBJECT_GLOBAL_REFCNT,
+		.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
+	},
 	.xo_xpc_type = XPC_TYPE_STRING,
 	.xo_size = 22,		/* strlen("Connection interrupted") */
 	.xo_u = {
@@ -69,8 +72,11 @@ static const struct xpc_dict_pair _xpc_error_connection_interrupted_pair = {
 
 const struct _xpc_dictionary_s _xpc_error_connection_interrupted = {
 	.inner = {
-		.header = { .isa = &OS_xpc_object_class },
-		.xo_flags = _XPC_STATIC_OBJECT_FLAG,
+		.header = {
+			.isa = &OS_xpc_object_class,
+			.ref_cnt = _OS_OBJECT_GLOBAL_REFCNT,
+			.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
+		},
 		.xo_xpc_type = XPC_TYPE_DICTIONARY,
 		.xo_size = 1,
 		.xo_u = {
@@ -87,8 +93,11 @@ const struct _xpc_dictionary_s _xpc_error_connection_interrupted = {
 const struct _xpc_dictionary_s _xpc_error_connection_invalid;
 
 static const struct xpc_object _xpc_error_connection_invalid_val = {
-	.header = { .isa = &OS_xpc_object_class },
-	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
+	.header = {
+		.isa = &OS_xpc_object_class,
+		.ref_cnt = _OS_OBJECT_GLOBAL_REFCNT,
+		.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
+	},
 	.xo_xpc_type = XPC_TYPE_STRING,
 	.xo_size = 18,		/* strlen("Connection invalid") */
 	.xo_u = {
@@ -107,8 +116,11 @@ static const struct xpc_dict_pair _xpc_error_connection_invalid_pair = {
 
 const struct _xpc_dictionary_s _xpc_error_connection_invalid = {
 	.inner = {
-		.header = { .isa = &OS_xpc_object_class },
-		.xo_flags = _XPC_STATIC_OBJECT_FLAG,
+		.header = {
+			.isa = &OS_xpc_object_class,
+			.ref_cnt = _OS_OBJECT_GLOBAL_REFCNT,
+			.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
+		},
 		.xo_xpc_type = XPC_TYPE_DICTIONARY,
 		.xo_size = 1,
 		.xo_u = {
@@ -125,8 +137,11 @@ const struct _xpc_dictionary_s _xpc_error_connection_invalid = {
 const struct _xpc_dictionary_s _xpc_error_termination_imminent;
 
 static const struct xpc_object _xpc_error_termination_imminent_val = {
-	.header = { .isa = &OS_xpc_object_class },
-	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
+	.header = {
+		.isa = &OS_xpc_object_class,
+		.ref_cnt = _OS_OBJECT_GLOBAL_REFCNT,
+		.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
+	},
 	.xo_xpc_type = XPC_TYPE_STRING,
 	.xo_size = 20,		/* strlen("Termination imminent") */
 	.xo_u = {
@@ -145,8 +160,11 @@ static const struct xpc_dict_pair _xpc_error_termination_imminent_pair = {
 
 const struct _xpc_dictionary_s _xpc_error_termination_imminent = {
 	.inner = {
-		.header = { .isa = &OS_xpc_object_class },
-		.xo_flags = _XPC_STATIC_OBJECT_FLAG,
+		.header = {
+			.isa = &OS_xpc_object_class,
+			.ref_cnt = _OS_OBJECT_GLOBAL_REFCNT,
+			.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
+		},
 		.xo_xpc_type = XPC_TYPE_DICTIONARY,
 		.xo_size = 1,
 		.xo_u = {

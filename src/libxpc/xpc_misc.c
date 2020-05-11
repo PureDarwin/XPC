@@ -116,26 +116,12 @@ xpc_object_destroy(struct xpc_object *xo)
 xpc_object_t
 xpc_retain(xpc_object_t obj)
 {
-	struct xpc_object *xo;
-
-	xo = obj;
-	if ((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) == _XPC_STATIC_OBJECT_FLAG)
-		// Don't change the reference count of statically compiled objects.
-		return obj;
-
 	return os_retain(obj);
 }
 
 void
 xpc_release(xpc_object_t obj)
 {
-	struct xpc_object *xo;
-	xo = obj;
-
-	if ((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) == _XPC_STATIC_OBJECT_FLAG)
-		// Don't change the reference count of statically compiled objects.
-		return;
-
 	os_release(obj);
 }
 

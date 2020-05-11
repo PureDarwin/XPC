@@ -72,7 +72,6 @@ typedef union {
 
 
 #define _XPC_FROM_WIRE 0x1
-#define _XPC_STATIC_OBJECT_FLAG 0x2
 
 struct xpc_object_header {
 	_OS_OBJECT_HEADER(const void *isa, ref_cnt, xref_cnt);
