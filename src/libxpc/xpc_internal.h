@@ -30,10 +30,10 @@
 
 #include "nv.h"
 #include <os/log.h>
+#include <os/object_private.h>
 
 
 #include <queue.h> // to get TAILQ_HEAD()
-#include "xpc_internal.h" // to get xpc_array_head
 
 
 
@@ -72,12 +72,15 @@ typedef union {
 
 
 #define _XPC_FROM_WIRE 0x1
-#define _XPC_STATIC_OBJECT_FLAG 0x2
+
+struct xpc_object_header {
+	_OS_OBJECT_HEADER(const void *isa, ref_cnt, xref_cnt);
+};
 
 struct xpc_object {
+	struct xpc_object_header header;
 	xpc_type_t		xo_xpc_type;
 	uint16_t		xo_flags;
-	_Atomic(uint32_t)	xo_refcnt;
 	size_t			xo_size;
 	xpc_u			xo_u;
 	audit_token_t *		xo_audit_token;
@@ -99,6 +102,7 @@ struct xpc_pending_call {
 };
 
 struct xpc_connection {
+	struct xpc_object_header header;
 	const char *		xc_name;
 	mach_port_t		xc_remote_port;
 	mach_port_t		xc_local_port;
@@ -144,6 +148,7 @@ __private_extern__ struct xpc_object *_xpc_prim_create(xpc_type_t type, xpc_u va
     size_t size);
 __private_extern__ struct xpc_object *_xpc_prim_create_flags(xpc_type_t type,
     xpc_u value, size_t size, uint16_t flags);
+__private_extern__ void xpc_object_destroy(struct xpc_object *xo);
 __private_extern__ const char *_xpc_get_type_name(xpc_object_t obj);
 __private_extern__ struct xpc_object *nv2xpc(const nvlist_t *nv);
 __private_extern__ nvlist_t *xpc2nv(struct xpc_object *xo);
@@ -163,5 +168,11 @@ __private_extern__ void xpc_api_misuse(const char *info, ...) __attribute__((nor
 	xpc_precondition(xo != NULL, "Parameter cannot be NULL")
 #define xpc_assert_type(xo, type) \
 	xpc_precondition(xo->xo_xpc_type == type, "object type mismatch: Expected %s", #type);
+
+#define OS_OBJECT_OBJC_CLASS_DECL(name) \
+	extern void *OS_OBJECT_CLASS_SYMBOL(name) \
+	asm(OS_OBJC_CLASS_RAW_SYMBOL_NAME(OS_OBJECT_CLASS(name)))
+#define OS_OBJECT_CLASS_SYMBOL(name) OS_##name##_class
+#define OS_OBJC_CLASS_RAW_SYMBOL_NAME(name) "_OBJC_CLASS_$_" OS_STRINGIFY(name)
 
 #endif	/* _LIBXPC_XPC_INTERNAL_H */

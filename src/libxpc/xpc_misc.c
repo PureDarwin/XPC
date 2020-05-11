@@ -111,40 +111,18 @@ xpc_object_destroy(struct xpc_object *xo)
 
 	if (xo->xo_audit_token != NULL)
 		free(xo->xo_audit_token);
-
-	free(xo);
 }
 
 xpc_object_t
 xpc_retain(xpc_object_t obj)
 {
-	struct xpc_object *xo;
-
-	xo = obj;
-	if ((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) == _XPC_STATIC_OBJECT_FLAG)
-		// Don't change the reference count of statically compiled objects.
-		return obj;
-
-	atomic_fetch_add(&xo->xo_refcnt, 1);
-	return (obj);
+	return os_retain(obj);
 }
 
 void
 xpc_release(xpc_object_t obj)
 {
-	struct xpc_object *xo;
-	xo = obj;
-
-	if ((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) == _XPC_STATIC_OBJECT_FLAG)
-		// Don't change the reference count of statically compiled objects.
-		return;
-
-	// atomic_fetch_sub() works like 'xo_refcnt--', in that the *old* value is returned.
-	int refcount = atomic_fetch_sub(&xo->xo_refcnt, 1) - 1;
-	if (refcount != 0)
-		return;
-
-	xpc_object_destroy(xo);
+	os_release(obj);
 }
 
 static const char *xpc_errors[] = {

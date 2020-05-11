@@ -32,6 +32,8 @@
 #include <time.h>
 #include "xpc_internal.h"
 
+OS_OBJECT_OBJC_CLASS_DECL(xpc_object);
+
 struct _xpc_type_s {
 	const char *description;
 };
@@ -61,28 +63,37 @@ struct _xpc_bool_s {
 };
 
 const struct _xpc_bool_s _xpc_bool_true = { .object = {
+	.header = {
+		.isa = &OS_xpc_object_class,
+		.ref_cnt = _OS_OBJECT_GLOBAL_REFCNT,
+		.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
+	},
 	.xo_xpc_type = XPC_TYPE_BOOL,
 	.xo_size = sizeof(bool),
-	.xo_refcnt = 1,
-	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 	.xo_u = {
 		.b = true
 	}
 } };
 const struct _xpc_bool_s _xpc_bool_false = { .object = {
+	.header = {
+		.isa = &OS_xpc_object_class,
+		.ref_cnt = _OS_OBJECT_GLOBAL_REFCNT,
+		.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
+	},
 	.xo_xpc_type = XPC_TYPE_BOOL,
 	.xo_size = sizeof(bool),
-	.xo_refcnt = 1,
-	.xo_flags = _XPC_STATIC_OBJECT_FLAG,
 	.xo_u = {
 		.b = false
 	}
 } };
 static const struct xpc_object _xpc_null_instance = {
+	.header = {
+		.isa = &OS_xpc_object_class,
+		.ref_cnt = _OS_OBJECT_GLOBAL_REFCNT,
+		.xref_cnt = _OS_OBJECT_GLOBAL_REFCNT
+	},
 	.xo_xpc_type = XPC_TYPE_NULL,
-	.xo_size = 0,
-	.xo_refcnt = 1,
-	.xo_flags = _XPC_STATIC_OBJECT_FLAG
+	.xo_size = 0
 };
 
 static size_t xpc_data_hash(const uint8_t *data, size_t length);
@@ -140,15 +151,14 @@ __private_extern__ struct xpc_object *
 _xpc_prim_create_flags(xpc_type_t type, xpc_u value, size_t size, uint16_t flags)
 {
 	struct xpc_object *xo;
-
-	if ((xo = malloc(sizeof(*xo))) == NULL)
+	xo = _os_object_alloc(OS_xpc_object_class, sizeof(struct xpc_object) - sizeof(struct xpc_object_header));
+	if (xo == NULL)
 		return (NULL);
 
 	xo->xo_size = size;
 	xo->xo_xpc_type = type;
 	xo->xo_flags = flags;
 	xo->xo_u = value;
-	xo->xo_refcnt = 1;
 	xo->xo_audit_token = NULL;
 
 	if (type == XPC_TYPE_DICTIONARY)
@@ -197,7 +207,7 @@ xpc_bool_set_value(xpc_object_t xbool, bool value) {
 
 	xpc_assert_nonnull(xo);
 	xpc_assert_type(xo, XPC_TYPE_BOOL);
-	xpc_assert((xo->xo_flags & _XPC_STATIC_OBJECT_FLAG) == 0, "You cannot call xpc_bool_set_value() on the statically allocated xpc_bool instances");
+	xpc_assert(xo->header.ref_cnt != _OS_OBJECT_GLOBAL_REFCNT, "You cannot call xpc_bool_set_value() on the statically allocated xpc_bool instances");
 
 	xo->xo_bool = value;
 }
