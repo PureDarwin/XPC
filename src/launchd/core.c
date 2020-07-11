@@ -27,7 +27,7 @@
 #include "core.h"
 
 #include "internal.h"
-//#include "helper.h" can we get away without this?
+#include "helper.h"
 
 #include <TargetConditionals.h>
 #include <mach/mach.h>

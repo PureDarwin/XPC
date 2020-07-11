@@ -80,6 +80,7 @@
 		1FF7B65821262AA800BE3BFB /* nvlist_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B65021262AA800BE3BFB /* nvlist_impl.h */; };
 		1FF7B65921262AA800BE3BFB /* nvpair_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FF7B65121262AA800BE3BFB /* nvpair_impl.h */; };
 		1FF7B65A21262ABD00BE3BFB /* libxpc_nv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1FF7B64521262A8400BE3BFB /* libxpc_nv.a */; };
+		1FF91E3D24BA352D0018CD6B /* helper.defs in Sources */ = {isa = PBXBuildFile; fileRef = 1791F1D3205D319600344BA5 /* helper.defs */; settings = {ATTRIBUTES = (Client, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -731,6 +732,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1FF91E3D24BA352D0018CD6B /* helper.defs in Sources */,
 				1791F1F3205D594200344BA5 /* job.defs in Sources */,
 				1791F1F6205D5A1400344BA5 /* job_forward.defs in Sources */,
 				1791F202205D5D9B00344BA5 /* mach_exc.defs in Sources */,
