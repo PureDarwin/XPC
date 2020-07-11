@@ -49,7 +49,7 @@ xpc_connection_create(const char *name, dispatch_queue_t targetq)
 	char *qname;
 	struct xpc_connection *conn;
 
-	conn = _os_object_alloc(OS_xpc_connection_class, sizeof(struct xpc_connection) - sizeof(struct xpc_object_header));
+	conn = _os_object_alloc(&OS_xpc_connection_class, sizeof(struct xpc_connection) - sizeof(struct xpc_object_header));
 	if (conn == NULL) {
 		errno = ENOMEM;
 		return (NULL);
