@@ -282,9 +282,6 @@ bootstrap_info(mach_port_t bp,
 	return vproc_mig_info(bp, service_names, service_namesCnt, service_jobs, service_jobsCnt, service_active, service_activeCnt, flags);
 }
 
-extern const char *
-mach_error_string(kern_return_t r);
-
 const char *
 bootstrap_strerror(kern_return_t r)
 {

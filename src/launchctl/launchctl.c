@@ -3512,9 +3512,6 @@ launch_data_array_append(launch_data_t a, launch_data_t o)
 	return launch_data_array_set_index(a, o, offt);
 }
 
-extern const char *
-mach_error_string(kern_return_t kr);
-
 mach_port_t
 str2bsport(const char *s)
 {
